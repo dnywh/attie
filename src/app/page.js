@@ -1,18 +1,33 @@
-import Image from "next/image";
-import Fixture from "@/components/Fixture";
+
+import FixturesClient from "@/components/FixturesClient";
 import styles from "./page.module.css";
 
-import { demoFixtures } from "@/data/demo/fixtures";
+import localMatches from "@/data/demo/local_matches.json";
 
-export default function Home() {
+
+// import { demoFixtures } from "@/data/demo/fixtures";
+
+async function getFixtures() {
+  // const response = await fetch("@/data/demo/fixtures");
+  // const data = await response.json();
+  return localMatches.matches;
+}
+
+// getFixtures().then((fixtures) => {
+//   console.log(fixtures);
+// });
+export default async function Home() {
+  const demoFixtures = await getFixtures();
+
   return (
     <div className={styles.page}>
+
+
       <main className={styles.main}>
         <h2>Fixtures</h2>
-        {demoFixtures.map((fixture) => (
-          <Fixture key={fixture.id} {...fixture} />
-        ))}
+
+        <FixturesClient fixtures={demoFixtures} />
       </main>
-    </div>
+    </div >
   );
 }

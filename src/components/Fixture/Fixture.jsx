@@ -1,21 +1,27 @@
-import TeamLogo from "@/components/TeamLogo";
+import OpponentRow from "@/components/OpponentRow";
 
-function Fixture() {
+function Fixture({ homeTeam, awayTeam, utcDate, score, showScore, ...props }) {
   return (
-    <>
-      <p>Mon, 25 Nov at 8 PM</p>
+    <li>
+      <p>{utcDate}</p>
       <p>FT</p>
       <ul>
         <li>
-          <TeamLogo />
-          Newcastle 1
+          <OpponentRow
+            team={homeTeam}
+            score={score.fullTime.home}
+            showScore={showScore}
+          />
         </li>
         <li>
-          <TeamLogo />
-          West Ham 0
+          <OpponentRow
+            team={awayTeam}
+            score={score.fullTime.away}
+            showScore={showScore}
+          />
         </li>
       </ul>
-    </>
+    </li>
   );
 }
 
