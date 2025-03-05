@@ -22,9 +22,13 @@ export default async function Home() {
   return (
     <div className={styles.page}>
 
+      <header>
+        <h1>Attie</h1>
+        <p>The anti-scores scores app.</p>
+      </header>
 
       <main className={styles.main}>
-        <h2>Fixtures</h2>
+
 
         <FixturesClient fixtures={demoFixtures} />
       </main>
