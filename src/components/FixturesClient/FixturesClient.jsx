@@ -15,6 +15,10 @@ const Main = styled("main")({
   gap: "2rem",
 });
 
+const StyledSwitch = styled(Switch)({
+  width: "100%",
+});
+
 const FixturesList = styled("ul")({
   display: "flex",
   flexDirection: "column",
@@ -98,9 +102,9 @@ export default function FixturesClient() {
             ))}
         </fieldset>
 
-        <Switch checked={showScore} onChange={setShowScore}>
+        <StyledSwitch checked={showScore} onChange={setShowScore}>
           <span>Scores {showScore ? "ON" : "OFF"}</span>
-        </Switch>
+        </StyledSwitch>
       </section>
 
       <section>

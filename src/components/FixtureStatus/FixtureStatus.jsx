@@ -27,7 +27,8 @@ const LiveStatus = styled(RegularStatus)({
 
 function FixtureStatus({ fixture }) {
   // https://docs.football-data.org/general/v4/match.html#_status_workflow_explained
-  const status = "IN_PLAY";
+  // const status = "IN_PLAY";
+  const status = fixture.status;
   // const formattedStatus = status;
 
   if (status === "IN_PLAY" || status === "PAUSED") {

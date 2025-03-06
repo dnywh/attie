@@ -8,11 +8,11 @@ const Header = styled("header")({
   textAlign: "center",
 
   "& h1": {
-    fontSize: "clamp(5rem, 14vw, 10rem)",
+    fontSize: "clamp(5rem, 20vw, 10rem)",
+    lineHeight: "100%",
   },
 
   "& p": {
-    marginTop: "-0.75rem",
     fontSize: "clamp(1.5rem, 5vw, 2rem)",
     textWrap: "balance",
     lineHeight: "120%",

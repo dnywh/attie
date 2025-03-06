@@ -1,4 +1,4 @@
-import "./globals.css";
+// import "./globals.css";
 import { globalCss, styled } from "@pigment-css/react";
 import '@pigment-css/react/styles.css';
 
@@ -64,7 +64,7 @@ ul, ol {
 `
 
 const Body = styled("body")({
-  padding: "1rem",
+  padding: "2rem 1rem",
   maxWidth: "40rem",
   margin: "0 auto",
   display: "flex",
