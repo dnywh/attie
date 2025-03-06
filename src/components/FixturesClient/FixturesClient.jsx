@@ -50,59 +50,51 @@ export default function FixturesClient() {
 
   return (
     <>
-      <fieldset>
-        <legend>Leagues:</legend>
-        <div>
-          <input
-            type="checkbox"
-            id="premier-league"
-            name="premier-league"
-            checked={selectedLeagues.includes("premier-league")}
-            onChange={handleLeagueChange}
-          />
-          <label htmlFor="premier-league">Premier League</label>
-        </div>
-        <div>
-          <input
-            type="checkbox"
-            id="champions-league"
-            name="champions-league"
-            checked={selectedLeagues.includes("champions-league")}
-            onChange={handleLeagueChange}
-          />
-          <label htmlFor="champions-league">UEFA Champions League</label>
-        </div>
-        <div>
-          <input
-            type="checkbox"
-            id="europa-league"
-            name="europa-league"
-            checked={selectedLeagues.includes("europa-league")}
-            onChange={handleLeagueChange}
-          />
-          <label htmlFor="europa-league">UEFA Europa League</label>
-        </div>
-      </fieldset>
-
-      <Switch checked={showScore} onChange={setShowScore}>
-        {/* className="group inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition data-[checked]:bg-blue-600" */}
-        <span>
-          {/*  className="size-4 translate-x-1 rounded-full bg-white transition group-data-[checked]:translate-x-6" */}
-          Scores {showScore ? "ON" : "OFF"}
-        </span>
-      </Switch>
-
-      {loading ? (
-        <p>Loading fixtures...</p>
-      ) : fixtures?.length > 0 ? (
-        <ul>
-          {fixtures.map((fixture) => (
-            <Fixture key={fixture.id} showScore={showScore} {...fixture} />
+      <section>
+        <h2>Controls</h2>
+        <fieldset>
+          <legend>Competitions:</legend>
+          {Object.entries(LEAGUES).map(([leagueId, league]) => (
+            <div key={leagueId}>
+              <input
+                type="checkbox"
+                id={leagueId}
+                name={leagueId}
+                disabled={league.tier === "paid"}
+                checked={selectedLeagues.includes(leagueId)}
+                onChange={handleLeagueChange}
+              />
+              <label htmlFor={leagueId}>
+                {league.name}{" "}
+                {league.tier === "paid" ? "(paid users only)" : ""}{" "}
+              </label>
+            </div>
           ))}
-        </ul>
-      ) : (
-        <p>No fixtures found</p>
-      )}
+        </fieldset>
+
+        <Switch checked={showScore} onChange={setShowScore}>
+          {/* className="group inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition data-[checked]:bg-blue-600" */}
+          <span>
+            {/*  className="size-4 translate-x-1 rounded-full bg-white transition group-data-[checked]:translate-x-6" */}
+            Scores {showScore ? "ON" : "OFF"}
+          </span>
+        </Switch>
+      </section>
+
+      <section>
+        <h2>Results</h2>
+        {loading ? (
+          <p>Loading fixtures...</p>
+        ) : fixtures?.length > 0 ? (
+          <ul>
+            {fixtures.map((fixture) => (
+              <Fixture key={fixture.id} showScore={showScore} {...fixture} />
+            ))}
+          </ul>
+        ) : (
+          <p>No fixtures found</p>
+        )}
+      </section>
     </>
   );
 }
