@@ -3,13 +3,13 @@ import { useState, useEffect } from "react";
 
 import { Switch } from "@headlessui/react";
 
-import { LEAGUES } from "@/constants/leagues";
+import { COMPETITIONS } from "@/constants/competitions";
 
 import Fixture from "@/components/Fixture";
 
 export default function FixturesClient() {
   const [showScore, setShowScore] = useState(false);
-  const [selectedLeagues, setSelectedLeagues] = useState([
+  const [selectedCompetitions, setSelectedCompetitions] = useState([
     "premier-league",
     "champions-league",
   ]);
@@ -18,50 +18,31 @@ export default function FixturesClient() {
 
   // Load initial data
   useEffect(() => {
-    fetchFixtures(selectedLeagues);
+    fetchFixtures(selectedCompetitions);
   }, []);
 
-  const fetchFixtures = async (leagues) => {
+  const fetchFixtures = async (competitions) => {
     setLoading(true);
     try {
-      const leagueCodes = leagues.map((l) => LEAGUES[l].code);
+      const competitionCodes = competitions.map((l) => COMPETITIONS[l].code);
 
-      // First, fetch all leagues in parallel
-      const responses = await Promise.all(
-        leagueCodes.map((code) =>
-          fetch(`/api/fixtures/${code}`)
-            .then((res) => res.json())
-            .then((data) => data.matches || [])
+      // Fetch and combine all matches in one step
+      const allMatches = (
+        await Promise.all(
+          competitionCodes.map(async (code) => {
+            const res = await fetch(`/api/fixtures/${code}`);
+            const data = await res.json();
+            return (data.matches || []).map((match) => ({
+              ...match,
+              competitionCode: code,
+            }));
+          })
         )
-      );
+      ).flat();
 
-      // Combine all matches into a single array and add league code
-      const allMatches = responses.reduce((acc, matches, index) => {
-        const leagueCode = leagueCodes[index];
-        const matchesWithLeague = matches.map((match) => ({
-          ...match,
-          leagueCode,
-        }));
-        return [...acc, ...matchesWithLeague];
-      }, []);
-
-      // Sort all matches by date
-      const sortedMatches = allMatches.sort((a, b) => {
-        // Parse the dates once
-        const dateA = new Date(a.utcDate).getTime();
-        const dateB = new Date(b.utcDate).getTime();
-        return dateB - dateA; // Most recent first
-      });
-
-      // Add debug logging
-      console.log(
-        "First 5 sorted matches:",
-        sortedMatches.slice(0, 5).map((m) => ({
-          date: new Date(m.utcDate).toISOString(),
-          league: m.leagueCode,
-          teams: `${m.homeTeam.name} vs ${m.awayTeam.name}`,
-          timestamp: new Date(m.utcDate).getTime(),
-        }))
+      // Sort by date
+      const sortedMatches = allMatches.sort(
+        (a, b) => new Date(b.utcDate) - new Date(a.utcDate)
       );
 
       setFixtures(sortedMatches);
@@ -72,14 +53,14 @@ export default function FixturesClient() {
     }
   };
 
-  const handleLeagueChange = async (event) => {
-    const league = event.target.name;
-    const newSelectedLeagues = selectedLeagues.includes(league)
-      ? selectedLeagues.filter((l) => l !== league)
-      : [...selectedLeagues, league];
+  const handleCompetitionChange = async (event) => {
+    const competition = event.target.name;
+    const newSelectedCompetitions = selectedCompetitions.includes(competition)
+      ? selectedCompetitions.filter((l) => l !== competition)
+      : [...selectedCompetitions, competition];
 
-    setSelectedLeagues(newSelectedLeagues);
-    fetchFixtures(newSelectedLeagues);
+    setSelectedCompetitions(newSelectedCompetitions);
+    fetchFixtures(newSelectedCompetitions);
   };
 
   return (
@@ -88,19 +69,19 @@ export default function FixturesClient() {
         <h2>Controls</h2>
         <fieldset>
           <legend>Competitions:</legend>
-          {Object.entries(LEAGUES).map(([leagueId, league]) => (
-            <div key={leagueId}>
+          {Object.entries(COMPETITIONS).map(([competitionId, competition]) => (
+            <div key={competitionId}>
               <input
                 type="checkbox"
-                id={leagueId}
-                name={leagueId}
-                disabled={league.tier === "paid"}
-                checked={selectedLeagues.includes(leagueId)}
-                onChange={handleLeagueChange}
+                id={competitionId}
+                name={competitionId}
+                disabled={competition.tier === "paid"}
+                checked={selectedCompetitions.includes(competitionId)}
+                onChange={handleCompetitionChange}
               />
-              <label htmlFor={leagueId}>
-                {league.name}{" "}
-                {league.tier === "paid" ? "(paid users only)" : ""}{" "}
+              <label htmlFor={competitionId}>
+                {competition.name}{" "}
+                {competition.tier === "paid" ? "(paid users only)" : ""}{" "}
               </label>
             </div>
           ))}

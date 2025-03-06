@@ -1,4 +1,4 @@
-export const LEAGUES = {
+export const COMPETITIONS = {
     'premier-league': {
         code: 'PL',
         name: 'Premier League',
