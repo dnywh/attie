@@ -1,4 +1,8 @@
+import { withPigment } from '@pigment-css/nextjs-plugin';
+
 /** @type {import('next').NextConfig} */
+
+
 const nextConfig = {
     images: {
         remotePatterns: [
@@ -11,4 +15,4 @@ const nextConfig = {
     },
 };
 
-export default nextConfig;
+export default withPigment(nextConfig);

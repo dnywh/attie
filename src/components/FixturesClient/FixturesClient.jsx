@@ -3,9 +3,23 @@ import { useState, useEffect } from "react";
 
 import { Switch } from "@headlessui/react";
 
+import { styled } from "@pigment-css/react";
+
 import { COMPETITIONS } from "@/constants/competitions";
 
 import Fixture from "@/components/Fixture";
+
+const Main = styled("main")({
+  display: "flex",
+  flexDirection: "column",
+  gap: "2rem",
+});
+
+const FixturesList = styled("ul")({
+  display: "flex",
+  flexDirection: "column",
+  gap: "1rem",
+});
 
 export default function FixturesClient() {
   const [showScore, setShowScore] = useState(false);
@@ -64,9 +78,8 @@ export default function FixturesClient() {
   };
 
   return (
-    <>
+    <Main>
       <section>
-        <h2>Controls</h2>
         <fieldset>
           <legend>Competitions:</legend>
           {Object.entries(COMPETITIONS)
@@ -91,11 +104,11 @@ export default function FixturesClient() {
       </section>
 
       <section>
-        <h2>Results</h2>
+        <h2>Today</h2>
         {loading ? (
           <p>Loading fixtures...</p>
         ) : fixtures?.length > 0 ? (
-          <ul>
+          <FixturesList>
             {fixtures.map((fixture) => (
               <Fixture
                 key={fixture.id}
@@ -103,11 +116,11 @@ export default function FixturesClient() {
                 showScore={showScore}
               />
             ))}
-          </ul>
+          </FixturesList>
         ) : (
           <p>No fixtures found</p>
         )}
       </section>
-    </>
+    </Main>
   );
 }
