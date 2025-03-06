@@ -15,6 +15,16 @@ const Main = styled("main")({
   gap: "4rem",
 });
 
+const FilterSection = styled("section")({
+  display: "flex",
+  flexDirection: "column",
+  gap: "0.5rem",
+});
+
+const Select = styled("select")({
+  width: "100%",
+});
+
 const StyledSwitch = styled(Switch)({
   width: "100%",
 });
@@ -117,7 +127,15 @@ export default function FixturesClient() {
 
   return (
     <Main>
-      <section>
+      <FilterSection>
+        <Select>
+          <option value="football">Football</option>
+          {/* <option value="basketball">Basketball</option>
+          <option value="tennis">Tennis</option> */}
+          <option value="tba" disabled>
+            After another sport? Let us know. Email: "hello" at this domain
+          </option>
+        </Select>
         <fieldset>
           <legend>Competitions:</legend>
           {Object.entries(COMPETITIONS)
@@ -137,9 +155,9 @@ export default function FixturesClient() {
         </fieldset>
 
         <StyledSwitch checked={showScore} onChange={setShowScore}>
-          <span>Scores {showScore ? "ON" : "OFF"}</span>
+          <span>{showScore ? "Hide" : "Show"} scores</span>
         </StyledSwitch>
-      </section>
+      </FilterSection>
 
       <section>
         {loading ? (
