@@ -11,7 +11,7 @@ export async function GET(request, { params }) {
 
     try {
         const response = await fetch(
-            `https://api.football-data.org/v4/competitions/${league}/matches?season=2024&dateFrom=${formattedStartRange}&dateTo=${today}`,
+            `https://api.football-data.org/v4/competitions/${league}/matches?dateFrom=${formattedStartRange}&dateTo=${today}`,
             {
                 headers: {
                     "X-Auth-Token": process.env.FOOTBALL_DATA_API_KEY,
