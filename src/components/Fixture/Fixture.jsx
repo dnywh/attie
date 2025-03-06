@@ -3,8 +3,8 @@ import OpponentRow from "@/components/OpponentRow";
 function Fixture({ fixture, showScore }) {
   return (
     <li>
-      <h3>{fixture.competition.name}</h3>
-      <p>{fixture.utcDate}</p>
+      <h3>{fixture.utcDate}</h3>
+      <p>{fixture.competition.name}</p>
       <p>FT</p>
       <ul>
         <li>

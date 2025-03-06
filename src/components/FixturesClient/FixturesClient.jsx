@@ -25,17 +25,46 @@ export default function FixturesClient() {
     setLoading(true);
     try {
       const leagueCodes = leagues.map((l) => LEAGUES[l].code);
-      const results = await Promise.all(
+
+      // First, fetch all leagues in parallel
+      const responses = await Promise.all(
         leagueCodes.map((code) =>
-          fetch(`/api/fixtures/${code}`).then((res) => res.json())
+          fetch(`/api/fixtures/${code}`)
+            .then((res) => res.json())
+            .then((data) => data.matches || [])
         )
       );
 
-      const allMatches = results.flatMap((result) => result.matches || []);
-      const sortedMatches = allMatches.sort(
-        (a, b) => new Date(a.date) - new Date(b.date)
+      // Combine all matches into a single array and add league code
+      const allMatches = responses.reduce((acc, matches, index) => {
+        const leagueCode = leagueCodes[index];
+        const matchesWithLeague = matches.map((match) => ({
+          ...match,
+          leagueCode,
+        }));
+        return [...acc, ...matchesWithLeague];
+      }, []);
+
+      // Sort all matches by date
+      const sortedMatches = allMatches.sort((a, b) => {
+        // Parse the dates once
+        const dateA = new Date(a.utcDate).getTime();
+        const dateB = new Date(b.utcDate).getTime();
+        return dateB - dateA; // Most recent first
+      });
+
+      // Add debug logging
+      console.log(
+        "First 5 sorted matches:",
+        sortedMatches.slice(0, 5).map((m) => ({
+          date: new Date(m.utcDate).toISOString(),
+          league: m.leagueCode,
+          teams: `${m.homeTeam.name} vs ${m.awayTeam.name}`,
+          timestamp: new Date(m.utcDate).getTime(),
+        }))
       );
-      setFixtures(sortedMatches.reverse());
+
+      setFixtures(sortedMatches);
     } catch (error) {
       console.error("Failed to fetch fixtures:", error);
     } finally {
@@ -93,7 +122,7 @@ export default function FixturesClient() {
         ) : fixtures?.length > 0 ? (
           <ul>
             {fixtures.map((fixture) => {
-              console.log(fixture);
+              // console.log(fixture);
               return (
                 <Fixture
                   key={fixture.id}
