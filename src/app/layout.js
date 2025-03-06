@@ -1,10 +1,12 @@
 // import "./globals.css";
+import { Analytics } from "@vercel/analytics/react"
+
 import { globalCss, styled } from "@pigment-css/react";
 import '@pigment-css/react/styles.css';
 
 export const metadata = {
   title: "Attie",
-  description: "The anti-scores scores app.",
+  description: "The anti-score scores app.",
 };
 
 globalCss`
@@ -77,6 +79,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <Body>
         {children}
+        <Analytics />
       </Body>
     </html>
   );

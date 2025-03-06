@@ -25,7 +25,7 @@ export default function Home() {
     <>
       <Header>
         <h1>Attie</h1>
-        <p>The anti-scores scores app.</p>
+        <p>Matches without the scores.</p>
       </Header>
 
       <FixturesClient />

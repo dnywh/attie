@@ -155,7 +155,7 @@ export default function FixturesClient() {
         </fieldset>
 
         <StyledSwitch checked={showScore} onChange={setShowScore}>
-          <span>{showScore ? "Hide" : "Show"} scores</span>
+          <span>{showScore ? "Hide" : "Show"} all scores</span>
         </StyledSwitch>
       </FilterSection>
 
