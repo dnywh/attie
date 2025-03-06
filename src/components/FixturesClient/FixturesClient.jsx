@@ -12,18 +12,52 @@ import Fixture from "@/components/Fixture";
 const Main = styled("main")({
   display: "flex",
   flexDirection: "column",
-  gap: "2rem",
+  gap: "4rem",
 });
 
 const StyledSwitch = styled(Switch)({
   width: "100%",
 });
 
-const FixturesList = styled("ul")({
+const AllFixturesList = styled("ul")({
   display: "flex",
   flexDirection: "column",
-  gap: "1rem",
+  gap: "3rem",
 });
+
+const DateGroup = styled("li")({
+  display: "flex",
+  flexDirection: "column",
+  gap: "1.5rem",
+
+  "& h2": {
+    // fontSize: "1.5rem",
+    textAlign: "center",
+  },
+});
+
+const DateFixturesList = styled("ul")({
+  display: "flex",
+  flexDirection: "column",
+  gap: "1.5rem",
+});
+
+const groupFixturesByDate = (fixtures) => {
+  return fixtures.reduce((groups, fixture) => {
+    const date = new Date(fixture.utcDate).toLocaleDateString("en-GB", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
+    if (!groups[date]) {
+      groups[date] = [];
+    }
+    groups[date].push(fixture);
+    return groups;
+  }, {});
+};
 
 export default function FixturesClient() {
   const [showScore, setShowScore] = useState(false);
@@ -108,19 +142,27 @@ export default function FixturesClient() {
       </section>
 
       <section>
-        <h2>Today</h2>
         {loading ? (
           <p>Loading fixtures...</p>
         ) : fixtures?.length > 0 ? (
-          <FixturesList>
-            {fixtures.map((fixture) => (
-              <Fixture
-                key={fixture.id}
-                fixture={fixture}
-                showScore={showScore}
-              />
-            ))}
-          </FixturesList>
+          <AllFixturesList>
+            {Object.entries(groupFixturesByDate(fixtures)).map(
+              ([date, dateFixtures]) => (
+                <DateGroup key={date}>
+                  <h2>{date}</h2>
+                  <DateFixturesList>
+                    {dateFixtures.map((fixture) => (
+                      <Fixture
+                        key={fixture.id}
+                        fixture={fixture}
+                        showScore={showScore}
+                      />
+                    ))}
+                  </DateFixturesList>
+                </DateGroup>
+              )
+            )}
+          </AllFixturesList>
         ) : (
           <p>No fixtures found</p>
         )}

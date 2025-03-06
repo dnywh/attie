@@ -37,13 +37,16 @@ const CompetitionName = styled("p")({
 });
 
 function Fixture({ fixture, showScore }) {
-  const formattedDate = new Date(fixture.utcDate).toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-  });
+  const formattedDate = new Date(fixture.utcDate).toLocaleDateString(
+    "default",
+    {
+      day: "numeric",
+      month: "short",
+      year: "2-digit",
+      hour: "numeric",
+      minute: "numeric",
+    }
+  );
 
   return (
     <StyledRow>
