@@ -9,7 +9,10 @@ import Fixture from "@/components/Fixture";
 
 export default function FixturesClient() {
   const [showScore, setShowScore] = useState(false);
-  const [selectedLeagues, setSelectedLeagues] = useState(["premier-league"]);
+  const [selectedLeagues, setSelectedLeagues] = useState([
+    "premier-league",
+    "champions-league",
+  ]);
   const [fixtures, setFixtures] = useState([]);
   const [loading, setLoading] = useState(true); // Start with loading true
 
@@ -29,8 +32,10 @@ export default function FixturesClient() {
       );
 
       const allMatches = results.flatMap((result) => result.matches || []);
-      const allMatchesReversed = allMatches.reverse();
-      setFixtures(allMatchesReversed);
+      const sortedMatches = allMatches.sort(
+        (a, b) => new Date(a.date) - new Date(b.date)
+      );
+      setFixtures(sortedMatches.reverse());
     } catch (error) {
       console.error("Failed to fetch fixtures:", error);
     } finally {
@@ -87,9 +92,16 @@ export default function FixturesClient() {
           <p>Loading fixtures...</p>
         ) : fixtures?.length > 0 ? (
           <ul>
-            {fixtures.map((fixture) => (
-              <Fixture key={fixture.id} showScore={showScore} {...fixture} />
-            ))}
+            {fixtures.map((fixture) => {
+              console.log(fixture);
+              return (
+                <Fixture
+                  key={fixture.id}
+                  fixture={fixture}
+                  showScore={showScore}
+                />
+              );
+            })}
           </ul>
         ) : (
           <p>No fixtures found</p>

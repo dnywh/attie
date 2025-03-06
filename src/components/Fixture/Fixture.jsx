@@ -1,22 +1,23 @@
 import OpponentRow from "@/components/OpponentRow";
 
-function Fixture({ homeTeam, awayTeam, utcDate, score, showScore, ...props }) {
+function Fixture({ fixture, showScore }) {
   return (
     <li>
-      <p>{utcDate}</p>
+      <h3>{fixture.competition.name}</h3>
+      <p>{fixture.utcDate}</p>
       <p>FT</p>
       <ul>
         <li>
           <OpponentRow
-            team={homeTeam}
-            score={score.fullTime.home}
+            team={fixture.homeTeam}
+            score={fixture.score.fullTime.home}
             showScore={showScore}
           />
         </li>
         <li>
           <OpponentRow
-            team={awayTeam}
-            score={score.fullTime.away}
+            team={fixture.awayTeam}
+            score={fixture.score.fullTime.away}
             showScore={showScore}
           />
         </li>

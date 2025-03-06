@@ -5,13 +5,14 @@ export async function GET(request, { params }) {
     const { searchParams } = new URL(request.url);
 
     const today = new Date().toISOString().split('T')[0];
-    const startRange = new Date();
-    startRange.setDate(startRange.getDate() - 30);
-    const formattedStartRange = startRange.toISOString().split('T')[0];
+    const startDate = new Date();
+    const dateRange = 30
+    startDate.setDate(startDate.getDate() - dateRange);
+    const formattedStartDate = startDate.toISOString().split('T')[0];
 
     try {
         const response = await fetch(
-            `https://api.football-data.org/v4/competitions/${league}/matches?dateFrom=${formattedStartRange}&dateTo=${today}`,
+            `https://api.football-data.org/v4/competitions/${league}/matches?dateFrom=${formattedStartDate}&dateTo=${today}`,
             {
                 headers: {
                     "X-Auth-Token": process.env.FOOTBALL_DATA_API_KEY,
