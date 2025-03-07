@@ -70,7 +70,7 @@ const groupFixturesByDate = (fixtures) => {
 };
 
 export default function FixturesClient() {
-  const [showScore, setShowScore] = useState(false);
+  const [showAllScores, setShowAllScores] = useState(false);
   const [selectedCompetitions, setSelectedCompetitions] = useState([
     "premier-league",
     // "champions-league",
@@ -133,7 +133,7 @@ export default function FixturesClient() {
           {/* <option value="basketball">Basketball</option>
           <option value="tennis">Tennis</option> */}
           <option value="tba" disabled>
-            After another sport? Let us know. Email: "hello" at this domain
+            After another sport? Email us: "hello" at this domain
           </option>
         </Select>
         <fieldset>
@@ -154,8 +154,8 @@ export default function FixturesClient() {
             ))}
         </fieldset>
 
-        <StyledSwitch checked={showScore} onChange={setShowScore}>
-          <span>{showScore ? "Hide" : "Show"} all scores</span>
+        <StyledSwitch checked={showAllScores} onChange={setShowAllScores}>
+          <span>{showAllScores ? "Hide" : "Show"} all scores</span>
         </StyledSwitch>
       </FilterSection>
 
@@ -173,7 +173,7 @@ export default function FixturesClient() {
                       <Fixture
                         key={fixture.id}
                         fixture={fixture}
-                        showScore={showScore}
+                        showAllScores={showAllScores}
                       />
                     ))}
                   </DateFixturesList>

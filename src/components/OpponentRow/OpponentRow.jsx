@@ -1,9 +1,10 @@
+"use client";
+import { useState, useEffect } from "react";
 import TeamLogo from "@/components/TeamLogo";
 import Score from "@/components/Score";
-
 import { styled } from "@pigment-css/react";
 
-const StyledRow = styled("li")({
+const StyledOpponentRow = styled("li")({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
@@ -26,13 +27,17 @@ const OpponentName = styled("p")({
   lineHeight: "100%",
 });
 
-function OpponentRow({ team, score, showScore }) {
+function OpponentRow({ team, score, showAllScores, showFixtureScores }) {
   return (
-    <StyledRow>
+    <StyledOpponentRow>
       <TeamLogo src={team.crest} />
       <OpponentName>{team.name}</OpponentName>
-      <Score score={score} showScore={showScore} />
-    </StyledRow>
+      <Score
+        score={score}
+        showAllScores={showAllScores}
+        showFixtureScores={showFixtureScores}
+      />
+    </StyledOpponentRow>
   );
 }
 

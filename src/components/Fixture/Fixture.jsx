@@ -1,9 +1,11 @@
+"use client";
+import { useState, useEffect } from "react";
 import FixtureStatus from "@/components/FixtureStatus";
 import OpponentRow from "@/components/OpponentRow";
 
 import { styled } from "@pigment-css/react";
 
-const StyledRow = styled("li")({
+const FixtureRow = styled("li")({
   display: "flex",
   flexDirection: "column",
   gap: "0.65rem",
@@ -11,6 +13,11 @@ const StyledRow = styled("li")({
   borderColor: "black",
   borderStyle: "solid",
   borderWidth: "1px",
+
+  "&:hover": {
+    transform: "scale(1.1)",
+    cursor: "pointer",
+  },
 });
 
 const FixtureTiming = styled("div")({
@@ -36,7 +43,7 @@ const CompetitionName = styled("p")({
   margin: "0",
 });
 
-function Fixture({ fixture, showScore }) {
+function Fixture({ fixture, showAllScores }) {
   const formattedDate = new Date(fixture.utcDate).toLocaleDateString(
     "default",
     {
@@ -48,8 +55,29 @@ function Fixture({ fixture, showScore }) {
     }
   );
 
+  const [showFixtureScores, setShowFixtureScores] = useState(false); // Fixture-level score visibility
+
+  // Reset fixture scores when global scores are toggled
+  useEffect(() => {
+    if (!showAllScores) {
+      setShowFixtureScores(false);
+    }
+  }, [showAllScores]);
+
+  const areScoresVisible = showAllScores || showFixtureScores;
+
+  const handleShowOrHideFixtureScores = (e) => {
+    e.stopPropagation(); // Prevent event bubbling
+    if (!showAllScores) {
+      setShowFixtureScores(!showFixtureScores);
+    }
+  };
+
   return (
-    <StyledRow>
+    <FixtureRow
+      onClick={handleShowOrHideFixtureScores}
+      style={{ cursor: showAllScores ? "default" : "pointer" }}
+    >
       <FixtureTiming>
         <p>{formattedDate}</p>
         <FixtureStatus fixture={fixture} />
@@ -59,17 +87,19 @@ function Fixture({ fixture, showScore }) {
         <OpponentRow
           team={fixture.homeTeam}
           score={fixture.score.fullTime.home}
-          showScore={showScore}
+          showAllScores={showAllScores}
+          showFixtureScores={showFixtureScores}
         />
         <OpponentRow
           team={fixture.awayTeam}
           score={fixture.score.fullTime.away}
-          showScore={showScore}
+          showAllScores={showAllScores}
+          showFixtureScores={showFixtureScores}
         />
       </ul>
 
       <CompetitionName>{fixture.competition.name}</CompetitionName>
-    </StyledRow>
+    </FixtureRow>
   );
 }
 
