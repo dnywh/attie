@@ -57,7 +57,10 @@ function Score({ score, showAllScores = false }) {
   };
 
   return (
-    <Block isVisible={isScoreVisible} onClick={handleReveal}>
+    <Block
+      isVisible={isScoreVisible}
+      onClick={!isScoreVisible ? handleReveal : undefined}
+    >
       {isScoreVisible && <p>{score}</p>}
     </Block>
   );
