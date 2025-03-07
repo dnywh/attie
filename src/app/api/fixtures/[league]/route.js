@@ -10,6 +10,8 @@ export async function GET(request, { params }) {
     startDate.setDate(startDate.getDate() - dateRange);
     const formattedStartDate = startDate.toISOString().split('T')[0];
 
+    console.log(`Getting games scheduled from today, your time (${today}), back ${dateRange} days to ${formattedStartDate}`);
+
     try {
         const response = await fetch(
             `https://api.football-data.org/v4/competitions/${league}/matches?dateFrom=${formattedStartDate}&dateTo=${today}`,

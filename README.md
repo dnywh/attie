@@ -20,20 +20,24 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Development
+## Fixtures Cache
 
-### Fixtures Cache
+The app uses two types of caching for fixture data:
 
-During development, fixture data is cached in localStorage to reduce API calls. The cache:
+### Production
 
-- Persists for 5 minutes
-- Only works in development mode
-- Clears automatically on page refresh after expiry
+- In-memory cache lasts 5 minutes
+- Clears on page refresh
+- Reduces API calls during single-page session
 
-To manually clear the cache, open your browser's developer console and run:
+### Development
+
+- Same in-memory cache as production
+- Additionally persists between page refreshes using localStorage
+- Useful for rapid development without hitting API limits
+
+To manually clear the development cache, open your browser's console and run:
 
 ```javascript
 localStorage.removeItem("fixturesDevCache");
 ```
-
-The fixture data is also cached in production but not between page loads.

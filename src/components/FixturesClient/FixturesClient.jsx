@@ -9,26 +9,27 @@ const isDev = process.env.NODE_ENV === "development";
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 const CACHE_KEY = "fixturesDevCache";
 
-// Initialize cache safely for SSR
-const getInitialCache = () => {
-  if (isDev && typeof window !== "undefined") {
-    try {
-      return new Map(JSON.parse(localStorage.getItem(CACHE_KEY) || "[]"));
-    } catch (e) {
-      console.warn("Failed to load cache:", e);
-    }
-  }
-  return new Map();
-};
+// Initialize cache
+const fixturesCache = new Map();
 
-const fixturesCache = getInitialCache();
+// Only in development, try to restore cache from localStorage
+if (isDev && typeof window !== "undefined") {
+  try {
+    const saved = JSON.parse(localStorage.getItem(CACHE_KEY) || "[]");
+    saved.forEach(([key, value]) => fixturesCache.set(key, value));
+  } catch (e) {
+    console.warn("Failed to restore cache:", e);
+  }
+}
 
 const updateCache = (code, data) => {
+  // Always update memory cache (both dev and prod)
   fixturesCache.set(code, {
     timestamp: Date.now(),
     data,
   });
 
+  // Only persist to localStorage in development
   if (isDev && typeof window !== "undefined") {
     try {
       localStorage.setItem(CACHE_KEY, JSON.stringify([...fixturesCache]));
@@ -60,6 +61,7 @@ const Fieldset = styled("fieldset")({
   "& div": {
     display: "flex",
     gap: "0.5rem",
+    alignItems: "center",
   },
 });
 
