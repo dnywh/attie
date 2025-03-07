@@ -1,16 +1,42 @@
 "use client";
 import { useState, useEffect } from "react";
-
 import { Switch } from "@headlessui/react";
-
 import { styled } from "@pigment-css/react";
-
+import Fixture from "@/components/Fixture";
 import { COMPETITIONS } from "@/constants/competitions";
 
-import Fixture from "@/components/Fixture";
-
+const isDev = process.env.NODE_ENV === "development";
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-const fixturesCache = new Map(); // { code: { timestamp: number, data: array } }
+const CACHE_KEY = "fixturesDevCache";
+
+// Initialize cache safely for SSR
+const getInitialCache = () => {
+  if (isDev && typeof window !== "undefined") {
+    try {
+      return new Map(JSON.parse(localStorage.getItem(CACHE_KEY) || "[]"));
+    } catch (e) {
+      console.warn("Failed to load cache:", e);
+    }
+  }
+  return new Map();
+};
+
+const fixturesCache = getInitialCache();
+
+const updateCache = (code, data) => {
+  fixturesCache.set(code, {
+    timestamp: Date.now(),
+    data,
+  });
+
+  if (isDev && typeof window !== "undefined") {
+    try {
+      localStorage.setItem(CACHE_KEY, JSON.stringify([...fixturesCache]));
+    } catch (e) {
+      console.warn("Failed to save cache:", e);
+    }
+  }
+};
 
 const Main = styled("main")({
   display: "flex",
@@ -22,6 +48,19 @@ const FilterSection = styled("section")({
   display: "flex",
   flexDirection: "column",
   gap: "0.5rem",
+});
+
+const Fieldset = styled("fieldset")({
+  display: "flex",
+  flexDirection: "column",
+  gap: "0.5rem",
+  maxHeight: "11rem",
+  overflowY: "scroll",
+
+  "& div": {
+    display: "flex",
+    gap: "0.5rem",
+  },
 });
 
 const Select = styled("select")({
@@ -97,12 +136,7 @@ export default function FixturesClient() {
       competitionCode: code,
     }));
 
-    // Cache the new data
-    fixturesCache.set(code, {
-      timestamp: now,
-      data: matches,
-    });
-
+    updateCache(code, matches);
     return matches;
   };
 
@@ -174,7 +208,7 @@ export default function FixturesClient() {
             After another sport? Email us: "hello" at this domain
           </option>
         </Select>
-        <fieldset>
+        <Fieldset>
           <legend>Competitions:</legend>
           {Object.entries(COMPETITIONS)
             .filter(([, competition]) => competition.tier !== "paid")
@@ -190,7 +224,7 @@ export default function FixturesClient() {
                 <label htmlFor={competitionId}>{competition.name}</label>
               </div>
             ))}
-        </fieldset>
+        </Fieldset>
 
         <StyledSwitch checked={showAllScores} onChange={setShowAllScores}>
           <span>{showAllScores ? "Hide" : "Show"} all scores</span>
