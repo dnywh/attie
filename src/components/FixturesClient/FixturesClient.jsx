@@ -173,7 +173,11 @@ const DateFixturesList = styled("ul")({
 
 const groupFixturesByDate = (fixtures) => {
   return fixtures.reduce((groups, fixture) => {
-    const date = new Date(fixture.utcDate).toLocaleDateString("en-GB", {
+    // Convert UTC date string to local date (will automatically convert to user's timezone)
+    const localDate = new Date(fixture.utcDate);
+
+    // Format the date in the user's local timezone
+    const date = localDate.toLocaleDateString("en-GB", {
       weekday: "long",
       year: "numeric",
       month: "long",
@@ -183,7 +187,10 @@ const groupFixturesByDate = (fixtures) => {
     if (!groups[date]) {
       groups[date] = [];
     }
-    groups[date].push(fixture);
+    groups[date].push({
+      ...fixture,
+      localDate, // Add localDate to fixture object if needed elsewhere
+    });
     return groups;
   }, {});
 };
@@ -229,9 +236,11 @@ export default function FixturesClient() {
           initialCodes.map(fetchFixturesForCompetition)
         );
         setFixtures(
-          matches
-            .flat()
-            .sort((a, b) => new Date(b.utcDate) - new Date(a.utcDate))
+          matches.flat().sort((a, b) => {
+            const dateA = new Date(a.utcDate);
+            const dateB = new Date(b.utcDate);
+            return dateB - dateA;
+          })
         );
       } catch (error) {
         console.error("Failed to fetch fixtures:", error);
@@ -261,10 +270,12 @@ export default function FixturesClient() {
         // Add competition
         setSelectedCompetitions((prev) => [...prev, competition]);
         const newMatches = await fetchFixturesForCompetition(competitionCode);
-        setFixtures((prev) =>
-          [...prev, ...newMatches].sort(
-            (a, b) => new Date(b.utcDate) - new Date(a.utcDate)
-          )
+        setFixtures((prevFixtures) =>
+          [...prevFixtures, ...newMatches].sort((a, b) => {
+            const dateA = new Date(a.utcDate);
+            const dateB = new Date(b.utcDate);
+            return dateB - dateA;
+          })
         );
       }
     } catch (error) {
