@@ -9,6 +9,9 @@ import { COMPETITIONS } from "@/constants/competitions";
 
 import Fixture from "@/components/Fixture";
 
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const fixturesCache = new Map(); // { code: { timestamp: number, data: array } }
+
 const Main = styled("main")({
   display: "flex",
   flexDirection: "column",
@@ -79,12 +82,28 @@ export default function FixturesClient() {
   const [loading, setLoading] = useState(true); // Start with loading true
 
   const fetchFixturesForCompetition = async (code) => {
+    const now = Date.now();
+    const cached = fixturesCache.get(code);
+
+    // Return cached data if fresh enough
+    if (cached && now - cached.timestamp < CACHE_DURATION) {
+      return cached.data;
+    }
+
     const res = await fetch(`/api/fixtures/${code}`);
     const data = await res.json();
-    return (data.matches || []).map((match) => ({
+    const matches = (data.matches || []).map((match) => ({
       ...match,
       competitionCode: code,
     }));
+
+    // Cache the new data
+    fixturesCache.set(code, {
+      timestamp: now,
+      data: matches,
+    });
+
+    return matches;
   };
 
   // Initial load
