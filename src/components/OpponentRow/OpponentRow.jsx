@@ -25,12 +25,15 @@ const OpponentName = styled("p")({
   lineHeight: "100%",
 });
 
-function OpponentRow({ team, score, showAllScores }) {
+function OpponentRow({ team, score, showAllScores, status }) {
+  console.log("status", status);
   return (
     <StyledOpponentRow>
       <TeamLogo src={team.crest} />
       <OpponentName>{team.name}</OpponentName>
-      <Score score={score} showAllScores={showAllScores} />
+      {!["SCHEDULED", "TIMED", "CANCELLED", "POSTPONED"].includes(status) && (
+        <Score score={score} showAllScores={showAllScores} />
+      )}
     </StyledOpponentRow>
   );
 }

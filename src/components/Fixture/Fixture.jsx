@@ -62,11 +62,13 @@ function Fixture({ fixture, showAllScores }) {
           team={fixture.homeTeam}
           score={fixture.score.fullTime.home}
           showAllScores={showAllScores}
+          status={fixture.status}
         />
         <OpponentRow
           team={fixture.awayTeam}
           score={fixture.score.fullTime.away}
           showAllScores={showAllScores}
+          status={fixture.status}
         />
       </OpponentsList>
 
