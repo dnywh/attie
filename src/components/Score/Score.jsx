@@ -8,54 +8,57 @@ const Block = styled("div")({
   alignItems: "center",
   width: "2rem",
   height: "2rem",
-  backgroundColor: "black",
   color: "black",
   borderRadius: "50%",
-
-  "&:hover": {
-    transform: "scale(1.1)",
-    cursor: "pointer",
-  },
+  transition: "transform 0.125s ease-in-out",
 
   variants: [
+    {
+      props: { isVisible: false },
+      style: {
+        cursor: "pointer",
+        backgroundColor: "black",
+        "&:hover": {
+          transform: "scale(1.1)",
+        },
+      },
+    },
     {
       props: { isVisible: true },
       style: {
         backgroundColor: "white",
         border: "0.5px dashed black",
+
+        "& p": {
+          userSelect: "none",
+          cursor: "default",
+        },
       },
     },
   ],
 });
 
-function Score({ score, showAllScores = false, showFixtureScores = false }) {
-  const [showLocalScore, setShowLocalScore] = useState(false);
+function Score({ score, showAllScores = false }) {
+  const [hasBeenRevealed, setHasBeenRevealed] = useState(false);
 
-  // Reset local score when higher-level visibility changes
+  // Reset local state when showAllScores changes to false
   useEffect(() => {
-    if (showAllScores || showFixtureScores) {
-      setShowLocalScore(false);
+    if (!showAllScores) {
+      setHasBeenRevealed(false);
     }
-  }, [showAllScores, showFixtureScores]);
+  }, [showAllScores]);
 
-  const isScoreVisible = showAllScores || showFixtureScores || showLocalScore;
+  const isScoreVisible = showAllScores || hasBeenRevealed;
 
-  const handleShowOrHideScore = (e) => {
-    e.stopPropagation(); // Prevent event bubbling
-    if (!showAllScores && !showFixtureScores) {
-      setShowLocalScore(!showLocalScore);
+  const handleReveal = (e) => {
+    if (!showAllScores && !hasBeenRevealed) {
+      setHasBeenRevealed(true);
     }
   };
 
   return (
-    <Block
-      isVisible={isScoreVisible}
-      onClick={handleShowOrHideScore}
-      style={{
-        cursor: showAllScores || showFixtureScores ? "default" : "pointer",
-      }}
-    >
-      {isScoreVisible && score}
+    <Block isVisible={isScoreVisible} onClick={handleReveal}>
+      {isScoreVisible && <p>{score}</p>}
     </Block>
   );
 }

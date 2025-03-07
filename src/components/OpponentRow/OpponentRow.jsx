@@ -27,16 +27,12 @@ const OpponentName = styled("p")({
   lineHeight: "100%",
 });
 
-function OpponentRow({ team, score, showAllScores, showFixtureScores }) {
+function OpponentRow({ team, score, showAllScores }) {
   return (
     <StyledOpponentRow>
       <TeamLogo src={team.crest} />
       <OpponentName>{team.name}</OpponentName>
-      <Score
-        score={score}
-        showAllScores={showAllScores}
-        showFixtureScores={showFixtureScores}
-      />
+      <Score score={score} showAllScores={showAllScores} />
     </StyledOpponentRow>
   );
 }

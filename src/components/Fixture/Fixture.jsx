@@ -13,11 +13,6 @@ const FixtureRow = styled("li")({
   borderColor: "black",
   borderStyle: "solid",
   borderWidth: "1px",
-
-  "&:hover": {
-    transform: "scale(1.1)",
-    cursor: "pointer",
-  },
 });
 
 const FixtureTiming = styled("div")({
@@ -34,6 +29,8 @@ const FixtureTiming = styled("div")({
     margin: "0",
   },
 });
+
+const OpponentsList = styled("ul")({});
 
 const CompetitionName = styled("p")({
   textTransform: "uppercase",
@@ -55,48 +52,25 @@ function Fixture({ fixture, showAllScores }) {
     }
   );
 
-  const [showFixtureScores, setShowFixtureScores] = useState(false); // Fixture-level score visibility
-
-  // Reset fixture scores when global scores are toggled
-  useEffect(() => {
-    if (!showAllScores) {
-      setShowFixtureScores(false);
-    }
-  }, [showAllScores]);
-
-  const areScoresVisible = showAllScores || showFixtureScores;
-
-  const handleShowOrHideFixtureScores = (e) => {
-    e.stopPropagation(); // Prevent event bubbling
-    if (!showAllScores) {
-      setShowFixtureScores(!showFixtureScores);
-    }
-  };
-
   return (
-    <FixtureRow
-      onClick={handleShowOrHideFixtureScores}
-      style={{ cursor: showAllScores ? "default" : "pointer" }}
-    >
+    <FixtureRow>
       <FixtureTiming>
         <p>{formattedDate}</p>
         <FixtureStatus fixture={fixture} />
       </FixtureTiming>
 
-      <ul>
+      <OpponentsList>
         <OpponentRow
           team={fixture.homeTeam}
           score={fixture.score.fullTime.home}
           showAllScores={showAllScores}
-          showFixtureScores={showFixtureScores}
         />
         <OpponentRow
           team={fixture.awayTeam}
           score={fixture.score.fullTime.away}
           showAllScores={showAllScores}
-          showFixtureScores={showFixtureScores}
         />
-      </ul>
+      </OpponentsList>
 
       <CompetitionName>{fixture.competition.name}</CompetitionName>
     </FixtureRow>
