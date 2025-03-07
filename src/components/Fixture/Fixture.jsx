@@ -1,5 +1,3 @@
-"use client";
-import { useState, useEffect } from "react";
 import FixtureStatus from "@/components/FixtureStatus";
 import OpponentRow from "@/components/OpponentRow";
 

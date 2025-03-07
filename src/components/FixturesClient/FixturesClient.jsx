@@ -78,51 +78,70 @@ export default function FixturesClient() {
   const [fixtures, setFixtures] = useState([]);
   const [loading, setLoading] = useState(true); // Start with loading true
 
-  // Load initial data
-  useEffect(() => {
-    fetchFixtures(selectedCompetitions);
-  }, []);
-
-  const fetchFixtures = async (competitions) => {
-    setLoading(true);
-    try {
-      const competitionCodes = competitions.map((l) => COMPETITIONS[l].code);
-
-      // Fetch and combine all matches in one step
-      const allMatches = (
-        await Promise.all(
-          competitionCodes.map(async (code) => {
-            const res = await fetch(`/api/fixtures/${code}`);
-            const data = await res.json();
-            return (data.matches || []).map((match) => ({
-              ...match,
-              competitionCode: code,
-            }));
-          })
-        )
-      ).flat();
-
-      // Sort by date
-      const sortedMatches = allMatches.sort(
-        (a, b) => new Date(b.utcDate) - new Date(a.utcDate)
-      );
-
-      setFixtures(sortedMatches);
-    } catch (error) {
-      console.error("Failed to fetch fixtures:", error);
-    } finally {
-      setLoading(false);
-    }
+  const fetchFixturesForCompetition = async (code) => {
+    const res = await fetch(`/api/fixtures/${code}`);
+    const data = await res.json();
+    return (data.matches || []).map((match) => ({
+      ...match,
+      competitionCode: code,
+    }));
   };
+
+  // Initial load
+  useEffect(() => {
+    const loadInitialFixtures = async () => {
+      setLoading(true);
+      try {
+        const initialCodes = selectedCompetitions.map(
+          (l) => COMPETITIONS[l].code
+        );
+        const matches = await Promise.all(
+          initialCodes.map(fetchFixturesForCompetition)
+        );
+        setFixtures(
+          matches
+            .flat()
+            .sort((a, b) => new Date(b.utcDate) - new Date(a.utcDate))
+        );
+      } catch (error) {
+        console.error("Failed to fetch fixtures:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadInitialFixtures();
+  }, []);
 
   const handleCompetitionChange = async (event) => {
     const competition = event.target.name;
-    const newSelectedCompetitions = selectedCompetitions.includes(competition)
-      ? selectedCompetitions.filter((l) => l !== competition)
-      : [...selectedCompetitions, competition];
+    const competitionCode = COMPETITIONS[competition].code;
 
-    setSelectedCompetitions(newSelectedCompetitions);
-    fetchFixtures(newSelectedCompetitions);
+    setLoading(true);
+    try {
+      if (selectedCompetitions.includes(competition)) {
+        // Remove competition
+        setSelectedCompetitions((prev) =>
+          prev.filter((l) => l !== competition)
+        );
+        setFixtures((prev) =>
+          prev.filter((fixture) => fixture.competitionCode !== competitionCode)
+        );
+      } else {
+        // Add competition
+        setSelectedCompetitions((prev) => [...prev, competition]);
+        const newMatches = await fetchFixturesForCompetition(competitionCode);
+        setFixtures((prev) =>
+          [...prev, ...newMatches].sort(
+            (a, b) => new Date(b.utcDate) - new Date(a.utcDate)
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Failed to update fixtures:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

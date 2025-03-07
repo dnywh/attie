@@ -1,5 +1,3 @@
-"use client";
-import { useState, useEffect } from "react";
 import TeamLogo from "@/components/TeamLogo";
 import Score from "@/components/Score";
 import { styled } from "@pigment-css/react";
