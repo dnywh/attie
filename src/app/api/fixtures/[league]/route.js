@@ -6,7 +6,7 @@ export async function GET(request, { params }) {
 
     const today = new Date().toISOString().split('T')[0];
     const startDate = new Date();
-    const dateRange = 14 // How many days back to go
+    const dateRange = 7 // How many days back to go
     startDate.setDate(startDate.getDate() - dateRange);
     const formattedStartDate = startDate.toISOString().split('T')[0];
 

@@ -171,25 +171,76 @@ const DateFixturesList = styled("ul")({
   gap: "1.5rem",
 });
 
+const formatDateForGrouping = (date) => {
+  // Keep the same format for grouping to ensure proper sorting
+  return date.toLocaleDateString("en-GB", {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  });
+};
+
+const formatDateForDisplay = (dateToFormat) => {
+  const date = new Date(dateToFormat);
+  const now = new Date();
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  const tomorrow = new Date(now);
+  tomorrow.setDate(now.getDate() + 1);
+
+  // Reset time portions for accurate date comparisons
+  const stripTime = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const strippedDate = stripTime(date);
+  const strippedNow = stripTime(now);
+  const strippedYesterday = stripTime(yesterday);
+  const strippedTomorrow = stripTime(tomorrow);
+
+  // Calculate day difference
+  const dayDiff = Math.round(
+    (strippedDate - strippedNow) / (1000 * 60 * 60 * 24)
+  );
+
+  // Special cases
+  if (strippedDate.getTime() === strippedNow.getTime()) return "Today";
+  if (strippedDate.getTime() === strippedYesterday.getTime())
+    return "Yesterday";
+  if (strippedDate.getTime() === strippedTomorrow.getTime()) return "Tomorrow";
+
+  // For future dates within the next week
+  if (dayDiff > 0 && dayDiff < 7) {
+    return date.toLocaleDateString("en-GB", { weekday: "long" });
+  }
+
+  // For all other dates (past dates and future dates beyond a week)
+  return date
+    .toLocaleDateString("en-GB", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+    })
+    .replace(/(\d+)/, "$1" + getOrdinalSuffix(date.getDate()));
+};
+
+const getOrdinalSuffix = (day) => {
+  const j = day % 10,
+    k = day % 100;
+  if (j == 1 && k != 11) return "st";
+  if (j == 2 && k != 12) return "nd";
+  if (j == 3 && k != 13) return "rd";
+  return "th";
+};
+
 const groupFixturesByDate = (fixtures) => {
   return fixtures.reduce((groups, fixture) => {
-    // Convert UTC date string to local date (will automatically convert to user's timezone)
     const localDate = new Date(fixture.utcDate);
+    const groupingKey = formatDateForGrouping(localDate);
 
-    // Format the date in the user's local timezone
-    const date = localDate.toLocaleDateString("en-GB", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-
-    if (!groups[date]) {
-      groups[date] = [];
+    if (!groups[groupingKey]) {
+      groups[groupingKey] = [];
     }
-    groups[date].push({
+    groups[groupingKey].push({
       ...fixture,
-      localDate, // Add localDate to fixture object if needed elsewhere
+      localDate,
     });
     return groups;
   }, {});
@@ -340,9 +391,9 @@ export default function FixturesClient() {
             ) : fixtures?.length > 0 ? (
               <AllFixturesList>
                 {Object.entries(groupFixturesByDate(fixtures)).map(
-                  ([date, dateFixtures]) => (
-                    <DateGroup key={date}>
-                      <h2>{date}</h2>
+                  ([groupingKey, dateFixtures]) => (
+                    <DateGroup key={groupingKey}>
+                      <h2>{formatDateForDisplay(dateFixtures[0].localDate)}</h2>
                       <DateFixturesList>
                         {dateFixtures.map((fixture) => (
                           <Fixture
