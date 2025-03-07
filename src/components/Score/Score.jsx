@@ -59,7 +59,8 @@ function Score({ score, showAllScores = false }) {
   return (
     <Block
       isVisible={isScoreVisible}
-      onClick={!isScoreVisible ? handleReveal : undefined}
+      // onClick={!isScoreVisible ? handleReveal : undefined} // Doesn't remove the visual tap target on iOS as intended
+      onClick={handleReveal}
     >
       {isScoreVisible && <p>{score}</p>}
     </Block>

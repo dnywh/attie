@@ -63,6 +63,12 @@ ul, ol {
   margin: 0;
   padding: 0;
 }
+
+fieldset {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
 `
 
 const Body = styled("body")({
