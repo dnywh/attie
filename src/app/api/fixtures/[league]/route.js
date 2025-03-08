@@ -2,15 +2,23 @@ import { NextResponse } from 'next/server';
 
 export async function GET(request, { params }) {
     const { league } = await params;
-    const { searchParams } = new URL(request.url);
 
-    const today = new Date().toISOString().split('T')[0];
-    const startDate = new Date();
-    const dateRange = 7 // How many days back to go
-    startDate.setDate(startDate.getDate() - dateRange);
+    // Use UTC dates for API query since API works in UTC
+    const now = new Date();
+    const today = new Date(Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth(),
+        now.getUTCDate()
+    )).toISOString().split('T')[0];
+
+    const startDate = new Date(Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth(),
+        now.getUTCDate() - 7
+    ));
     const formattedStartDate = startDate.toISOString().split('T')[0];
 
-    console.log(`Getting games scheduled from today, your time (${today}), back ${dateRange} days to ${formattedStartDate}`);
+    console.log(`Getting games scheduled from today UTC (${today}), back 7 days to ${formattedStartDate}`);
 
     try {
         const response = await fetch(

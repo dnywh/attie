@@ -160,7 +160,6 @@ const DateGroup = styled("li")({
   gap: "1.5rem",
 
   "& h2": {
-    // fontSize: "1.5rem",
     textAlign: "center",
   },
 });
@@ -171,54 +170,39 @@ const DateFixturesList = styled("ul")({
   gap: "1.5rem",
 });
 
-const formatDateForGrouping = (date) => {
-  // Keep the same format for grouping to ensure proper sorting
-  return date.toLocaleDateString("en-GB", {
-    year: "numeric",
-    month: "numeric",
-    day: "numeric",
-  });
-};
-
-const formatDateForDisplay = (dateToFormat) => {
-  const date = new Date(dateToFormat);
+const formatDateForDisplay = (date) => {
   const now = new Date();
-  const yesterday = new Date(now);
-  yesterday.setDate(now.getDate() - 1);
-  const tomorrow = new Date(now);
-  tomorrow.setDate(now.getDate() + 1);
+  const localDate = new Date(date);
 
-  // Reset time portions for accurate date comparisons
-  const stripTime = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  const strippedDate = stripTime(date);
-  const strippedNow = stripTime(now);
-  const strippedYesterday = stripTime(yesterday);
-  const strippedTomorrow = stripTime(tomorrow);
+  // Convert both dates to start of day in local timezone
+  const stripTime = (d) => {
+    const local = new Date(d);
+    local.setHours(0, 0, 0, 0);
+    return local.getTime();
+  };
 
-  // Calculate day difference
-  const dayDiff = Math.round(
-    (strippedDate - strippedNow) / (1000 * 60 * 60 * 24)
-  );
+  const dateTime = stripTime(localDate);
+  const nowTime = stripTime(now);
+  const dayDiff = Math.round((dateTime - nowTime) / (1000 * 60 * 60 * 24));
 
-  // Special cases
-  if (strippedDate.getTime() === strippedNow.getTime()) return "Today";
-  if (strippedDate.getTime() === strippedYesterday.getTime())
-    return "Yesterday";
-  if (strippedDate.getTime() === strippedTomorrow.getTime()) return "Tomorrow";
-
-  // For future dates within the next week
-  if (dayDiff > 0 && dayDiff < 7) {
-    return date.toLocaleDateString("en-GB", { weekday: "long" });
+  // Only show Today/Yesterday for past dates
+  if (dayDiff === 0) return "Today";
+  if (dayDiff === -1) return "Yesterday";
+  if (dayDiff > 0) {
+    // Future dates should not be shown since route.js limits to today
+    console.warn("Future date encountered:", date);
+    return "Invalid Date";
   }
 
-  // For all other dates (past dates and future dates beyond a week)
-  return date
+  // All other past dates
+  const suffix = getOrdinalSuffix(localDate.getDate());
+  return localDate
     .toLocaleDateString("en-GB", {
       weekday: "long",
       day: "numeric",
       month: "long",
     })
-    .replace(/(\d+)/, "$1" + getOrdinalSuffix(date.getDate()));
+    .replace(/(\d+)/, `$1${suffix}`);
 };
 
 const getOrdinalSuffix = (day) => {
@@ -233,12 +217,12 @@ const getOrdinalSuffix = (day) => {
 const groupFixturesByDate = (fixtures) => {
   return fixtures.reduce((groups, fixture) => {
     const localDate = new Date(fixture.utcDate);
-    const groupingKey = formatDateForGrouping(localDate);
+    const dayStart = new Date(localDate).setHours(0, 0, 0, 0); // Use timestamp as key
 
-    if (!groups[groupingKey]) {
-      groups[groupingKey] = [];
+    if (!groups[dayStart]) {
+      groups[dayStart] = [];
     }
-    groups[groupingKey].push({
+    groups[dayStart].push({
       ...fixture,
       localDate,
     });
@@ -250,7 +234,7 @@ export default function FixturesClient() {
   const [showAllScores, setShowAllScores] = useState(false);
   const [selectedCompetitions, setSelectedCompetitions] = useState([
     "premier-league",
-    // "champions-league",
+    "champions-league",
   ]);
   const [fixtures, setFixtures] = useState([]);
   const [loading, setLoading] = useState(true); // Start with loading true
@@ -341,8 +325,8 @@ export default function FixturesClient() {
       <FilterSection>
         <Select>
           <option value="football">Football</option>
-          <option value="basketball">Basketball</option>
-          <option value="tennis">Tennis</option>
+          {/* <option value="basketball">Basketball</option>
+          <option value="tennis">Tennis</option> */}
           {/* <option value="tba" disabled>
             After another sport? Email us: "hello" at this domain
           </option> */}
@@ -390,22 +374,27 @@ export default function FixturesClient() {
               <p>Loading fixtures...</p>
             ) : fixtures?.length > 0 ? (
               <AllFixturesList>
-                {Object.entries(groupFixturesByDate(fixtures)).map(
-                  ([groupingKey, dateFixtures]) => (
-                    <DateGroup key={groupingKey}>
-                      <h2>{formatDateForDisplay(dateFixtures[0].localDate)}</h2>
-                      <DateFixturesList>
-                        {dateFixtures.map((fixture) => (
-                          <Fixture
-                            key={fixture.id}
-                            fixture={fixture}
-                            showAllScores={showAllScores}
-                          />
-                        ))}
-                      </DateFixturesList>
-                    </DateGroup>
+                {Object.entries(
+                  groupFixturesByDate(
+                    // Filter out any future fixtures based on UTC time
+                    fixtures.filter(
+                      (fixture) => new Date(fixture.utcDate) <= new Date()
+                    )
                   )
-                )}
+                ).map(([groupingKey, dateFixtures]) => (
+                  <DateGroup key={groupingKey}>
+                    <h2>{formatDateForDisplay(dateFixtures[0].localDate)}</h2>
+                    <DateFixturesList>
+                      {dateFixtures.map((fixture) => (
+                        <Fixture
+                          key={fixture.id}
+                          fixture={fixture}
+                          showAllScores={showAllScores}
+                        />
+                      ))}
+                    </DateFixturesList>
+                  </DateGroup>
+                ))}
               </AllFixturesList>
             ) : (
               <p>No fixtures found</p>

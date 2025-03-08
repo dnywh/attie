@@ -26,7 +26,6 @@ const OpponentName = styled("p")({
 });
 
 function OpponentRow({ team, score, showAllScores, status }) {
-  console.log("status", status);
   return (
     <StyledOpponentRow>
       <TeamLogo src={team.crest} />
