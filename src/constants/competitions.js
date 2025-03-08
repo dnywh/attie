@@ -47,6 +47,24 @@ export const COMPETITIONS = {
         type: 'league',
         tier: 'free',
     },
+    'liga-portugal': {
+        code: 'PPL',
+        name: 'Primeira Liga',
+        type: 'league',
+        tier: 'free',
+    },
+    'eredivisie': {
+        code: 'DED',
+        name: 'Eredivise',
+        type: 'league',
+        tier: 'free',
+    },
+    'brasileirao': {
+        code: 'BSA',
+        name: 'Brasileiro Série A',
+        type: 'league',
+        tier: 'free',
+    },
     'fa-cup': {
         code: 'FAC',
         name: 'FA Cup',

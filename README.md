@@ -1,8 +1,6 @@
 # Attie
 
-The (work-in-progress) anti-scores scores app, live at [attie.app](https://www.attie.app).
-
-This is a [Next.js](https://nextjs.org) project.
+The anti-scores scores app, live at [attie.app](https://www.attie.app). Built on [Next.js](https://nextjs.org).
 
 ## Getting Started
 
