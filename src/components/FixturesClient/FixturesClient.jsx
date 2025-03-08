@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Switch } from "@headlessui/react";
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import Fixture from "@/components/Fixture";
+import FancyDropdown from "@/components/FancyDropdown";
 import { COMPETITIONS } from "@/constants/competitions";
 import { styled } from "@pigment-css/react";
 
@@ -54,6 +54,13 @@ const FilterSection = styled("section")({
   alignItems: "center",
 });
 
+const FilterSectionNew = styled("section")({
+  display: "flex",
+  flexDirection: "row",
+  gap: "0.5rem",
+  alignItems: "center",
+});
+
 const Select = styled("select")({});
 
 const Fieldset = styled("fieldset")({
@@ -87,23 +94,6 @@ const Chip = styled("div")({
     fontWeight: "500",
     padding: "0.25rem 0.5rem 0.25rem 0",
   },
-});
-
-const StyledTabList = styled(TabList)({
-  // display: "flex",
-  // gap: "1rem",
-  display: "none",
-});
-
-const StyledTab = styled(Tab)({
-  width: "100%",
-});
-
-const StyledTabPanel = styled(TabPanel)({
-  display: "flex",
-  flexDirection: "column",
-  gap: "1rem",
-  marginTop: "1rem",
 });
 
 const SwitchContainer = styled("div")({
@@ -357,52 +347,45 @@ export default function FixturesClient() {
         </Fieldset>
       </FilterSection>
 
-      <TabGroup>
-        <StyledTabList>
-          <StyledTab>Results</StyledTab>
-          <StyledTab>Upcoming</StyledTab>
-        </StyledTabList>
-        <TabPanels>
-          <StyledTabPanel>
-            <SwitchContainer>
-              Scores
-              <StyledSwitch checked={showAllScores} onChange={setShowAllScores}>
-                <span />
-              </StyledSwitch>
-            </SwitchContainer>
-            {loading ? (
-              <p>Loading fixtures...</p>
-            ) : fixtures?.length > 0 ? (
-              <AllFixturesList>
-                {Object.entries(
-                  groupFixturesByDate(
-                    // Filter out any future fixtures based on UTC time
-                    fixtures.filter(
-                      (fixture) => new Date(fixture.utcDate) <= new Date()
-                    )
-                  )
-                ).map(([groupingKey, dateFixtures]) => (
-                  <DateGroup key={groupingKey}>
-                    <h2>{formatDateForDisplay(dateFixtures[0].localDate)}</h2>
-                    <DateFixturesList>
-                      {dateFixtures.map((fixture) => (
-                        <Fixture
-                          key={fixture.id}
-                          fixture={fixture}
-                          showAllScores={showAllScores}
-                        />
-                      ))}
-                    </DateFixturesList>
-                  </DateGroup>
-                ))}
-              </AllFixturesList>
-            ) : (
-              <p>No fixtures found</p>
-            )}
-          </StyledTabPanel>
-          <StyledTabPanel>Upcoming games</StyledTabPanel>
-        </TabPanels>
-      </TabGroup>
+      <FilterSectionNew>
+        <FancyDropdown icon="⚽︎" count={3} fillSpace={true}>
+          Premier League, Champions League, Europa League
+        </FancyDropdown>
+        <FancyDropdown icon="⏲" />
+        <FancyDropdown icon="○" />
+      </FilterSectionNew>
+
+      <section>
+        {loading ? (
+          <p>Loading fixtures...</p>
+        ) : fixtures?.length > 0 ? (
+          <AllFixturesList>
+            {Object.entries(
+              groupFixturesByDate(
+                // Filter out any future fixtures based on UTC time
+                fixtures.filter(
+                  (fixture) => new Date(fixture.utcDate) <= new Date()
+                )
+              )
+            ).map(([groupingKey, dateFixtures]) => (
+              <DateGroup key={groupingKey}>
+                <h2>{formatDateForDisplay(dateFixtures[0].localDate)}</h2>
+                <DateFixturesList>
+                  {dateFixtures.map((fixture) => (
+                    <Fixture
+                      key={fixture.id}
+                      fixture={fixture}
+                      showAllScores={showAllScores}
+                    />
+                  ))}
+                </DateFixturesList>
+              </DateGroup>
+            ))}
+          </AllFixturesList>
+        ) : (
+          <p>No fixtures found</p>
+        )}
+      </section>
     </Main>
   );
 }
