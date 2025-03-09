@@ -1,6 +1,6 @@
 // import "./globals.css";
+import { Jost } from 'next/font/google'
 import { Analytics } from "@vercel/analytics/react"
-
 import { globalCss, styled } from "@pigment-css/react";
 import '@pigment-css/react/styles.css';
 
@@ -8,6 +8,11 @@ export const metadata = {
   title: "Attie",
   description: "The anti-score scores app.",
 };
+
+const jost = Jost({
+  subsets: ['latin-ext'],
+  display: 'swap',
+})
 
 globalCss`
 // https://www.joshwcomeau.com/css/custom-css-reset/
@@ -55,7 +60,7 @@ h1, h2, h3, h4, h5, h6 {
 
 // Custom styles
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  // font-family: Arial, Helvetica, sans-serif;
 }
 
 ul, ol {
@@ -83,7 +88,7 @@ const Body = styled("body")({
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" className={jost.className}>
       <Body>
         {children}
         <Analytics />

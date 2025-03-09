@@ -9,10 +9,13 @@ const Header = styled("header")({
   color: "white",
 
   "& h1": {
+    fontStyle: "italic",
+    textTransform: "lowercase",
+    letterSpacing: "-0.05em",
     fontSize: "clamp(5rem, 20vw, 10rem)",
     lineHeight: "100%",
     webkitTextStroke: "2px black",
-    textShadow: "3px 3px 0 #000, -1px -1px 0 #000,  1px -1px 0 #000, 1px 1px 0 #000, 1px 1px 0 #000"
+    textShadow: "6px 6px 0 #000, -1px -1px 0 #000,  1px -1px 0 #000, 1px 1px 0 #000, 1px 1px 0 #000"
   },
 
   "& p": {

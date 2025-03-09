@@ -340,8 +340,8 @@ export default function FixturesClient() {
             </fieldset>
             <p>
               {showFutureFixtures
-                ? "Shows games from today forward into to the future."
-                : "Shows games from today back into to the past."}
+                ? "Shows upcoming fixtures, from today into to the future."
+                : "Shows in-progress or finished fixtures, from today back."}
             </p>
           </FancyDropdown>
           {!showFutureFixtures && (
