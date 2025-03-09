@@ -78,6 +78,7 @@ const Body = styled("body")({
   display: "flex",
   flexDirection: "column",
   gap: "3rem",
+  backgroundColor: "#FA6565",
 });
 
 export default function RootLayout({ children }) {

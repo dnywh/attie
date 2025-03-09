@@ -8,8 +8,6 @@ const StyledOpponentRow = styled("li")({
   alignItems: "center",
   gap: "1rem",
   padding: "1rem",
-  borderColor: "black",
-  borderStyle: "solid",
 
   "&:not(:last-child)": {
     borderWidth: "1px",

@@ -1,6 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Switch } from "@headlessui/react";
+import {
+  Switch,
+  Description,
+  Dialog,
+  DialogBackdrop,
+  DialogPanel,
+  DialogTitle,
+} from "@headlessui/react";
 import Fixture from "@/components/Fixture";
 import FancyDropdown from "@/components/FancyDropdown";
 import { COMPETITIONS } from "@/constants/competitions";
@@ -61,11 +68,14 @@ const FilterSectionNew = styled("section")({
   alignItems: "center",
 });
 
-const Select = styled("select")({});
+const Select = styled("select")({
+  width: "100%",
+  padding: "0.5rem",
+});
 
 const Fieldset = styled("fieldset")({
   display: "flex",
-  flexDirection: "row",
+  flexDirection: "column",
   gap: "0.5rem",
 });
 
@@ -93,48 +103,7 @@ const Chip = styled("div")({
     fontSize: "0.85rem",
     fontWeight: "500",
     padding: "0.25rem 0.5rem 0.25rem 0",
-  },
-});
-
-const SwitchContainer = styled("div")({
-  display: "flex",
-  gap: "0.5rem",
-  alignSelf: "flex-end",
-  alignItems: "center",
-});
-
-const StyledSwitch = styled(Switch)({
-  // textWrap: "nowrap",
-
-  // Remove default button styling
-  appearance: "none",
-  border: "none",
-  padding: "0",
-  margin: "0",
-  cursor: "pointer",
-  // Set basic styling
-  display: "inline-flex",
-  alignItems: "center",
-  width: "3.5rem",
-  height: "2rem",
-  backgroundColor: "gray",
-  borderRadius: "1.5rem",
-  transition: "backgroundColor 0.125s ease-in-out",
-
-  "& span": {
-    backgroundColor: "white",
-    borderRadius: "1rem",
-    width: "1.75rem",
-    height: "1.75rem",
-    transition: "transform 0.125s ease-in-out",
-    transform: "translateX(0.15rem)",
-  },
-
-  "&[data-checked]": {
-    backgroundColor: "blue",
-    "& span": {
-      transform: "translateX(1.65rem)",
-    },
+    width: "100%",
   },
 });
 
@@ -158,6 +127,42 @@ const DateFixturesList = styled("ul")({
   display: "flex",
   flexDirection: "column",
   gap: "1.5rem",
+});
+
+const StyledDialog = styled(Dialog)({
+  position: "relative",
+  zIndex: "50",
+});
+
+const DialogInner = styled("div")({
+  position: "fixed",
+  bottom: "0.5rem",
+  left: "50%",
+  transform: "translateX(-50%)",
+  backgroundColor: "white",
+  padding: "2rem",
+  width: "calc(100% - 1rem)",
+  maxWidth: "30rem",
+  borderRadius: "0.25rem",
+});
+
+const StyledDialogBackdropOne = styled(DialogBackdrop)({
+  position: "fixed",
+  top: "0",
+  left: "0",
+  right: "0",
+  bottom: "0",
+  backgroundColor: "#FA6565",
+  opacity: "95%",
+});
+
+const StyledDialogBackdropTwo = styled(DialogBackdrop)({
+  position: "fixed",
+  top: "0",
+  left: "0",
+  right: "0",
+  bottom: "0",
+  backdropFilter: "grayscale(96%) sepia(30%)",
 });
 
 const formatDateForDisplay = (date) => {
@@ -228,6 +233,17 @@ export default function FixturesClient() {
   ]);
   const [fixtures, setFixtures] = useState([]);
   const [loading, setLoading] = useState(true); // Start with loading true
+
+  const [isOpen, setIsOpen] = useState(false);
+  function open() {
+    console.log("opening...");
+    setIsOpen(true);
+  }
+
+  function close() {
+    console.log("closing...");
+    setIsOpen(false);
+  }
 
   const fetchFixturesForCompetition = async (code) => {
     const now = Date.now();
@@ -311,81 +327,104 @@ export default function FixturesClient() {
   };
 
   return (
-    <Main>
-      <FilterSection>
-        <Select>
-          <option value="football">Football</option>
-          {/* <option value="basketball">Basketball</option>
-          <option value="tennis">Tennis</option> */}
-          {/* <option value="tba" disabled>
-            After another sport? Email us: "hello" at this domain
-          </option> */}
-        </Select>
-        <Fieldset>
-          {/* <legend>Competitions:</legend> */}
-          {Object.entries(COMPETITIONS)
-            .filter(([, competition]) => competition.tier !== "paid")
-            .map(([competitionId, competition]) => (
-              <Chip
-                key={competitionId}
-                data-active={
-                  selectedCompetitions.includes(competitionId)
-                    ? true
-                    : undefined
-                }
-              >
-                <input
-                  type="checkbox"
-                  id={competitionId}
-                  name={competitionId}
-                  checked={selectedCompetitions.includes(competitionId)}
-                  onChange={handleCompetitionChange}
-                />
-                <label htmlFor={competitionId}>{competition.name}</label>
-              </Chip>
-            ))}
-        </Fieldset>
-      </FilterSection>
+    <>
+      <Main>
+        <FilterSectionNew>
+          <FancyDropdown
+            onClick={open}
+            icon="⚽︎"
+            label={selectedCompetitions.join(", ")}
+            count={selectedCompetitions.length}
+            fillSpace={true}
+          >
+            {selectedCompetitions}
+          </FancyDropdown>
+          <FancyDropdown icon="⏲" />
+          <FancyDropdown icon="○" />
+        </FilterSectionNew>
 
-      <FilterSectionNew>
-        <FancyDropdown icon="⚽︎" count={3} fillSpace={true}>
-          Premier League, Champions League, Europa League
-        </FancyDropdown>
-        <FancyDropdown icon="⏲" />
-        <FancyDropdown icon="○" />
-      </FilterSectionNew>
-
-      <section>
-        {loading ? (
-          <p>Loading fixtures...</p>
-        ) : fixtures?.length > 0 ? (
-          <AllFixturesList>
-            {Object.entries(
-              groupFixturesByDate(
-                // Filter out any future fixtures based on UTC time
-                fixtures.filter(
-                  (fixture) => new Date(fixture.utcDate) <= new Date()
+        <section>
+          {loading ? (
+            <p>Loading fixtures...</p>
+          ) : fixtures?.length > 0 ? (
+            <AllFixturesList>
+              {Object.entries(
+                groupFixturesByDate(
+                  // Filter out any future fixtures based on UTC time
+                  fixtures.filter(
+                    (fixture) => new Date(fixture.utcDate) <= new Date()
+                  )
                 )
-              )
-            ).map(([groupingKey, dateFixtures]) => (
-              <DateGroup key={groupingKey}>
-                <h2>{formatDateForDisplay(dateFixtures[0].localDate)}</h2>
-                <DateFixturesList>
-                  {dateFixtures.map((fixture) => (
-                    <Fixture
-                      key={fixture.id}
-                      fixture={fixture}
-                      showAllScores={showAllScores}
+              ).map(([groupingKey, dateFixtures]) => (
+                <DateGroup key={groupingKey}>
+                  <h2>{formatDateForDisplay(dateFixtures[0].localDate)}</h2>
+                  <DateFixturesList>
+                    {dateFixtures.map((fixture) => (
+                      <Fixture
+                        key={fixture.id}
+                        fixture={fixture}
+                        showAllScores={showAllScores}
+                      />
+                    ))}
+                  </DateFixturesList>
+                </DateGroup>
+              ))}
+            </AllFixturesList>
+          ) : (
+            <p>No fixtures found</p>
+          )}
+        </section>
+      </Main>
+
+      <StyledDialog open={isOpen} onClose={() => setIsOpen(false)}>
+        <StyledDialogBackdropOne />
+        <StyledDialogBackdropTwo />
+        <DialogInner>
+          <DialogPanel
+            transition
+            className="w-full max-w-md rounded-xl bg-white/5 p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+          >
+            <header>
+              <button onClick={close}>Close</button>
+              {/* <DialogTitle>Sport and competitions</DialogTitle> */}
+            </header>
+            <label htmlFor="sport">1. Sport</label>
+            <Select name="sport" id="sport">
+              <option value="football">Football</option>
+              <option value="basketball">Basketball</option>
+              <option value="tennis">Tennis</option>
+              <option value="tba" disabled>
+                After another sport? Email us: "hello" at this domain
+              </option>
+            </Select>
+
+            <Fieldset>
+              <legend>2. Competitions:</legend>
+              {Object.entries(COMPETITIONS)
+                .filter(([, competition]) => competition.tier !== "paid")
+                .map(([competitionId, competition]) => (
+                  <Chip
+                    key={competitionId}
+                    data-active={
+                      selectedCompetitions.includes(competitionId)
+                        ? true
+                        : undefined
+                    }
+                  >
+                    <input
+                      type="checkbox"
+                      id={competitionId}
+                      name={competitionId}
+                      checked={selectedCompetitions.includes(competitionId)}
+                      onChange={handleCompetitionChange}
                     />
-                  ))}
-                </DateFixturesList>
-              </DateGroup>
-            ))}
-          </AllFixturesList>
-        ) : (
-          <p>No fixtures found</p>
-        )}
-      </section>
-    </Main>
+                    <label htmlFor={competitionId}>{competition.name}</label>
+                  </Chip>
+                ))}
+            </Fieldset>
+          </DialogPanel>
+        </DialogInner>
+      </StyledDialog>
+    </>
   );
 }

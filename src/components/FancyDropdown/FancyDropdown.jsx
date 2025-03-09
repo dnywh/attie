@@ -1,12 +1,17 @@
 import { styled } from "@pigment-css/react";
 
-const StyledDropdown = styled("div")({
+const StyledButton = styled("button")({
+  appearance: "none",
+  border: "none",
+
+  cursor: "pointer",
+
   display: "flex",
   gap: "0.65rem",
   padding: "0.65rem",
-  borderColor: "black",
-  borderStyle: "solid",
-  borderWidth: "1px",
+  // borderColor: "black",
+  // borderStyle: "solid",
+  // borderWidth: "1px",
   backgroundColor: "rgb(240, 240, 240)",
   alignItems: "center",
   fontSize: "0.85rem",
@@ -15,7 +20,7 @@ const StyledDropdown = styled("div")({
   // whiteSpace: "nowrap",
 
   "&::after": {
-    content: '"▾"',
+    content: '"⟠"',
     // display: "block",
     // flexGrow: 1,
     // borderBottom: "1px solid black",
@@ -44,6 +49,7 @@ const IconSpan = styled("span")({
 });
 
 const ContentSpan = styled("span")({
+  textAlign: "left",
   variants: [
     {
       props: { fillSpace: true },
@@ -70,13 +76,20 @@ const CountSpan = styled("span")({
   justifyContent: "center",
   flexShrink: 0,
 });
-function FancyDropdown({ icon = "•", fillSpace = false, count, children }) {
+function FancyDropdown({
+  icon = "•",
+  label,
+  fillSpace = false,
+  count,
+  children,
+  ...props
+}) {
   return (
-    <StyledDropdown fillSpace={fillSpace}>
+    <StyledButton fillSpace={fillSpace} {...props}>
       <IconSpan>{icon}</IconSpan>
-      {children && <ContentSpan fillSpace={fillSpace}>{children}</ContentSpan>}
+      {label && <ContentSpan fillSpace={fillSpace}>{label}</ContentSpan>}
       {count && <CountSpan>{count}</CountSpan>}
-    </StyledDropdown>
+    </StyledButton>
   );
 }
 

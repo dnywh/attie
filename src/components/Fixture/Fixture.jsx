@@ -11,6 +11,7 @@ const FixtureRow = styled("li")({
   borderColor: "black",
   borderStyle: "solid",
   borderWidth: "1px",
+  backgroundColor: "#FEE272",
 });
 
 const FixtureTiming = styled("div")({
@@ -28,7 +29,12 @@ const FixtureTiming = styled("div")({
   },
 });
 
-const OpponentsList = styled("ul")({});
+const OpponentsList = styled("ul")({
+  borderColor: "black",
+  borderWidth: "1px",
+  borderStyle: "solid",
+  backgroundColor: "white",
+});
 
 const CompetitionName = styled("p")({
   textTransform: "uppercase",
