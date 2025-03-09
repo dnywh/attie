@@ -21,6 +21,9 @@ const StyledOpponentRow = styled("li")({
 const OpponentName = styled("p")({
   flex: "1",
   lineHeight: "100%",
+  textTransform: "uppercase",
+  letterSpacing: "0.025rem",
+  fontWeight: "500",
 });
 
 function OpponentRow({ team, score, showAllScores, status }) {

@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Fixture from "@/components/Fixture";
 import FancyDropdown from "@/components/FancyDropdown";
+import HeadingBanner from "@/components/HeadingBanner";
 import { COMPETITIONS } from "@/constants/competitions";
 import { styled } from "@pigment-css/react";
 
@@ -45,11 +46,14 @@ const Main = styled("main")({
   gap: "1rem",
 });
 
-const FilterSectionNew = styled("section")({
+const ControlBar = styled("section")({
   display: "flex",
   flexDirection: "row",
   gap: "0.5rem",
+  padding: "0.5rem",
   alignItems: "center",
+  backgroundColor: "#AEF4F5",
+  border: "1px solid black",
 });
 
 const Select = styled("select")({
@@ -101,10 +105,6 @@ const DateGroup = styled("li")({
   display: "flex",
   flexDirection: "column",
   gap: "1.5rem",
-
-  "& h2": {
-    textAlign: "center",
-  },
 });
 
 const DateFixturesList = styled("ul")({
@@ -264,7 +264,7 @@ export default function FixturesClient() {
   return (
     <>
       <Main>
-        <FilterSectionNew>
+        <ControlBar>
           <FancyDropdown
             icon="⚽️"
             label={selectedCompetitions.join(", ")}
@@ -376,7 +376,7 @@ export default function FixturesClient() {
               </p>
             </FancyDropdown>
           )}
-        </FilterSectionNew>
+        </ControlBar>
 
         <section>
           {loading ? (
@@ -395,7 +395,9 @@ export default function FixturesClient() {
                 )
               ).map(([groupingKey, dateFixtures]) => (
                 <DateGroup key={groupingKey}>
-                  <h2>{formatDateForDisplay(dateFixtures[0].localDate)}</h2>
+                  <HeadingBanner>
+                    {formatDateForDisplay(dateFixtures[0].localDate)}
+                  </HeadingBanner>
                   <DateFixturesList>
                     {dateFixtures.map((fixture) => (
                       <Fixture

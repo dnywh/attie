@@ -19,15 +19,23 @@ const StyledButton = styled("button")({
   display: "flex",
   gap: "0.65rem",
   padding: "0.65rem",
-  // borderColor: "black",
-  // borderStyle: "solid",
-  // borderWidth: "1px",
-  backgroundColor: "rgb(240, 240, 240)",
+  borderColor: "black",
+  borderStyle: "solid",
+  borderWidth: "1px",
+  borderRadius: "0.25rem",
+  backgroundColor: "white",
   alignItems: "center",
   fontSize: "0.85rem",
   // textWrap: "noWrap",
   overflow: "hidden",
   // whiteSpace: "nowrap",
+
+  transition: "transform 0.1s ease",
+  transformOrigin: "bottom center",
+
+  "&:hover": {
+    transform: "translateY(-2px) scale(1.005)",
+  },
 
   "&::after": {
     content: '"⟠"',
