@@ -131,11 +131,7 @@ const formatDateForDisplay = (date) => {
   // Only show Today/Yesterday for past dates
   if (dayDiff === 0) return "Today";
   if (dayDiff === -1) return "Yesterday";
-  if (dayDiff > 0) {
-    // Future dates should not be shown since route.js limits to today
-    console.warn("Future date encountered:", date);
-    return "Invalid Date";
-  }
+  if (dayDiff === 1) return "Tomorrow";
 
   // All other past dates
   const suffix = getOrdinalSuffix(localDate.getDate());
@@ -171,6 +167,17 @@ const groupFixturesByDate = (fixtures) => {
     });
     return groups;
   }, {});
+};
+
+// Add this helper function near your other utility functions
+const sortFixtures = (fixtures, showFutureFixtures) => {
+  return fixtures.sort((a, b) => {
+    const dateA = new Date(a.utcDate);
+    const dateB = new Date(b.utcDate);
+    // For past fixtures: most recent first (B-A)
+    // For future fixtures: soonest first (A-B)
+    return showFutureFixtures ? dateA - dateB : dateB - dateA;
+  });
 };
 
 export default function FixturesClient() {
@@ -214,13 +221,7 @@ export default function FixturesClient() {
         const matches = await Promise.all(
           initialCodes.map(fetchFixturesForCompetition)
         );
-        setFixtures(
-          matches.flat().sort((a, b) => {
-            const dateA = new Date(a.utcDate);
-            const dateB = new Date(b.utcDate);
-            return dateB - dateA;
-          })
-        );
+        setFixtures(sortFixtures(matches.flat(), showFutureFixtures));
       } catch (error) {
         console.error("Failed to fetch fixtures:", error);
       } finally {
@@ -229,7 +230,7 @@ export default function FixturesClient() {
     };
 
     loadInitialFixtures();
-  }, []);
+  }, [showFutureFixtures]); // Add this dependency
 
   const handleCompetitionChange = async (event) => {
     const competition = event.target.name;
@@ -250,11 +251,7 @@ export default function FixturesClient() {
         setSelectedCompetitions((prev) => [...prev, competition]);
         const newMatches = await fetchFixturesForCompetition(competitionCode);
         setFixtures((prevFixtures) =>
-          [...prevFixtures, ...newMatches].sort((a, b) => {
-            const dateA = new Date(a.utcDate);
-            const dateB = new Date(b.utcDate);
-            return dateB - dateA;
-          })
+          sortFixtures([...prevFixtures, ...newMatches], showFutureFixtures)
         );
       }
     } catch (error) {
@@ -388,10 +385,13 @@ export default function FixturesClient() {
             <AllFixturesList>
               {Object.entries(
                 groupFixturesByDate(
-                  // Filter out any future fixtures based on UTC time
-                  fixtures.filter(
-                    (fixture) => new Date(fixture.utcDate) <= new Date()
-                  )
+                  fixtures.filter((fixture) => {
+                    const fixtureDate = new Date(fixture.utcDate);
+                    const now = new Date();
+                    return showFutureFixtures
+                      ? fixtureDate >= now // Future fixtures
+                      : fixtureDate <= now; // Past fixtures
+                  })
                 )
               ).map(([groupingKey, dateFixtures]) => (
                 <DateGroup key={groupingKey}>

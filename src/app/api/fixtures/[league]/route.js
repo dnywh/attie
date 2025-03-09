@@ -2,27 +2,26 @@ import { NextResponse } from 'next/server';
 
 export async function GET(request, { params }) {
     const { league } = await params;
-
-    // Use UTC dates for API query since API works in UTC
     const now = new Date();
-    const today = new Date(Date.UTC(
-        now.getUTCFullYear(),
-        now.getUTCMonth(),
-        now.getUTCDate()
-    )).toISOString().split('T')[0];
 
-    const startDate = new Date(Date.UTC(
+    // Get dates for -7 to +7 days window
+    const pastDate = new Date(Date.UTC(
         now.getUTCFullYear(),
         now.getUTCMonth(),
         now.getUTCDate() - 7
-    ));
-    const formattedStartDate = startDate.toISOString().split('T')[0];
+    )).toISOString().split('T')[0];
 
-    console.log(`Getting games scheduled from today UTC (${today}), back 7 days to ${formattedStartDate}`);
+    const futureDate = new Date(Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth(),
+        now.getUTCDate() + 7
+    )).toISOString().split('T')[0];
+
+    console.log(`Getting games scheduled from ${pastDate} to ${futureDate}`);
 
     try {
         const response = await fetch(
-            `https://api.football-data.org/v4/competitions/${league}/matches?dateFrom=${formattedStartDate}&dateTo=${today}`,
+            `https://api.football-data.org/v4/competitions/${league}/matches?dateFrom=${pastDate}&dateTo=${futureDate}`,
             {
                 headers: {
                     "X-Auth-Token": process.env.FOOTBALL_DATA_API_KEY,
