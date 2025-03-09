@@ -1,13 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import {
-  Switch,
-  Description,
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
-  DialogTitle,
-} from "@headlessui/react";
 import Fixture from "@/components/Fixture";
 import FancyDropdown from "@/components/FancyDropdown";
 import { COMPETITIONS } from "@/constants/competitions";
@@ -51,14 +43,6 @@ const Main = styled("main")({
   display: "flex",
   flexDirection: "column",
   gap: "1rem",
-});
-
-const FilterSection = styled("section")({
-  display: "flex",
-  flexDirection: "row",
-  gap: "0.5rem",
-  overflowX: "scroll",
-  alignItems: "center",
 });
 
 const FilterSectionNew = styled("section")({
@@ -129,42 +113,6 @@ const DateFixturesList = styled("ul")({
   gap: "1.5rem",
 });
 
-const StyledDialog = styled(Dialog)({
-  position: "relative",
-  zIndex: "50",
-});
-
-const DialogInner = styled("div")({
-  position: "fixed",
-  bottom: "0.5rem",
-  left: "50%",
-  transform: "translateX(-50%)",
-  backgroundColor: "white",
-  padding: "2rem",
-  width: "calc(100% - 1rem)",
-  maxWidth: "30rem",
-  borderRadius: "0.25rem",
-});
-
-const StyledDialogBackdropOne = styled(DialogBackdrop)({
-  position: "fixed",
-  top: "0",
-  left: "0",
-  right: "0",
-  bottom: "0",
-  backgroundColor: "#FA6565",
-  opacity: "95%",
-});
-
-const StyledDialogBackdropTwo = styled(DialogBackdrop)({
-  position: "fixed",
-  top: "0",
-  left: "0",
-  right: "0",
-  bottom: "0",
-  backdropFilter: "grayscale(96%) sepia(30%)",
-});
-
 const formatDateForDisplay = (date) => {
   const now = new Date();
   const localDate = new Date(date);
@@ -226,6 +174,7 @@ const groupFixturesByDate = (fixtures) => {
 };
 
 export default function FixturesClient() {
+  const [showFutureFixtures, setShowFutureFixtures] = useState(false);
   const [showAllScores, setShowAllScores] = useState(false);
   const [selectedCompetitions, setSelectedCompetitions] = useState([
     "premier-league",
@@ -233,17 +182,6 @@ export default function FixturesClient() {
   ]);
   const [fixtures, setFixtures] = useState([]);
   const [loading, setLoading] = useState(true); // Start with loading true
-
-  const [isOpen, setIsOpen] = useState(false);
-  function open() {
-    console.log("opening...");
-    setIsOpen(true);
-  }
-
-  function close() {
-    console.log("closing...");
-    setIsOpen(false);
-  }
 
   const fetchFixturesForCompetition = async (code) => {
     const now = Date.now();
@@ -331,16 +269,116 @@ export default function FixturesClient() {
       <Main>
         <FilterSectionNew>
           <FancyDropdown
-            onClick={open}
-            icon="⚽︎"
+            icon="⚽️"
             label={selectedCompetitions.join(", ")}
             count={selectedCompetitions.length}
             fillSpace={true}
           >
-            {selectedCompetitions}
+            <>
+              <label htmlFor="sport">1. Sport</label>
+              <Select name="sport" id="sport">
+                <option value="football">Football</option>
+                <option value="basketball">Basketball</option>
+                <option value="tennis">Tennis</option>
+                <option value="tba" disabled>
+                  After another sport? Email us: "hello" at this domain
+                </option>
+              </Select>
+
+              <Fieldset>
+                <legend>2. Competitions</legend>
+                {Object.entries(COMPETITIONS)
+                  .filter(([, competition]) => competition.tier !== "paid")
+                  .map(([competitionId, competition]) => (
+                    <Chip
+                      key={competitionId}
+                      data-active={
+                        selectedCompetitions.includes(competitionId)
+                          ? true
+                          : undefined
+                      }
+                    >
+                      <input
+                        type="checkbox"
+                        id={competitionId}
+                        name={competitionId}
+                        checked={selectedCompetitions.includes(competitionId)}
+                        onChange={handleCompetitionChange}
+                      />
+                      <label htmlFor={competitionId}>{competition.name}</label>
+                    </Chip>
+                  ))}
+              </Fieldset>
+            </>
           </FancyDropdown>
-          <FancyDropdown icon="⏲" />
-          <FancyDropdown icon="○" />
+          <FancyDropdown icon={showFutureFixtures ? "🗓️" : "🕥"}>
+            <fieldset>
+              <legend>Fixture direction</legend>
+              <div>
+                <input
+                  type="radio"
+                  id="backward-fixtures"
+                  name="fixture-direction"
+                  value="backwards"
+                  checked={!showFutureFixtures}
+                  onChange={() => setShowFutureFixtures(false)}
+                />
+                <label htmlFor="backward-fixtures">Backwards</label>
+              </div>
+
+              <div>
+                <input
+                  type="radio"
+                  id="forward-fixtures"
+                  name="fixture-direction"
+                  value="forwards"
+                  checked={showFutureFixtures}
+                  onChange={() => setShowFutureFixtures(true)}
+                />
+                <label htmlFor="forward-fixtures">Forwards</label>
+              </div>
+            </fieldset>
+            <p>
+              {showFutureFixtures
+                ? "Shows games from today forward into to the future."
+                : "Shows games from today back into to the past."}
+            </p>
+          </FancyDropdown>
+          {!showFutureFixtures && (
+            <FancyDropdown icon={showAllScores ? "👀" : "⚫️"}>
+              <fieldset>
+                <legend>Score visibility</legend>
+                <div>
+                  <input
+                    type="radio"
+                    id="hide-scores"
+                    name="score-visibility"
+                    value="hidden"
+                    checked={!showAllScores}
+                    onChange={() => setShowAllScores(false)}
+                  />
+                  <label htmlFor="hide-scores">Hide all scores</label>
+                </div>
+
+                <div>
+                  <input
+                    type="radio"
+                    id="show-scores"
+                    name="score-visibility"
+                    value="visible"
+                    checked={showAllScores}
+                    onChange={() => setShowAllScores(true)}
+                  />
+                  <label htmlFor="show-scores">Show all scores</label>
+                </div>
+              </fieldset>
+              <p>
+                {showAllScores
+                  ? "Reveals all scores, just like any other sports results app (Seriously?)."
+                  : "Hides all scores. Tap the black circles to reveal individual scores."}
+              </p>
+            </FancyDropdown>
+          )}
         </FilterSectionNew>
 
         <section>
@@ -375,56 +413,6 @@ export default function FixturesClient() {
           )}
         </section>
       </Main>
-
-      <StyledDialog open={isOpen} onClose={() => setIsOpen(false)}>
-        <StyledDialogBackdropOne />
-        <StyledDialogBackdropTwo />
-        <DialogInner>
-          <DialogPanel
-            transition
-            className="w-full max-w-md rounded-xl bg-white/5 p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
-          >
-            <header>
-              <button onClick={close}>Close</button>
-              {/* <DialogTitle>Sport and competitions</DialogTitle> */}
-            </header>
-            <label htmlFor="sport">1. Sport</label>
-            <Select name="sport" id="sport">
-              <option value="football">Football</option>
-              <option value="basketball">Basketball</option>
-              <option value="tennis">Tennis</option>
-              <option value="tba" disabled>
-                After another sport? Email us: "hello" at this domain
-              </option>
-            </Select>
-
-            <Fieldset>
-              <legend>2. Competitions:</legend>
-              {Object.entries(COMPETITIONS)
-                .filter(([, competition]) => competition.tier !== "paid")
-                .map(([competitionId, competition]) => (
-                  <Chip
-                    key={competitionId}
-                    data-active={
-                      selectedCompetitions.includes(competitionId)
-                        ? true
-                        : undefined
-                    }
-                  >
-                    <input
-                      type="checkbox"
-                      id={competitionId}
-                      name={competitionId}
-                      checked={selectedCompetitions.includes(competitionId)}
-                      onChange={handleCompetitionChange}
-                    />
-                    <label htmlFor={competitionId}>{competition.name}</label>
-                  </Chip>
-                ))}
-            </Fieldset>
-          </DialogPanel>
-        </DialogInner>
-      </StyledDialog>
     </>
   );
 }
