@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Fixture from "@/components/Fixture";
 import FancyDropdown from "@/components/FancyDropdown";
 import HeadingBanner from "@/components/HeadingBanner";
+import Button from "@/components/Button";
 import { COMPETITIONS } from "@/constants/competitions";
 import { styled } from "@pigment-css/react";
 
@@ -43,7 +44,7 @@ const updateCache = (code, data) => {
 const Main = styled("main")({
   display: "flex",
   flexDirection: "column",
-  gap: "1rem",
+  gap: "1.5rem",
 });
 
 const ControlBar = styled("section")({
@@ -54,6 +55,8 @@ const ControlBar = styled("section")({
   alignItems: "center",
   backgroundColor: "#AEF4F5",
   border: "1px solid black",
+  borderRadius: "3px",
+  overflowX: "hidden",
 });
 
 const Select = styled("select")({
@@ -98,13 +101,18 @@ const Chip = styled("div")({
 const AllFixturesList = styled("ul")({
   display: "flex",
   flexDirection: "column",
-  gap: "3rem",
+  gap: "1.5rem",
 });
 
 const DateGroup = styled("li")({
   display: "flex",
   flexDirection: "column",
   gap: "1.5rem",
+
+  // "&:not(:first-of-type)": {
+  paddingTop: "1.5rem",
+  borderTop: "1px dashed rgba(0,0,0,0.1)",
+  // },
 });
 
 const DateFixturesList = styled("ul")({
@@ -409,6 +417,9 @@ export default function FixturesClient() {
                   </DateFixturesList>
                 </DateGroup>
               ))}
+              <Button onClick={() => console.log("Loading more...")}>
+                Load more
+              </Button>
             </AllFixturesList>
           ) : (
             <p>No fixtures found</p>

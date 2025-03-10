@@ -24,8 +24,16 @@ const FixtureTiming = styled("div")({
     textTransform: "uppercase",
     letterSpacing: "0.085em",
     fontSize: "0.8em",
-    textAlign: "center",
     margin: "0",
+    "&:first-of-type": {
+      textAlign: "left",
+      overflow: "hidden",
+      whiteSpace: "nowrap",
+      textOverflow: "ellipsis",
+    },
+    "&:last-of-type": {
+      textAlign: "right",
+    },
   },
 });
 
@@ -69,12 +77,14 @@ function Fixture({ fixture, showAllScores }) {
           score={fixture.score.fullTime.home}
           showAllScores={showAllScores}
           status={fixture.status}
+          isHomeTeam={true}
         />
         <OpponentRow
           team={fixture.awayTeam}
           score={fixture.score.fullTime.away}
           showAllScores={showAllScores}
           status={fixture.status}
+          isHomeTeam={false}
         />
       </OpponentsList>
 

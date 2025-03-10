@@ -21,8 +21,9 @@ const StyledOpponentRow = styled("li")({
 const OpponentName = styled("p")({
   flex: "1",
   lineHeight: "100%",
+  fontSize: "0.9375rem", // 15px
+  letterSpacing: "0.035em",
   textTransform: "uppercase",
-  letterSpacing: "0.025rem",
   fontWeight: "500",
   // Truncate and ellipsize text
   overflow: "hidden",
@@ -30,10 +31,14 @@ const OpponentName = styled("p")({
   textOverflow: "ellipsis",
 });
 
-function OpponentRow({ team, score, showAllScores, status }) {
+function OpponentRow({ team, score, showAllScores, status, isHomeTeam }) {
   return (
     <StyledOpponentRow>
-      <TeamLogo src={team.crest} />
+      <TeamLogo
+        src={team.crest}
+        alt={`Crest for ${team.shortName ? team.shortName : team.name}`}
+        isHomeTeam={isHomeTeam}
+      />
       <OpponentName>{team.shortName ? team.shortName : team.name}</OpponentName>
       {!["SCHEDULED", "TIMED", "CANCELLED", "POSTPONED"].includes(status) && (
         <Score score={score} showAllScores={showAllScores} />

@@ -13,7 +13,6 @@ import { styled } from "@pigment-css/react";
 const StyledButton = styled("button")({
   appearance: "none",
   border: "none",
-
   cursor: "pointer",
 
   display: "flex",
@@ -68,6 +67,8 @@ const IconSpan = styled("span")({
 
 const ContentSpan = styled("span")({
   textAlign: "left",
+  textTransform: "uppercase",
+  letterSpacing: "0.015em",
   variants: [
     {
       props: { fillSpace: true },
@@ -83,8 +84,8 @@ const ContentSpan = styled("span")({
 
 const CountSpan = styled("span")({
   fontSize: "0.75rem",
-  backgroundColor: "black",
-  color: "white",
+  backgroundColor: "#FEE272",
+  color: "black",
   width: "1.5rem",
   height: "1.5rem",
   borderRadius: "0.75rem",

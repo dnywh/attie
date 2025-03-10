@@ -1,5 +1,5 @@
-// import "./globals.css";
-import { Jost } from 'next/font/google'
+// Supports weights 100-900
+import '@fontsource-variable/jost/wght-italic.css';
 import { Analytics } from "@vercel/analytics/react"
 import { globalCss, styled } from "@pigment-css/react";
 import '@pigment-css/react/styles.css';
@@ -9,12 +9,8 @@ export const metadata = {
   description: "The anti-score scores app.",
 };
 
-const jost = Jost({
-  subsets: ['latin-ext'],
-  display: 'swap',
-})
-
 globalCss`
+
 // https://www.joshwcomeau.com/css/custom-css-reset/
 
 /* 1. Use a more-intuitive box-sizing model */
@@ -59,9 +55,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 // Custom styles
-body {
-  // font-family: Arial, Helvetica, sans-serif;
-}
 
 ul, ol {
   list-style: none;
@@ -77,6 +70,7 @@ fieldset {
 `
 
 const Body = styled("body")({
+  fontFamily: "'Jost Variable', Futura, Helvetica, Arial, sans-serif",
   padding: "2rem 1rem",
   maxWidth: "40rem",
   margin: "0 auto",
@@ -88,7 +82,7 @@ const Body = styled("body")({
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={jost.className}>
+    <html lang="en">
       <Body>
         {children}
         <Analytics />

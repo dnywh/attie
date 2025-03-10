@@ -7,21 +7,28 @@ const Header = styled("header")({
   alignItems: "center",
   textAlign: "center",
   color: "white",
+  textTransform: "lowercase",
+  fontStyle: "italic",
 
   "& h1": {
-    fontStyle: "italic",
-    textTransform: "lowercase",
-    letterSpacing: "-0.05em",
+    letterSpacing: "-0.035em",
     fontSize: "clamp(5rem, 20vw, 10rem)",
     lineHeight: "100%",
-    webkitTextStroke: "2px black",
-    textShadow: "6px 6px 0 #000, -1px -1px 0 #000,  1px -1px 0 #000, 1px 1px 0 #000, 1px 1px 0 #000"
+    // TODO: Add more for less-jagged edges
+    textShadow: "0 1px 0 black, 1px 2px 0 black, 2px 3px 0 black, 3px 4px 0 black, 3px 5px 0 black, 3px 6px 0 black",
+    "-webkit-text-stroke": "5px black",
+    "paint-order": "stroke fill",
   },
 
   "& p": {
-    fontSize: "clamp(1.5rem, 5vw, 2rem)",
+    fontSize: "1.0625rem",
+    fontWeight: "500",
     textWrap: "balance",
     lineHeight: "120%",
+    // TODO: Add more for less-jagged edges
+    textShadow: "1px 1px 0 black, 2px 2px 0 black",
+    "-webkit-text-stroke": "2px black",
+    "paint-order": "stroke fill",
   },
 });
 
@@ -31,7 +38,7 @@ export default function Home() {
     <>
       <Header>
         <h1>Attie</h1>
-        <p>The anti-score scores app.</p>
+        <p>The anti-score scores app</p>
         {/* <p>Matches without the scores.</p> */}
       </Header>
 

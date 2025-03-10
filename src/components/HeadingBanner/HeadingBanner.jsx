@@ -10,6 +10,12 @@ const StyledHeading = styled("h2")({
   color: "white",
   backgroundColor: "black",
   padding: "0.25rem 0",
+  // Sticky
+  position: "sticky",
+  top: "0",
+  zIndex: "1",
+  // top: "3px",
+  // boxShadow: "0 0 0 3px #FA6565",
 });
 
 function HeadingBanner({ children = "Heading" }) {
