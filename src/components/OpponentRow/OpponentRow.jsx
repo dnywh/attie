@@ -24,13 +24,17 @@ const OpponentName = styled("p")({
   textTransform: "uppercase",
   letterSpacing: "0.025rem",
   fontWeight: "500",
+  // Truncate and ellipsize text
+  overflow: "hidden",
+  whiteSpace: "nowrap",
+  textOverflow: "ellipsis",
 });
 
 function OpponentRow({ team, score, showAllScores, status }) {
   return (
     <StyledOpponentRow>
       <TeamLogo src={team.crest} />
-      <OpponentName>{team.name}</OpponentName>
+      <OpponentName>{team.shortName ? team.shortName : team.name}</OpponentName>
       {!["SCHEDULED", "TIMED", "CANCELLED", "POSTPONED"].includes(status) && (
         <Score score={score} showAllScores={showAllScores} />
       )}

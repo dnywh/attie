@@ -308,39 +308,6 @@ export default function FixturesClient() {
               </Fieldset>
             </>
           </FancyDropdown>
-          <FancyDropdown icon={showFutureFixtures ? "🗓️" : "🕥"}>
-            <fieldset>
-              <legend>Fixture direction</legend>
-              <div>
-                <input
-                  type="radio"
-                  id="backward-fixtures"
-                  name="fixture-direction"
-                  value="backwards"
-                  checked={!showFutureFixtures}
-                  onChange={() => setShowFutureFixtures(false)}
-                />
-                <label htmlFor="backward-fixtures">Backwards</label>
-              </div>
-
-              <div>
-                <input
-                  type="radio"
-                  id="forward-fixtures"
-                  name="fixture-direction"
-                  value="forwards"
-                  checked={showFutureFixtures}
-                  onChange={() => setShowFutureFixtures(true)}
-                />
-                <label htmlFor="forward-fixtures">Forwards</label>
-              </div>
-            </fieldset>
-            <p>
-              {showFutureFixtures
-                ? "Shows upcoming fixtures, from today into to the future."
-                : "Shows in-progress or finished fixtures, from today back."}
-            </p>
-          </FancyDropdown>
           {!showFutureFixtures && (
             <FancyDropdown icon={showAllScores ? "👀" : "⚫️"}>
               <fieldset>
@@ -376,6 +343,39 @@ export default function FixturesClient() {
               </p>
             </FancyDropdown>
           )}
+          <FancyDropdown icon={showFutureFixtures ? "🗓️" : "🕥"}>
+            <fieldset>
+              <legend>Fixture direction</legend>
+              <div>
+                <input
+                  type="radio"
+                  id="backward-fixtures"
+                  name="fixture-direction"
+                  value="backwards"
+                  checked={!showFutureFixtures}
+                  onChange={() => setShowFutureFixtures(false)}
+                />
+                <label htmlFor="backward-fixtures">Backwards</label>
+              </div>
+
+              <div>
+                <input
+                  type="radio"
+                  id="forward-fixtures"
+                  name="fixture-direction"
+                  value="forwards"
+                  checked={showFutureFixtures}
+                  onChange={() => setShowFutureFixtures(true)}
+                />
+                <label htmlFor="forward-fixtures">Forwards</label>
+              </div>
+            </fieldset>
+            <p>
+              {showFutureFixtures
+                ? "Shows upcoming fixtures, from today into to the future."
+                : "Shows in-progress or finished fixtures, from today back."}
+            </p>
+          </FancyDropdown>
         </ControlBar>
 
         <section>
