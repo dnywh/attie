@@ -7,14 +7,15 @@ const StyledOpponentRow = styled("li")({
   justifyContent: "space-between",
   alignItems: "center",
   gap: "1rem",
-  padding: "1rem",
 
   "&:not(:last-child)": {
     borderWidth: "1px",
+    padding: "1rem 1rem 0.625rem 1rem",
   },
 
   "&:last-child": {
     borderWidth: "0 1px 1px 1px",
+    padding: "0.625rem 1rem 1rem 1rem",
   },
 });
 

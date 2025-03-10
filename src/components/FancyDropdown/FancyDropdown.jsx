@@ -8,9 +8,20 @@ import {
   DialogPanel,
   DialogTitle,
 } from "@headlessui/react";
+import Button from "@/components/Button";
 import { styled } from "@pigment-css/react";
 
-const StyledButton = styled("button")({
+const DialogHeader = styled("header")(({ theme }) => ({
+  display: "flex",
+  flexDirection: "row-reverse",
+
+  // Sticky behaviour
+  position: "sticky",
+  top: "0",
+  backgroundColor: theme.colors.mid.secondary,
+}));
+
+const StyledButton = styled("button")(({ theme }) => ({
   appearance: "none",
   border: "none",
   cursor: "pointer",
@@ -18,13 +29,14 @@ const StyledButton = styled("button")({
   display: "flex",
   gap: "0.65rem",
   padding: "0.65rem",
-  borderColor: "black",
+  borderColor: theme.colors.text,
   borderStyle: "solid",
   borderWidth: "1px",
   borderRadius: "0.25rem",
-  backgroundColor: "white",
+  backgroundColor: theme.colors.foreground,
   alignItems: "center",
   fontSize: "0.85rem",
+  fontWeight: "500",
   // textWrap: "noWrap",
   overflow: "hidden",
   // whiteSpace: "nowrap",
@@ -58,7 +70,7 @@ const StyledButton = styled("button")({
       },
     },
   ],
-});
+}));
 
 const IconSpan = styled("span")({
   flexShrink: 0,
@@ -82,19 +94,18 @@ const ContentSpan = styled("span")({
   ],
 });
 
-const CountSpan = styled("span")({
+const CountSpan = styled("span")(({ theme }) => ({
   fontSize: "0.75rem",
   backgroundColor: "#FEE272",
   color: "black",
   width: "1.5rem",
   height: "1.5rem",
   borderRadius: "0.75rem",
-  fontWeight: "bold",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   flexShrink: 0,
-});
+}));
 
 // Dialog
 const StyledDialog = styled(Dialog)({
@@ -102,19 +113,35 @@ const StyledDialog = styled(Dialog)({
   zIndex: "50",
 });
 
-const DialogInner = styled("div")({
+const DialogInner = styled("div")(({ theme }) => ({
   position: "fixed",
   bottom: "0.5rem",
   left: "50%",
   transform: "translateX(-50%)",
-  backgroundColor: "white",
-  padding: "2rem",
+  backgroundColor: theme.colors.mid.secondary,
+  padding: "1rem 0.75rem 1.75rem",
   width: "calc(100% - 1rem)",
   maxWidth: "30rem",
   borderRadius: "0.25rem",
+
+  maxHeight: "calc(100dvh - 1rem)",
+  overflowY: "scroll",
+
+  "@media (min-height: 768px)": {
+    transform: "translateX(-50%) translateY(50%)",
+    top: "50%",
+    bottom: "unset",
+    transform: "translate(-50%, -50%)",
+  },
+}));
+
+const StyledDialogPanel = styled(DialogPanel)({
+  display: "flex",
+  flexDirection: "column",
+  gap: "1.5rem",
 });
 
-const StyledDialogBackdropOne = styled(DialogBackdrop)({
+const StyledDialogBackdropOne = styled(DialogBackdrop)(({ theme }) => ({
   position: "fixed",
   top: "0",
   left: "0",
@@ -122,7 +149,7 @@ const StyledDialogBackdropOne = styled(DialogBackdrop)({
   bottom: "0",
   backgroundColor: "#FA6565",
   opacity: "95%",
-});
+}));
 
 const StyledDialogBackdropTwo = styled(DialogBackdrop)({
   position: "fixed",
@@ -164,13 +191,13 @@ function FancyDropdown({
         <StyledDialogBackdropOne />
         <StyledDialogBackdropTwo />
         <DialogInner>
-          <DialogPanel transition>
-            <header>
-              <button onClick={close}>Close</button>
+          <StyledDialogPanel transition>
+            <DialogHeader>
+              <Button onClick={close}>Close</Button>
               {/* <DialogTitle>Sport and competitions</DialogTitle> */}
-            </header>
+            </DialogHeader>
             {children}
-          </DialogPanel>
+          </StyledDialogPanel>
         </DialogInner>
       </StyledDialog>
     </>

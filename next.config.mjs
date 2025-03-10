@@ -1,4 +1,4 @@
-import { withPigment } from '@pigment-css/nextjs-plugin';
+import { withPigment, extendTheme } from '@pigment-css/nextjs-plugin';
 
 /** @type {import('next').NextConfig} */
 
@@ -15,4 +15,16 @@ const nextConfig = {
     },
 };
 
-export default withPigment(nextConfig);
+export default withPigment(nextConfig, {
+    theme: extendTheme({
+        colors: {
+            background: "#FE0101",
+            mid: {
+                primary: "#FEE272",
+                secondary: "#AEF4F5",
+            },
+            foreground: "#FFFFFF",
+            text: "#000000",
+        }
+    })
+});

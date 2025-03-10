@@ -1,9 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import Fixture from "@/components/Fixture";
 import FancyDropdown from "@/components/FancyDropdown";
 import HeadingBanner from "@/components/HeadingBanner";
 import Button from "@/components/Button";
+import FieldsetItems from "@/components/FieldsetItems";
+import InputLabel from "@/components/InputLabel";
+import InputGroup from "@/components/InputGroup";
+import SelectionExplainerText from "@/components/SelectionExplainerText";
 import { COMPETITIONS } from "@/constants/competitions";
 import { styled } from "@pigment-css/react";
 
@@ -68,34 +73,6 @@ const Fieldset = styled("fieldset")({
   display: "flex",
   flexDirection: "column",
   gap: "0.5rem",
-});
-
-const Chip = styled("div")({
-  display: "flex",
-  gap: "0.5rem",
-  alignItems: "center",
-  borderRadius: "0.5rem",
-  backgroundColor: "white",
-  border: "1px dashed gray",
-  textWrap: "nowrap",
-
-  "&[data-active]": {
-    border: "1px solid black",
-    backgroundColor: "rgb(236, 236, 236)",
-  },
-
-  "& input, & label ": {
-    cursor: "pointer",
-  },
-  " & input": {
-    marginLeft: "0.5rem",
-  },
-  "& label": {
-    fontSize: "0.85rem",
-    fontWeight: "500",
-    padding: "0.25rem 0.5rem 0.25rem 0",
-    width: "100%",
-  },
 });
 
 const AllFixturesList = styled("ul")({
@@ -280,109 +257,125 @@ export default function FixturesClient() {
             fillSpace={true}
           >
             <>
-              <label htmlFor="sport">1. Sport</label>
+              <HeadingBanner as="label" htmlFor="sport">
+                1. Sport
+              </HeadingBanner>
               <Select name="sport" id="sport">
                 <option value="football">Football</option>
-                <option value="basketball">Basketball</option>
-                <option value="tennis">Tennis</option>
-                <option value="tba" disabled>
-                  After another sport? Email us: "hello" at this domain
-                </option>
               </Select>
 
               <Fieldset>
-                <legend>2. Competitions</legend>
-                {Object.entries(COMPETITIONS)
-                  .filter(([, competition]) => competition.tier !== "paid")
-                  .map(([competitionId, competition]) => (
-                    <Chip
-                      key={competitionId}
-                      data-active={
-                        selectedCompetitions.includes(competitionId)
-                          ? true
-                          : undefined
-                      }
-                    >
-                      <input
-                        type="checkbox"
-                        id={competitionId}
-                        name={competitionId}
-                        checked={selectedCompetitions.includes(competitionId)}
-                        onChange={handleCompetitionChange}
-                      />
-                      <label htmlFor={competitionId}>{competition.name}</label>
-                    </Chip>
-                  ))}
+                <HeadingBanner as="legend">2. Competitions</HeadingBanner>
+                <FieldsetItems>
+                  {Object.entries(COMPETITIONS)
+                    .filter(([, competition]) => competition.tier !== "paid")
+                    .map(([competitionId, competition]) => (
+                      <InputGroup
+                        key={competitionId}
+                        data-active={
+                          selectedCompetitions.includes(competitionId)
+                            ? true
+                            : undefined
+                        }
+                      >
+                        <input
+                          type="checkbox"
+                          id={competitionId}
+                          name={competitionId}
+                          checked={selectedCompetitions.includes(competitionId)}
+                          onChange={handleCompetitionChange}
+                        />
+                        <InputLabel htmlFor={competitionId}>
+                          {competition.name}
+                        </InputLabel>
+                      </InputGroup>
+                    ))}
+                </FieldsetItems>
               </Fieldset>
+              <SelectionExplainerText>
+                Are we missing your favourite sport or competition?{" "}
+                <Link href="mailto:?body=Please replace the email address with 'hello' at this domain.">
+                  Let us know
+                </Link>
+                .
+              </SelectionExplainerText>
             </>
           </FancyDropdown>
           {!showFutureFixtures && (
             <FancyDropdown icon={showAllScores ? "👀" : "⚫️"}>
               <fieldset>
-                <legend>Score visibility</legend>
-                <div>
-                  <input
-                    type="radio"
-                    id="hide-scores"
-                    name="score-visibility"
-                    value="hidden"
-                    checked={!showAllScores}
-                    onChange={() => setShowAllScores(false)}
-                  />
-                  <label htmlFor="hide-scores">Hide all scores</label>
-                </div>
+                <HeadingBanner as="legend">Score visibility</HeadingBanner>
+                <FieldsetItems>
+                  <InputGroup>
+                    <input
+                      type="radio"
+                      id="hide-scores"
+                      name="score-visibility"
+                      value="hidden"
+                      checked={!showAllScores}
+                      onChange={() => setShowAllScores(false)}
+                    />
+                    <InputLabel htmlFor="hide-scores">
+                      Hide all scores
+                    </InputLabel>
+                  </InputGroup>
 
-                <div>
-                  <input
-                    type="radio"
-                    id="show-scores"
-                    name="score-visibility"
-                    value="visible"
-                    checked={showAllScores}
-                    onChange={() => setShowAllScores(true)}
-                  />
-                  <label htmlFor="show-scores">Show all scores</label>
-                </div>
+                  <InputGroup>
+                    <input
+                      type="radio"
+                      id="show-scores"
+                      name="score-visibility"
+                      value="visible"
+                      checked={showAllScores}
+                      onChange={() => setShowAllScores(true)}
+                    />
+                    <InputLabel htmlFor="show-scores">
+                      Show all scores
+                    </InputLabel>
+                  </InputGroup>
+                </FieldsetItems>
               </fieldset>
-              <p>
+              <SelectionExplainerText>
                 {showAllScores
                   ? "Reveals all scores, just like any other sports results app (Seriously?)."
                   : "Hides all scores. Tap the black circles to reveal individual scores."}
-              </p>
+              </SelectionExplainerText>
             </FancyDropdown>
           )}
           <FancyDropdown icon={showFutureFixtures ? "🗓️" : "🕥"}>
             <fieldset>
-              <legend>Fixture direction</legend>
-              <div>
-                <input
-                  type="radio"
-                  id="backward-fixtures"
-                  name="fixture-direction"
-                  value="backwards"
-                  checked={!showFutureFixtures}
-                  onChange={() => setShowFutureFixtures(false)}
-                />
-                <label htmlFor="backward-fixtures">Backwards</label>
-              </div>
+              <HeadingBanner as="legend">Fixture direction</HeadingBanner>
+              <FieldsetItems>
+                <InputGroup>
+                  <input
+                    type="radio"
+                    id="backward-fixtures"
+                    name="fixture-direction"
+                    value="backwards"
+                    checked={!showFutureFixtures}
+                    onChange={() => setShowFutureFixtures(false)}
+                  />
+                  <InputLabel htmlFor="backward-fixtures">Backwards</InputLabel>
+                </InputGroup>
 
-              <div>
-                <input
-                  type="radio"
-                  id="forward-fixtures"
-                  name="fixture-direction"
-                  value="forwards"
-                  checked={showFutureFixtures}
-                  onChange={() => setShowFutureFixtures(true)}
-                />
-                <label htmlFor="forward-fixtures">Forwards</label>
-              </div>
+                <InputGroup>
+                  <input
+                    type="radio"
+                    id="forward-fixtures"
+                    name="fixture-direction"
+                    value="forwards"
+                    checked={showFutureFixtures}
+                    onChange={() => setShowFutureFixtures(true)}
+                  />
+                  <InputLabel htmlFor="forward-fixtures">Forwards</InputLabel>
+                </InputGroup>
+              </FieldsetItems>
             </fieldset>
-            <p>
+            <SelectionExplainerText>
               {showFutureFixtures
                 ? "Shows upcoming fixtures, from today into to the future."
                 : "Shows in-progress or finished fixtures, from today back."}
-            </p>
+            </SelectionExplainerText>
           </FancyDropdown>
         </ControlBar>
 
@@ -403,7 +396,7 @@ export default function FixturesClient() {
                 )
               ).map(([groupingKey, dateFixtures]) => (
                 <DateGroup key={groupingKey}>
-                  <HeadingBanner>
+                  <HeadingBanner sticky={true}>
                     {formatDateForDisplay(dateFixtures[0].localDate)}
                   </HeadingBanner>
                   <DateFixturesList>

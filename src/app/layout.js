@@ -48,7 +48,7 @@ p, h1, h2, h3, h4, h5, h6 {
 
 /* 8. Improve line wrapping */
 p {
-  text-wrap: pretty;
+  text-wrap: balance;
 }
 h1, h2, h3, h4, h5, h6 {
   text-wrap: balance;
@@ -66,6 +66,10 @@ fieldset {
   border: none;
   margin: 0;
   padding: 0;
+}
+
+p a {
+  color: inherit;
 }
 `
 
