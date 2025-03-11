@@ -10,12 +10,13 @@ const FixtureRow = styled("li")(({ theme }) => ({
   padding: "0.65rem",
   border: "1px solid black",
   backgroundColor: "#FEE272",
-  boxShadow: "0 3px 0 0 black",
+  boxShadow: "0 4px 0 0 black",
   borderRadius: "3px",
 
   // Border between each item
   "&:not(:last-of-type)": {
     position: "relative",
+    // Blue and black goalposts
     "&::before": {
       content: '""',
       position: "absolute",
@@ -26,14 +27,13 @@ const FixtureRow = styled("li")(({ theme }) => ({
       background:
         "linear-gradient(to right,  transparent 48px, black 0, black 50px, #AEF4F5 0, #AEF4F5 62px, black 0, black 68px, transparent 0, transparent calc(100% - 68px), black 0, black calc(100% - 62px), #AEF4F5 0, #AEF4F5 calc(100% - 50px), black 0, black calc(100% - 48px), transparent 0)",
     },
-
-    // Black
+    // Shorter, black shadow on goalposts
     "&::after": {
       content: '""',
       position: "absolute",
       top: "calc(100% + 3px + 1px)", // Match offset caused by boxShadow and border
       left: "0",
-      height: "calc(0.375rem - 1px)", // Match gap in parent component, minus same offsets as above
+      height: "calc(0.425rem - 1px)", // Match gap in parent component, minus same offsets as above
       width: "100%",
       background:
         "linear-gradient(to right, transparent 48px, black 0, black 68px, transparent 0, transparent calc(100% - 68px), black 0, black calc(100% - 48px), transparent 0)",
@@ -74,12 +74,12 @@ const CompetitionName = styled("p")({
   margin: "0",
 });
 
-const OpponentsList = styled("ul")({
-  borderColor: "black",
-  borderWidth: "1px",
-  borderStyle: "solid",
+const OpponentsList = styled("ul")(({ theme }) => ({
+  border: "1px solid black",
+  borderRadius: "2px",
   backgroundColor: "white",
-});
+  boxShadow: "0.5px 1.5px 0 0 white",
+}));
 
 function Fixture({ fixture, showAllScores }) {
   const formattedDate = new Date(fixture.utcDate).toLocaleDateString(
