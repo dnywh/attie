@@ -3,16 +3,43 @@ import OpponentRow from "@/components/OpponentRow";
 
 import { styled } from "@pigment-css/react";
 
-const FixtureRow = styled("li")({
+const FixtureRow = styled("li")(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   gap: "0.65rem",
   padding: "0.65rem",
-  borderColor: "black",
-  borderStyle: "solid",
-  borderWidth: "1px",
+  border: "1px solid black",
   backgroundColor: "#FEE272",
-});
+  boxShadow: "0 3px 0 0 black",
+  borderRadius: "3px",
+
+  // Border between each item
+  "&:not(:last-of-type)": {
+    position: "relative",
+    "&::before": {
+      content: '""',
+      position: "absolute",
+      top: "calc(100% + 3px + 1px)", // Match offset caused by boxShadow and border
+      left: "0",
+      height: "calc(1.5rem - 3px)", // Match gap in parent component, minus same offsets as above
+      width: "100%",
+      background:
+        "linear-gradient(to right,  transparent 80px, black 0, black 84px, #AEF4F5 0, #AEF4F5 100px, transparent 0, transparent calc(100% - 100px), #AEF4F5 0, #AEF4F5 calc(100% - 80px), transparent 0)",
+    },
+
+    // Black
+    "&::after": {
+      content: '""',
+      position: "absolute",
+      top: "calc(100% + 3px + 1px)", // Match offset caused by boxShadow and border
+      left: "0",
+      height: "calc(0.5rem - 1px)", // Match gap in parent component, minus same offsets as above
+      width: "100%",
+      background:
+        "linear-gradient(to right, transparent 80px, black 0, black 100px, transparent 0, transparent calc(100% - 100px), black 0, black calc(100% - 80px), transparent 0)",
+    },
+  },
+}));
 
 const FixtureTiming = styled("div")({
   display: "flex",
@@ -21,9 +48,10 @@ const FixtureTiming = styled("div")({
   gap: "1rem",
 
   "& p": {
+    fontSize: "0.6875rem",
     textTransform: "uppercase",
-    letterSpacing: "0.085em",
-    fontSize: "0.8em",
+    letterSpacing: "0.1em",
+    lineHeight: "100%",
     margin: "0",
     "&:first-of-type": {
       textAlign: "left",
@@ -37,19 +65,20 @@ const FixtureTiming = styled("div")({
   },
 });
 
+const CompetitionName = styled("p")({
+  fontSize: "0.6875rem",
+  textTransform: "uppercase",
+  letterSpacing: "0.1em",
+  lineHeight: "100%",
+  textAlign: "center",
+  margin: "0",
+});
+
 const OpponentsList = styled("ul")({
   borderColor: "black",
   borderWidth: "1px",
   borderStyle: "solid",
   backgroundColor: "white",
-});
-
-const CompetitionName = styled("p")({
-  textTransform: "uppercase",
-  letterSpacing: "0.085em",
-  fontSize: "0.8em",
-  textAlign: "center",
-  margin: "0",
 });
 
 function Fixture({ fixture, showAllScores }) {
