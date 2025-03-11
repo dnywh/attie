@@ -24,7 +24,7 @@ const FixtureRow = styled("li")(({ theme }) => ({
       height: "calc(1.5rem - 3px)", // Match gap in parent component, minus same offsets as above
       width: "100%",
       background:
-        "linear-gradient(to right,  transparent 80px, black 0, black 84px, #AEF4F5 0, #AEF4F5 100px, transparent 0, transparent calc(100% - 100px), #AEF4F5 0, #AEF4F5 calc(100% - 80px), transparent 0)",
+        "linear-gradient(to right,  transparent 48px, black 0, black 50px, #AEF4F5 0, #AEF4F5 62px, black 0, black 68px, transparent 0, transparent calc(100% - 68px), black 0, black calc(100% - 62px), #AEF4F5 0, #AEF4F5 calc(100% - 50px), black 0, black calc(100% - 48px), transparent 0)",
     },
 
     // Black
@@ -33,10 +33,10 @@ const FixtureRow = styled("li")(({ theme }) => ({
       position: "absolute",
       top: "calc(100% + 3px + 1px)", // Match offset caused by boxShadow and border
       left: "0",
-      height: "calc(0.5rem - 1px)", // Match gap in parent component, minus same offsets as above
+      height: "calc(0.375rem - 1px)", // Match gap in parent component, minus same offsets as above
       width: "100%",
       background:
-        "linear-gradient(to right, transparent 80px, black 0, black 100px, transparent 0, transparent calc(100% - 100px), black 0, black calc(100% - 80px), transparent 0)",
+        "linear-gradient(to right, transparent 48px, black 0, black 68px, transparent 0, transparent calc(100% - 68px), black 0, black calc(100% - 48px), transparent 0)",
     },
   },
 }));
