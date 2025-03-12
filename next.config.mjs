@@ -17,6 +17,9 @@ const nextConfig = {
 
 export default withPigment(nextConfig, {
     theme: extendTheme({
+        curves: {
+            springy: "180ms cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+        },
         colors: {
             background: "#FE0101",
             mid: {

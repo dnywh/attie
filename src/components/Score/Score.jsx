@@ -1,8 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
+import useSound from "use-sound";
 import { styled } from "@pigment-css/react";
 
-const Block = styled("div")({
+const Block = styled("div")(({ theme }) => ({
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
@@ -10,7 +11,13 @@ const Block = styled("div")({
   height: "2rem",
   color: "black",
   borderRadius: "50%",
-  transition: "transform 0.125s ease-in-out",
+  transition: `transform ${theme.curves.springy}`,
+  "&:hover": {
+    transform: "scale(1.1)",
+  },
+  "&:active": {
+    transform: "scale(0.85)",
+  },
 
   variants: [
     {
@@ -18,9 +25,6 @@ const Block = styled("div")({
       style: {
         cursor: "pointer",
         backgroundColor: "black",
-        "&:hover": {
-          transform: "scale(1.1)",
-        },
       },
     },
     {
@@ -28,6 +32,9 @@ const Block = styled("div")({
       style: {
         backgroundColor: "white",
         border: "0.5px dashed black",
+        "&:hover, &:active": {
+          transform: "unset",
+        },
 
         "& p": {
           userSelect: "none",
@@ -36,10 +43,11 @@ const Block = styled("div")({
       },
     },
   ],
-});
+}));
 
-function Score({ score, showAllScores = false }) {
+function Score({ score, showAllScores = false, useSoundEffects }) {
   const [hasBeenRevealed, setHasBeenRevealed] = useState(false);
+  const [play] = useSound("/sounds/scratch.mp3");
 
   // Reset local state when showAllScores changes to false
   useEffect(() => {
@@ -52,16 +60,13 @@ function Score({ score, showAllScores = false }) {
 
   const handleReveal = (e) => {
     if (!showAllScores && !hasBeenRevealed) {
+      useSoundEffects && play();
       setHasBeenRevealed(true);
     }
   };
 
   return (
-    <Block
-      isVisible={isScoreVisible}
-      // onClick={!isScoreVisible ? handleReveal : undefined} // Doesn't remove the visual tap target on iOS as intended
-      onClick={handleReveal}
-    >
+    <Block isVisible={isScoreVisible} onClick={handleReveal}>
       {isScoreVisible && <p>{score}</p>}
     </Block>
   );

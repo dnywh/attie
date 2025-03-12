@@ -32,7 +32,14 @@ const OpponentName = styled("p")({
   textOverflow: "ellipsis",
 });
 
-function OpponentRow({ team, score, showAllScores, status, isHomeTeam }) {
+function OpponentRow({
+  team,
+  score,
+  showAllScores,
+  status,
+  isHomeTeam,
+  useSoundEffects,
+}) {
   return (
     <StyledOpponentRow>
       <TeamLogo
@@ -42,7 +49,11 @@ function OpponentRow({ team, score, showAllScores, status, isHomeTeam }) {
       />
       <OpponentName>{team.shortName ? team.shortName : team.name}</OpponentName>
       {!["SCHEDULED", "TIMED", "CANCELLED", "POSTPONED"].includes(status) && (
-        <Score score={score} showAllScores={showAllScores} />
+        <Score
+          score={score}
+          showAllScores={showAllScores}
+          useSoundEffects={useSoundEffects}
+        />
       )}
     </StyledOpponentRow>
   );

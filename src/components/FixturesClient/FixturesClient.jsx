@@ -52,17 +52,19 @@ const Main = styled("main")({
   gap: "1.5rem",
 });
 
-const ControlBar = styled("section")({
+const ControlBar = styled("section")(({ theme }) => ({
   display: "flex",
   flexDirection: "row",
   gap: "0.5rem",
   padding: "0.5rem",
   alignItems: "center",
-  backgroundColor: "#AEF4F5",
-  border: "1px solid black",
-  borderRadius: "3px",
+  backgroundColor: theme.colors.mid.secondary,
   overflowX: "hidden",
-});
+
+  border: `1px solid ${theme.colors.text}`,
+  boxShadow: `0 3px 0 0 ${theme.colors.text}`,
+  borderRadius: "3px",
+}));
 
 const Select = styled("select")({
   width: "100%",
@@ -174,6 +176,7 @@ export default function FixturesClient() {
   ]);
   const [fixtures, setFixtures] = useState([]);
   const [loading, setLoading] = useState(true); // Start with loading true
+  const [useSoundEffects, setUseSoundEffects] = useState(true); // Start with sound effects on
 
   const fetchFixturesForCompetition = async (code) => {
     const now = Date.now();
@@ -335,6 +338,35 @@ export default function FixturesClient() {
                   </InputGroup>
                 </FieldsetItems>
               </fieldset>
+              {!showAllScores && (
+                <fieldset>
+                  <HeadingBanner as="legend">Sound effects</HeadingBanner>
+                  <FieldsetItems>
+                    <InputGroup>
+                      <input
+                        type="radio"
+                        id="sound-on"
+                        name="sound-effects"
+                        value="audible"
+                        checked={useSoundEffects}
+                        onChange={() => setUseSoundEffects(true)}
+                      />
+                      <InputLabel htmlFor="sound-on">Sound on</InputLabel>
+                    </InputGroup>
+                    <InputGroup>
+                      <input
+                        type="radio"
+                        id="sound-off"
+                        name="sound-effects"
+                        value="muted"
+                        checked={!useSoundEffects}
+                        onChange={() => setUseSoundEffects(false)}
+                      />
+                      <InputLabel htmlFor="sound-off">Sound off</InputLabel>
+                    </InputGroup>
+                  </FieldsetItems>
+                </fieldset>
+              )}
               <SelectionExplainerText>
                 {showAllScores
                   ? "Reveals all scores, just like any other sports results app (Seriously?)."
@@ -405,6 +437,7 @@ export default function FixturesClient() {
                         key={fixture.id}
                         fixture={fixture}
                         showAllScores={showAllScores}
+                        useSoundEffects={useSoundEffects}
                       />
                     ))}
                   </DateFixturesList>

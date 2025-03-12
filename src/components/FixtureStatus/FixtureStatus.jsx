@@ -16,10 +16,10 @@ const LiveStatus = styled(RegularStatus)({
   display: "flex",
   gap: "0.1rem",
   alignItems: "center",
-  "&::after": {
+  "&::before": {
     content: "'•'",
     fontSize: "2rem",
-    lineHeight: "100%",
+    // lineHeight: "100%",
     display: "inline-block",
     animation: `${blink} 1s infinite alternate`,
   },
