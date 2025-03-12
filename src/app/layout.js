@@ -68,7 +68,7 @@ fieldset {
   padding: 0;
 }
 
-p a {
+a {
   color: inherit;
 }
 
@@ -81,7 +81,7 @@ button {
   }
 `
 
-const Body = styled("body")({
+const Body = styled("body")(({ theme }) => ({
   fontFamily: "'Jost Variable', Futura, Helvetica, Arial, sans-serif",
   padding: "2rem 1rem",
   maxWidth: "40rem",
@@ -89,8 +89,8 @@ const Body = styled("body")({
   display: "flex",
   flexDirection: "column",
   gap: "3rem",
-  backgroundColor: "#FA6565",
-});
+  backgroundColor: theme.colors.background,
+}));
 
 export default function RootLayout({ children }) {
   return (

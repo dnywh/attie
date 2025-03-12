@@ -1,36 +1,30 @@
 import TeamLogo from "@/components/TeamLogo";
 import Score from "@/components/Score";
 import { styled } from "@pigment-css/react";
+import { teamText, ellipsizedText } from "@/styles/commonStyles";
 
 const StyledOpponentRow = styled("li")({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  gap: "1rem",
+  gap: "0.625rem",
 
   "&:not(:last-child)": {
     borderWidth: "1px",
-    padding: "1rem 1rem 0.625rem 1rem",
+    padding: "0.85rem 0.85rem 0.525rem 0.85rem",
   },
 
   "&:last-child": {
     borderWidth: "0 1px 1px 1px",
-    padding: "0.625rem 1rem 1rem 1rem",
+    padding: "0.525rem 0.85rem 0.85rem 0.85rem",
   },
 });
 
-const OpponentName = styled("p")({
+const OpponentName = styled("p")(({ theme }) => ({
   flex: "1",
-  lineHeight: "100%",
-  fontSize: "0.9375rem", // 15px
-  letterSpacing: "0.035em",
-  textTransform: "uppercase",
-  fontWeight: "500",
-  // Truncate and ellipsize text
-  overflow: "hidden",
-  whiteSpace: "nowrap",
-  textOverflow: "ellipsis",
-});
+  ...teamText,
+  ...ellipsizedText,
+}));
 
 function OpponentRow({
   team,

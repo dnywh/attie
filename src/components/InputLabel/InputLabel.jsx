@@ -1,14 +1,10 @@
 import { styled } from "@pigment-css/react";
+import { teamText, ellipsizedText } from "@/styles/commonStyles";
 
 const StyledLabel = styled("label")(({ theme }) => ({
-  textTransform: "uppercase",
-  letterSpacing: "0.035em",
-  lineHeight: "100%",
+  ...ellipsizedText,
+  ...teamText,
   width: "100%",
-  // Truncate and ellipsize text
-  overflow: "hidden",
-  whiteSpace: "nowrap",
-  textOverflow: "ellipsis",
 }));
 
 function InputLabel({ children, ...props }) {

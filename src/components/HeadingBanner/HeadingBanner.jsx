@@ -21,7 +21,7 @@ const StyledHeading = styled("h2")(({ theme }) => ({
       style: {
         // Sticky behaviour
         position: "sticky",
-        top: "0",
+        top: "-1px", // To avoid underlying artifacts at top corners
         zIndex: "1",
         // top: "3px",
         // boxShadow: "0 0 0 3px #FA6565",

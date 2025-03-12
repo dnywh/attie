@@ -1,15 +1,15 @@
 import { styled } from "@pigment-css/react";
+import { ellipsizedText } from "@/styles/commonStyles";
 
 const StyledButton = styled("button")(({ theme }) => ({
   color: "black",
   fontWeight: "700",
   fontSize: "0.85rem",
   textTransform: "uppercase",
+  fontStyle: "italic",
   textDecoration: "underline",
-  letterSpacing: "0.035em",
-  overflow: "hidden",
-  whiteSpace: "nowrap",
-  textOverflow: "ellipsis",
+  letterSpacing: "0.055em",
+  ...ellipsizedText,
   // Tap target sizing to account for small text design
   minHeight: "2.5rem", // 40px
   padding: "0 0.5rem", // Tappable on sides of text

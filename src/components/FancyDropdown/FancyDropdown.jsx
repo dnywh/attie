@@ -15,6 +15,7 @@ import { styled, keyframes } from "@pigment-css/react";
 //   veryBasicCardStyle,
 //   smallCardStyle,
 // } from "@/styles/commonStyles";
+import { teamText } from "@/styles/commonStyles";
 
 const scrollShadow = keyframes({
   from: {
@@ -58,9 +59,7 @@ const StyledButton = styled("button")(({ theme }) => ({
   color: theme.colors.text,
   backgroundColor: theme.colors.foreground,
   alignItems: "center",
-  fontSize: "0.85rem",
-  fontWeight: "500",
-  lineHeight: "100%",
+  ...teamText,
   height: "2.5rem", // 40px
   // textWrap: "noWrap",
   overflow: "hidden",
@@ -85,16 +84,11 @@ const StyledButton = styled("button")(({ theme }) => ({
   },
 
   "&::after": {
-    content: '"⟠"',
+    content: '"▾"',
     // display: "block",
     // flexGrow: 1,
     // borderBottom: "1px solid black",
     // margin: "0.5rem 0",
-  },
-
-  "&:focus": {
-    backgroundColor: "blue",
-    opacity: "0.5",
   },
 
   variants: [
@@ -165,7 +159,7 @@ const DialogInner = styled("div")(({ theme }) => ({
   maxWidth: "30rem",
   borderRadius: "0.25rem",
 
-  maxHeight: "calc(100dvh - 4rem)",
+  maxHeight: "calc(100dvh - 5rem)",
   overflowY: "scroll",
 
   "@media (min-height: 768px)": {

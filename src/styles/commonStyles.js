@@ -7,9 +7,42 @@
 //     borderRadius: "0px",
 // });
 
+export const ellipsizedText = ({
+    // Truncate and ellipsize text
+    overflow: "hidden",
+    whiteSpace: "nowrap",
+    textOverflow: "ellipsis",
+});
+
+export const smallText = ({
+    fontSize: "0.6875rem",
+    lineHeight: "100%",
+    letterSpacing: "0.1em",
+    textTransform: "uppercase",
+});
+
+export const teamText = ({
+    fontWeight: "500",
+    fontSize: "0.875rem",
+    lineHeight: "100%",
+    letterSpacing: "0.055em",
+    textTransform: "uppercase",
+});
+
+
+
 export const dashedBorder = ({ theme }) => ({
-    borderTop: `1px dashed ${theme.colors.text}`,
     paddingTop: "1.5rem",
+    // Dashed border generator
+    // https://codepen.io/amit_sheen/pen/xxZeyjO
+    backgroundColor: theme.colors.background,
+    backgroundImage:
+        "none, repeating-linear-gradient(90deg, rgb(255 255 255 / 30%), rgb(255 255 255 / 30%) 3px, transparent 3px, transparent 6px, rgb(0 0 0 / 95%) 1.25rem)",
+    // backgroundPosition: "0 0, 0 0, 100% 0, 0 100%",
+    backgroundSize: "0 100%,100% 1.5px, 0 100%,100% 0",
+    backgroundRepeat: "no-repeat",
+    // backgroundBlendMode: "soft-light",
+    backgroundBlendMode: "overlay",
 });
 
 export const veryBasicCardStyle = ({ theme }) => ({
@@ -63,7 +96,8 @@ export const elevatedCard = ({ theme }) => ({
 })
 
 // Scores, dropdowns
-const bleedingWhiteCard = ({ theme }) => ({
+export const bleedingWhiteCard = ({ theme }) => ({
+    backgroundColor: theme.colors.foreground,
     border: `1px solid ${theme.colors.text}`,
     borderRadius: "2px",
     boxShadow: `0.5px 1.5px 0 0 ${theme.colors.foreground}`,

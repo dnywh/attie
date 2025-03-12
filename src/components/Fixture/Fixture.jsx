@@ -1,7 +1,7 @@
 import FixtureStatus from "@/components/FixtureStatus";
 import OpponentRow from "@/components/OpponentRow";
 import { styled } from "@pigment-css/react";
-// import { createCardStyle, smallCardStyle } from "@/styles/commonStyles";
+import { smallText } from "@/styles/commonStyles";
 
 const FixtureRow = styled("li")(({ theme }) => ({
   display: "flex",
@@ -28,7 +28,7 @@ const FixtureRow = styled("li")(({ theme }) => ({
       height: "calc(1.5rem - 3px)", // Match gap in parent component, minus same offsets as above
       width: "100%",
       background:
-        "linear-gradient(to right,  transparent 48px, black 0, black 50px, #AEF4F5 0, #AEF4F5 62px, black 0, black 68px, transparent 0, transparent calc(100% - 68px), black 0, black calc(100% - 62px), #AEF4F5 0, #AEF4F5 calc(100% - 50px), black 0, black calc(100% - 48px), transparent 0)",
+        "linear-gradient(to right,  transparent 34px, black 0, black 36px, #AEF4F5 0, #AEF4F5 48px, black 0, black 54px, transparent 0, transparent calc(100% - 54px), black 0, black calc(100% - 48px), #AEF4F5 0, #AEF4F5 calc(100% - 36px), black 0, black calc(100% - 34px), transparent 0)",
     },
     // Shorter, black shadow on goalposts
     "&::after": {
@@ -39,7 +39,7 @@ const FixtureRow = styled("li")(({ theme }) => ({
       height: "calc(0.425rem - 1px)", // Match gap in parent component, minus same offsets as above
       width: "100%",
       background:
-        "linear-gradient(to right, transparent 48px, black 0, black 68px, transparent 0, transparent calc(100% - 68px), black 0, black calc(100% - 48px), transparent 0)",
+        "linear-gradient(to right, transparent 34px, black 0, black 54px, transparent 0, transparent calc(100% - 54px), black 0, black calc(100% - 48px), transparent 0)",
     },
   },
 }));
@@ -51,10 +51,7 @@ const FixtureTiming = styled("div")({
   gap: "1rem",
 
   "& p": {
-    fontSize: "0.6875rem",
-    textTransform: "uppercase",
-    letterSpacing: "0.1em",
-    lineHeight: "100%",
+    ...smallText,
     margin: "0",
     "&:first-of-type": {
       textAlign: "left",
@@ -69,10 +66,7 @@ const FixtureTiming = styled("div")({
 });
 
 const CompetitionName = styled("p")({
-  fontSize: "0.6875rem",
-  textTransform: "uppercase",
-  letterSpacing: "0.1em",
-  lineHeight: "100%",
+  ...smallText,
   textAlign: "center",
   margin: "0",
 });

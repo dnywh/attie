@@ -8,7 +8,7 @@ const StyledDiv = styled("div")(({ theme }) => ({
   alignItems: "center",
 
   "& label": {
-    padding: "1rem 0.75rem",
+    padding: "0.75rem 0.75rem",
   },
 
   "& input": {

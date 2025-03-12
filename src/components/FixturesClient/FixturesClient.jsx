@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import Link from "next/link";
 import { Fieldset, Legend } from "@headlessui/react";
 import Fixture from "@/components/Fixture";
@@ -11,6 +11,7 @@ import InputLabel from "@/components/InputLabel";
 import InputGroup from "@/components/InputGroup";
 import LoadingText from "@/components/LoadingText";
 import SelectionExplainerText from "@/components/SelectionExplainerText";
+import Interstitial from "@/components/Interstitial";
 import { COMPETITIONS } from "@/constants/competitions";
 import { dashedBorder } from "@/styles/commonStyles";
 import { styled } from "@pigment-css/react";
@@ -90,12 +91,7 @@ const DateGroup = styled("li")(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   gap: "0.25rem", // Between header and another ul
-
-  // "&:not(:first-of-type)": {
-  // paddingTop: "1.5rem",
-  // borderTop: "1px dashed rgba(0,0,0,0.1)",
   ...dashedBorder({ theme }),
-  // },
 }));
 
 const DateFixturesList = styled("ul")({
@@ -108,7 +104,6 @@ const EmptyState = styled("div")(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   gap: "0.5rem",
-
   ...dashedBorder({ theme }),
 }));
 
@@ -448,23 +443,43 @@ export default function FixturesClient() {
                       : fixtureDate <= now; // Past fixtures
                   })
                 )
-              ).map(([groupingKey, dateFixtures]) => (
-                <DateGroup key={groupingKey}>
-                  <HeadingBanner sticky="true">
-                    {formatDateForDisplay(dateFixtures[0].localDate)}
-                  </HeadingBanner>
-                  <DateFixturesList>
-                    {dateFixtures.map((fixture) => (
-                      <Fixture
-                        key={fixture.id}
-                        fixture={fixture}
-                        showAllScores={showAllScores}
-                        useSoundEffects={useSoundEffects}
-                      />
-                    ))}
-                  </DateFixturesList>
-                </DateGroup>
+              ).map(([groupingKey, dateFixtures], index, array) => (
+                <Fragment key={groupingKey}>
+                  <DateGroup>
+                    <HeadingBanner sticky="true">
+                      {formatDateForDisplay(dateFixtures[0].localDate)}
+                    </HeadingBanner>
+                    <DateFixturesList>
+                      {dateFixtures.map((fixture) => (
+                        <Fixture
+                          key={fixture.id}
+                          fixture={fixture}
+                          showAllScores={showAllScores}
+                          useSoundEffects={useSoundEffects}
+                        />
+                      ))}
+                    </DateFixturesList>
+                  </DateGroup>
+                  {index === Math.floor(array.length / 2) && (
+                    <Interstitial
+                      linkUrl="https://www.dannywhite.net/"
+                      linkText="Reach out"
+                    >
+                      <p>
+                        Attie is lovingly crafted by one-man-band,{" "}
+                        <Link
+                          href="https://www.dannywhite.net/"
+                          target="_blank"
+                        >
+                          Danny White
+                        </Link>
+                        . Got an idea that needs making? Get Danny involved.
+                      </p>
+                    </Interstitial>
+                  )}
+                </Fragment>
               ))}
+
               <Button onClick={() => console.log("Loading more...")}>
                 Load more
               </Button>
