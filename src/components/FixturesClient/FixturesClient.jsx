@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { Fieldset, Legend } from "@headlessui/react";
 import Fixture from "@/components/Fixture";
 import FancyDropdown from "@/components/FancyDropdown";
 import HeadingBanner from "@/components/HeadingBanner";
@@ -8,8 +9,10 @@ import Button from "@/components/Button";
 import FieldsetItems from "@/components/FieldsetItems";
 import InputLabel from "@/components/InputLabel";
 import InputGroup from "@/components/InputGroup";
+import LoadingText from "@/components/LoadingText";
 import SelectionExplainerText from "@/components/SelectionExplainerText";
 import { COMPETITIONS } from "@/constants/competitions";
+import { dashedBorder } from "@/styles/commonStyles";
 import { styled } from "@pigment-css/react";
 
 const isDev = process.env.NODE_ENV === "development";
@@ -71,10 +74,10 @@ const Select = styled("select")({
   padding: "0.5rem",
 });
 
-const Fieldset = styled("fieldset")({
+const StyledFieldset = styled(Fieldset)({
   display: "flex",
   flexDirection: "column",
-  gap: "0.5rem",
+  gap: "0.25rem", // 4px gap
 });
 
 const AllFixturesList = styled("ul")({
@@ -83,22 +86,31 @@ const AllFixturesList = styled("ul")({
   gap: "1.5rem",
 });
 
-const DateGroup = styled("li")({
+const DateGroup = styled("li")(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
-  gap: "1.5rem",
+  gap: "0.25rem", // Between header and another ul
 
   // "&:not(:first-of-type)": {
-  paddingTop: "1.5rem",
-  borderTop: "1px dashed rgba(0,0,0,0.1)",
+  // paddingTop: "1.5rem",
+  // borderTop: "1px dashed rgba(0,0,0,0.1)",
+  ...dashedBorder({ theme }),
   // },
-});
+}));
 
 const DateFixturesList = styled("ul")({
   display: "flex",
   flexDirection: "column",
   gap: "1.5rem",
 });
+
+const EmptyState = styled("div")(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  gap: "0.5rem",
+
+  ...dashedBorder({ theme }),
+}));
 
 const formatDateForDisplay = (date) => {
   const now = new Date();
@@ -255,20 +267,26 @@ export default function FixturesClient() {
         <ControlBar>
           <FancyDropdown
             icon="⚽️"
-            label={selectedCompetitions.join(", ")}
+            label={
+              selectedCompetitions.length
+                ? selectedCompetitions.join(", ")
+                : "Nothing selected"
+            }
             count={selectedCompetitions.length}
             fillSpace={true}
           >
             <>
-              <HeadingBanner as="label" htmlFor="sport">
-                1. Sport
-              </HeadingBanner>
-              <Select name="sport" id="sport">
-                <option value="football">Football</option>
-              </Select>
+              <StyledFieldset>
+                <HeadingBanner as="label" htmlFor="sport">
+                  1. Sport
+                </HeadingBanner>
+                <Select name="sport" id="sport">
+                  <option value="football">Football</option>
+                </Select>
+              </StyledFieldset>
 
-              <Fieldset>
-                <HeadingBanner as="legend">2. Competitions</HeadingBanner>
+              <StyledFieldset>
+                <HeadingBanner as={Legend}>2. Competitions</HeadingBanner>
                 <FieldsetItems>
                   {Object.entries(COMPETITIONS)
                     .filter(([, competition]) => competition.tier !== "paid")
@@ -294,7 +312,7 @@ export default function FixturesClient() {
                       </InputGroup>
                     ))}
                 </FieldsetItems>
-              </Fieldset>
+              </StyledFieldset>
               <SelectionExplainerText>
                 Are we missing your favourite sport or competition?{" "}
                 <Link href="mailto:?body=Please replace the email address with 'hello' at this domain.">
@@ -306,8 +324,8 @@ export default function FixturesClient() {
           </FancyDropdown>
           {!showFutureFixtures && (
             <FancyDropdown icon={showAllScores ? "👀" : "⚫️"}>
-              <fieldset>
-                <HeadingBanner as="legend">Score visibility</HeadingBanner>
+              <StyledFieldset>
+                <HeadingBanner as={Legend}>Score visibility</HeadingBanner>
                 <FieldsetItems>
                   <InputGroup>
                     <input
@@ -337,10 +355,10 @@ export default function FixturesClient() {
                     </InputLabel>
                   </InputGroup>
                 </FieldsetItems>
-              </fieldset>
+              </StyledFieldset>
               {!showAllScores && (
-                <fieldset>
-                  <HeadingBanner as="legend">Sound effects</HeadingBanner>
+                <StyledFieldset>
+                  <HeadingBanner as={Legend}>Sound effects</HeadingBanner>
                   <FieldsetItems>
                     <InputGroup>
                       <input
@@ -365,7 +383,7 @@ export default function FixturesClient() {
                       <InputLabel htmlFor="sound-off">Sound off</InputLabel>
                     </InputGroup>
                   </FieldsetItems>
-                </fieldset>
+                </StyledFieldset>
               )}
               <SelectionExplainerText>
                 {showAllScores
@@ -375,8 +393,8 @@ export default function FixturesClient() {
             </FancyDropdown>
           )}
           <FancyDropdown icon={showFutureFixtures ? "🗓️" : "🕥"}>
-            <fieldset>
-              <HeadingBanner as="legend">Fixture direction</HeadingBanner>
+            <StyledFieldset>
+              <HeadingBanner as={Legend}>Fixture direction</HeadingBanner>
               <FieldsetItems>
                 <InputGroup>
                   <input
@@ -402,7 +420,7 @@ export default function FixturesClient() {
                   <InputLabel htmlFor="forward-fixtures">Forwards</InputLabel>
                 </InputGroup>
               </FieldsetItems>
-            </fieldset>
+            </StyledFieldset>
             <SelectionExplainerText>
               {showFutureFixtures
                 ? "Shows upcoming fixtures, from today into to the future."
@@ -413,7 +431,11 @@ export default function FixturesClient() {
 
         <section>
           {loading ? (
-            <p>Loading fixtures...</p>
+            <EmptyState>
+              <SelectionExplainerText>
+                <LoadingText>Loading fixtures</LoadingText>
+              </SelectionExplainerText>
+            </EmptyState>
           ) : fixtures?.length > 0 ? (
             <AllFixturesList>
               {Object.entries(
@@ -428,7 +450,7 @@ export default function FixturesClient() {
                 )
               ).map(([groupingKey, dateFixtures]) => (
                 <DateGroup key={groupingKey}>
-                  <HeadingBanner sticky={true}>
+                  <HeadingBanner sticky="true">
                     {formatDateForDisplay(dateFixtures[0].localDate)}
                   </HeadingBanner>
                   <DateFixturesList>
@@ -448,7 +470,15 @@ export default function FixturesClient() {
               </Button>
             </AllFixturesList>
           ) : (
-            <p>No fixtures found</p>
+            <EmptyState>
+              <SelectionExplainerText>
+                {!selectedCompetitions.length
+                  ? "Select at least one competition from above"
+                  : "No fixtures found"}
+              </SelectionExplainerText>
+              {/* Requires lifting out 'isOpen' state to here */}
+              {/* <Button>Edit selection</Button> */}
+            </EmptyState>
           )}
         </section>
       </Main>

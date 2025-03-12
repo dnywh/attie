@@ -13,10 +13,11 @@ const StyledHeading = styled("h2")(({ theme }) => ({
   // Required since it might be rendered as inline elements like label
   display: "block",
   width: "100%",
+  borderRadius: "3px",
 
   variants: [
     {
-      props: { sticky: true },
+      props: { sticky: "true" },
       style: {
         // Sticky behaviour
         position: "sticky",
@@ -31,7 +32,7 @@ const StyledHeading = styled("h2")(({ theme }) => ({
 
 function HeadingBanner({
   as = "h2",
-  sticky = false,
+  sticky = "false",
   children = "Heading Title",
   ...props
 }) {

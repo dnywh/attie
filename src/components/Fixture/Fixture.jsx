@@ -1,17 +1,20 @@
 import FixtureStatus from "@/components/FixtureStatus";
 import OpponentRow from "@/components/OpponentRow";
-
 import { styled } from "@pigment-css/react";
+// import { createCardStyle, smallCardStyle } from "@/styles/commonStyles";
 
 const FixtureRow = styled("li")(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   gap: "0.65rem",
   padding: "0.65rem",
-  border: "1px solid black",
   backgroundColor: "#FEE272",
-  boxShadow: "0 4px 0 0 black",
-  borderRadius: "3px",
+  border: `1px solid ${theme.colors.text}`,
+  boxShadow: `0 3px 0 0 ${theme.colors.text}`,
+  borderRadius: `3px`,
+  // ...smallCardStyle({ theme }),
+  // ...cardStyle({ theme }),
+  // ...createCardStyle({ shadowSize: 40, borderRadius: 30 })({ theme }),
 
   // Border between each item
   "&:not(:last-of-type)": {
