@@ -28,6 +28,7 @@ export default withPigment(nextConfig, {
             },
             foreground: "#FFFFFF",
             text: "#000000",
+            shadow: "rgba(0,0,0,0.1)"
         }
     })
 });

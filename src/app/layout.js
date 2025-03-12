@@ -71,6 +71,14 @@ fieldset {
 p a {
   color: inherit;
 }
+
+button {
+  appearance: none;
+  border: none;
+  color: unset;
+  background: none;
+  cursor: pointer;
+  }
 `
 
 const Body = styled("body")({
