@@ -20,6 +20,12 @@ const StyledButton = styled("button")(({ theme }) => ({
   "&:hover": {
     transform: "scale(1.05)",
   },
+
+  "&:disabled": {
+    textDecoration: "none",
+    opacity: "0.5",
+    cursor: "wait",
+  },
 }));
 
 function Button({ children, ...props }) {

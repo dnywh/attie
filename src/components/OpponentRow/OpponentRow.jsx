@@ -34,14 +34,21 @@ function OpponentRow({
   isHomeTeam,
   useSoundEffects,
 }) {
+  // Prepare for 'null' cases like a not-yet-determined opponent in upcoming knockout stage
+  const teamName = team.shortName
+    ? team.shortName
+    : team.name
+    ? team.name
+    : "TBA";
+
   return (
     <StyledOpponentRow>
       <TeamLogo
-        src={team.crest}
-        alt={`Crest for ${team.shortName ? team.shortName : team.name}`}
+        src={team.crest ? team.crest : "/img/globe.svg"}
+        alt={`Crest for ${teamName}`}
         isHomeTeam={isHomeTeam}
       />
-      <OpponentName>{team.shortName ? team.shortName : team.name}</OpponentName>
+      <OpponentName>{teamName}</OpponentName>
       {!["SCHEDULED", "TIMED", "CANCELLED", "POSTPONED"].includes(status) && (
         <Score
           score={score}

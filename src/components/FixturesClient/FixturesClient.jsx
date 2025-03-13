@@ -178,54 +178,153 @@ export default function FixturesClient() {
   const [showFutureFixtures, setShowFutureFixtures] = useState(false);
   const [showAllScores, setShowAllScores] = useState(false);
   const [selectedCompetitions, setSelectedCompetitions] = useState([
-    "premier-league",
+    // "premier-league",
     "champions-league",
   ]);
   const [fixtures, setFixtures] = useState([]);
-  const [loading, setLoading] = useState(true); // Start with loading true
-  const [useSoundEffects, setUseSoundEffects] = useState(true); // Start with sound effects on
+  const [loading, setLoading] = useState(true);
+  const [useSoundEffects, setUseSoundEffects] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [dateWindow, setDateWindow] = useState({
+    start: 7,
+    end: 7,
+  });
 
-  const fetchFixturesForCompetition = async (code) => {
+  const fetchFixturesForCompetition = async (
+    competitionCode,
+    customDateWindow
+  ) => {
     const now = Date.now();
-    const cached = fixturesCache.get(code);
+    const cacheKey = `${competitionCode}-${
+      customDateWindow?.start || dateWindow.start
+    }-${customDateWindow?.end || dateWindow.end}-${showFutureFixtures}`; // Add direction to cache key
+
+    // Clear cache when switching directions
+    if (showFutureFixtures !== fixturesCache.get("direction")) {
+      console.log("Direction changed, clearing cache");
+      fixturesCache.clear();
+      fixturesCache.set("direction", showFutureFixtures);
+    }
+
+    const cached = fixturesCache.get(cacheKey);
 
     // Return cached data if fresh enough
     if (cached && now - cached.timestamp < CACHE_DURATION) {
+      console.log(`Using cached data for ${competitionCode}`);
       return cached.data;
     }
 
-    const res = await fetch(`/api/fixtures/${code}`);
-    const data = await res.json();
-    const matches = (data.matches || []).map((match) => ({
-      ...match,
-      competitionCode: code,
-    }));
+    // Calculate date range
+    const currentDate = new Date();
+    const startDate = new Date(currentDate);
+    const endDate = new Date(currentDate);
+    const windowStart = customDateWindow?.start || dateWindow.start;
+    const windowEnd = customDateWindow?.end || dateWindow.end;
 
-    updateCache(code, matches);
-    return matches;
+    if (showFutureFixtures) {
+      // For future fixtures: start from today up to N days ahead
+      startDate.setHours(0, 0, 0, 0); // Start of today
+      endDate.setDate(currentDate.getDate() + windowEnd);
+      endDate.setHours(23, 59, 59, 999); // End of the last day
+    } else {
+      // For past fixtures: start from N days ago up to today
+      startDate.setDate(currentDate.getDate() - windowStart);
+      startDate.setHours(0, 0, 0, 0); // Start of first day
+      endDate.setHours(23, 59, 59, 999); // End of today
+    }
+
+    const dateFrom = startDate.toISOString().split("T")[0];
+    const dateTo = endDate.toISOString().split("T")[0];
+
+    console.log(
+      `Fetching fixtures for ${competitionCode} from ${dateFrom} to ${dateTo} (${
+        showFutureFixtures ? "future" : "past"
+      })`
+    );
+
+    try {
+      const res = await fetch(
+        `/api/fixtures/${competitionCode}?dateFrom=${dateFrom}&dateTo=${dateTo}`
+      );
+
+      if (!res.ok) {
+        if (res.status === 429) {
+          throw new Error("429 Rate limit exceeded");
+        }
+        console.error(
+          `Failed to fetch fixtures for ${competitionCode}: ${res.status}`
+        );
+        return [];
+      }
+
+      const data = await res.json();
+      if (data.error) {
+        console.error(`API error for ${competitionCode}:`, data.error);
+        return [];
+      }
+
+      const matches = (data.matches || []).map((match) => ({
+        ...match,
+        competitionCode,
+      }));
+
+      updateCache(cacheKey, matches);
+      return matches;
+    } catch (error) {
+      console.error(`Error fetching fixtures for ${competitionCode}:`, error);
+      throw error; // Re-throw to handle rate limiting in handleLoadMore
+    }
   };
 
   // Initial load
   useEffect(() => {
     const loadInitialFixtures = async () => {
       setLoading(true);
+      setFixtures([]); // Clear fixtures when direction changes
+
       try {
+        // Reset date window when direction changes
+        setDateWindow({
+          start: 7,
+          end: 7,
+        });
+
         const initialCodes = selectedCompetitions.map(
           (l) => COMPETITIONS[l].code
         );
-        const matches = await Promise.all(
-          initialCodes.map(fetchFixturesForCompetition)
+
+        console.log(
+          `Loading initial fixtures for ${initialCodes.join(", ")} (${
+            showFutureFixtures ? "future" : "past"
+          })`
         );
-        setFixtures(sortFixtures(matches.flat(), showFutureFixtures));
+
+        const matches = await Promise.all(
+          initialCodes.map((competitionCode) =>
+            fetchFixturesForCompetition(competitionCode)
+          )
+        );
+
+        const allMatches = matches.flat();
+        console.log(`Loaded ${allMatches.length} total fixtures`);
+
+        if (allMatches.length === 0) {
+          console.log("No fixtures found in initial load");
+        }
+
+        setFixtures(sortFixtures(allMatches, showFutureFixtures));
       } catch (error) {
         console.error("Failed to fetch fixtures:", error);
+        if (error.message?.includes("429")) {
+          alert("Rate limit exceeded. Please try again in a minute.");
+        }
       } finally {
         setLoading(false);
       }
     };
 
     loadInitialFixtures();
-  }, [showFutureFixtures]); // Add this dependency
+  }, [showFutureFixtures]); // Only re-run when direction changes
 
   const handleCompetitionChange = async (event) => {
     const competition = event.target.name;
@@ -253,6 +352,62 @@ export default function FixturesClient() {
       console.error("Failed to update fixtures:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleLoadMore = async () => {
+    setLoadingMore(true);
+    try {
+      // Increase the window by 7 days
+      const newWindow = {
+        start: dateWindow.start + 7,
+        end: dateWindow.end + 7,
+      };
+
+      const matches = await Promise.all(
+        selectedCompetitions.map((competition) =>
+          fetchFixturesForCompetition(COMPETITIONS[competition].code, newWindow)
+        )
+      );
+
+      // Merge new fixtures with existing ones, removing duplicates
+      const newFixtures = matches.flat();
+
+      // If no new fixtures were found, alert the user but don't update the window
+      if (newFixtures.length === 0) {
+        alert(
+          `No ${
+            showFutureFixtures ? "upcoming" : "past"
+          } fixtures found in the next window. This might be because the season is ${
+            showFutureFixtures ? "yet to be scheduled" : "completed"
+          }.`
+        );
+        return;
+      }
+
+      setFixtures((prevFixtures) => {
+        const combined = [...prevFixtures, ...newFixtures];
+        // Remove duplicates based on fixture ID
+        const unique = Array.from(
+          new Map(combined.map((f) => [f.id, f])).values()
+        );
+        return sortFixtures(unique, showFutureFixtures);
+      });
+
+      // Only update the date window if we found new fixtures
+      setDateWindow(newWindow);
+      console.log(
+        `Successfully loaded ${newFixtures.length} fixtures for ${newWindow.start} to ${newWindow.end}`
+      );
+    } catch (error) {
+      console.error("Failed to load more fixtures:", error);
+      if (error.message?.includes("429")) {
+        alert("Rate limit exceeded. Please try again in a minute.");
+      } else {
+        alert("Failed to load more fixtures. Please try again.");
+      }
+    } finally {
+      setLoadingMore(false);
     }
   };
 
@@ -460,7 +615,8 @@ export default function FixturesClient() {
                       ))}
                     </DateFixturesList>
                   </DateGroup>
-                  {index === Math.floor(array.length / 2) && (
+                  {/* {index === Math.floor(array.length / 2) && ( */}
+                  {index === 1 && (
                     <Interstitial
                       linkUrl="https://www.dannywhite.net/"
                       linkText="Reach out"
@@ -480,9 +636,21 @@ export default function FixturesClient() {
                 </Fragment>
               ))}
 
-              <Button onClick={() => console.log("Loading more...")}>
-                Load more
-              </Button>
+              {fixtures.length > 0 ? (
+                <Button onClick={handleLoadMore} disabled={loadingMore}>
+                  {loadingMore ? (
+                    <LoadingText>Loading</LoadingText>
+                  ) : (
+                    "Load more"
+                  )}
+                </Button>
+              ) : (
+                <EmptyState>
+                  <SelectionExplainerText>
+                    End of fixtures list
+                  </SelectionExplainerText>
+                </EmptyState>
+              )}
             </AllFixturesList>
           ) : (
             <EmptyState>
@@ -491,8 +659,6 @@ export default function FixturesClient() {
                   ? "Select at least one competition from above"
                   : "No fixtures found"}
               </SelectionExplainerText>
-              {/* Requires lifting out 'isOpen' state to here */}
-              {/* <Button>Edit selection</Button> */}
             </EmptyState>
           )}
         </section>
