@@ -313,8 +313,8 @@ const ControlBar = styled("section")(({ theme }) => ({
   backgroundColor: theme.colors.mid.secondary,
   overflowX: "hidden",
 
-  border: `1px solid ${theme.colors.text}`,
-  boxShadow: `0 3px 0 0 ${theme.colors.text}`,
+  border: `1px solid ${theme.colors.text.primary}`,
+  boxShadow: `0 3px 0 0 ${theme.colors.text.primary}`,
   borderRadius: "3px",
 }));
 

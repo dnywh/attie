@@ -6,7 +6,8 @@ import '@pigment-css/react/styles.css';
 
 export const metadata = {
   title: "Attie",
-  description: "The anti-score scores app.",
+  tagLine: "The anti-score scores app.", // TODO SEO
+  description: "Don’t spoil the game. Get the results without the scores.",
 };
 
 globalCss`

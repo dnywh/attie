@@ -44,7 +44,7 @@ const DialogHeader = styled("header")(({ theme }) => ({
   "@supports (animation-timeline: scroll())": {
     // https://ryanmulligan.dev/blog/sticky-header-scroll-shadow/
     // https://mskelton.dev/blog/css-scroll-animations
-    "--header-border-color": theme.colors.text,
+    "--header-border-color": theme.colors.text.primary,
     "--header-shadow-color": theme.colors.shadow,
     animation: `${scrollShadow} linear both`,
     animationTimeline: "scroll()",
@@ -56,7 +56,7 @@ const StyledButton = styled("button")(({ theme }) => ({
   display: "flex",
   gap: "0.65rem",
   padding: "0.65rem",
-  color: theme.colors.text,
+  color: theme.colors.text.primary,
   backgroundColor: theme.colors.foreground,
   alignItems: "center",
   ...teamText,
@@ -69,7 +69,7 @@ const StyledButton = styled("button")(({ theme }) => ({
 
   // ...veryBasicCardStyle({ theme }),
 
-  border: `1px solid ${theme.colors.text}`,
+  border: `1px solid ${theme.colors.text.primary}`,
   borderRadius: "2px",
   boxShadow: `0.5px 1.5px 0 0 ${theme.colors.foreground}`,
 

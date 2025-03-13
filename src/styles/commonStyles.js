@@ -2,8 +2,8 @@
 
 // Common card-like element with black border and shadow
 // export const cardStyle = ({ theme }) => ({
-//     border: `1px solid ${theme.colors.text}`,
-//     boxShadow: `0 4px 0 0 ${theme.colors.text}`,
+//     border: `1px solid ${theme.colors.text.primary}`,
+//     boxShadow: `0 4px 0 0 ${theme.colors.text.primary}`,
 //     borderRadius: "0px",
 // });
 
@@ -46,8 +46,8 @@ export const dashedBorder = ({ theme }) => ({
 });
 
 export const veryBasicCardStyle = ({ theme }) => ({
-    border: `1px solid ${theme.colors.text}`,
-    boxShadow: `0 4px 0 0 ${theme.colors.text}`,
+    border: `1px solid ${theme.colors.text.primary}`,
+    boxShadow: `0 4px 0 0 ${theme.colors.text.primary}`,
     borderRadius: "3px",
 });
 
@@ -66,8 +66,8 @@ export const interactiveStyles = ({
 // Helper function to ensure consistent parameter handling
 const createCardStyle = ({ shadowSize = 4, borderRadius = 3, interactive = false }) =>
     ({ theme }) => ({
-        border: `1px solid ${theme.colors.text}`,
-        boxShadow: `0 ${shadowSize}px 0 0 ${theme.colors.text}`,
+        border: `1px solid ${theme.colors.text.primary}`,
+        boxShadow: `0 ${shadowSize}px 0 0 ${theme.colors.text.primary}`,
         borderRadius: `${borderRadius}px`,
         ...(interactive ? interactiveStyles : {}),
     });
@@ -90,15 +90,15 @@ export { createCardStyle };
 
 // ControlBar, yellow fixture cards
 export const elevatedCard = ({ theme }) => ({
-    border: `1px solid ${theme.colors.text}`,
-    boxShadow: `0 3px 0 0 ${theme.colors.text}`,
+    border: `1px solid ${theme.colors.text.primary}`,
+    boxShadow: `0 3px 0 0 ${theme.colors.text.primary}`,
     borderRadius: "3px",
 })
 
 // Scores, dropdowns
 export const bleedingWhiteCard = ({ theme }) => ({
     backgroundColor: theme.colors.foreground,
-    border: `1px solid ${theme.colors.text}`,
+    border: `1px solid ${theme.colors.text.primary}`,
     borderRadius: "2px",
     boxShadow: `0.5px 1.5px 0 0 ${theme.colors.foreground}`,
 });

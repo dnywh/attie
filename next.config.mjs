@@ -26,11 +26,16 @@ export default withPigment(nextConfig, {
         colors: {
             background: "#FA6565",
             mid: {
-                primary: "#FEE272",
-                secondary: "#AEF4F5",
+                primary: "#FEE272", // Yellow cards
+                secondary: "#AEF4F5", // Blue interstitials
+                tertiary: "#D8D4C4", // Brown/gray cards
+                quaternary: "rgb(245, 245, 245)" // TBD team crests
             },
             foreground: "#FFFFFF",
-            text: "#000000",
+            text: {
+                primary: "#000000",
+                tertiary: "rgb(128, 128, 128)", // TBD team names
+            },
             shadow: "rgba(0,0,0,0.1)"
         }
     })

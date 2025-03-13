@@ -24,6 +24,20 @@ const OpponentName = styled("p")(({ theme }) => ({
   flex: "1",
   ...teamText,
   ...ellipsizedText,
+  variants: [
+    {
+      props: { isKnown: true },
+      style: {
+        color: theme.colors.text.primary,
+      },
+    },
+    {
+      props: { isKnown: false },
+      style: {
+        color: theme.colors.text.tertiary,
+      },
+    },
+  ],
 }));
 
 function OpponentRow({
@@ -34,21 +48,23 @@ function OpponentRow({
   isHomeTeam,
   useSoundEffects,
 }) {
+  const isKnown = !!team.shortName || !!team.name;
   // Prepare for 'null' cases like a not-yet-determined opponent in upcoming knockout stage
   const teamName = team.shortName
     ? team.shortName
     : team.name
     ? team.name
-    : "TBA";
+    : "TBD";
 
   return (
     <StyledOpponentRow>
       <TeamLogo
-        src={team.crest ? team.crest : "/img/globe.svg"}
+        isKnown={isKnown}
+        src={team.crest}
         alt={`Crest for ${teamName}`}
         isHomeTeam={isHomeTeam}
       />
-      <OpponentName>{teamName}</OpponentName>
+      <OpponentName isKnown={isKnown}>{teamName}</OpponentName>
       {!["SCHEDULED", "TIMED", "CANCELLED", "POSTPONED"].includes(status) && (
         <Score
           score={score}
