@@ -39,7 +39,7 @@ const FixtureRow = styled("li")(({ theme }) => ({
       height: "calc(0.425rem - 1px)", // Match gap in parent component, minus same offsets as above
       width: "100%",
       background:
-        "linear-gradient(to right, transparent 34px, black 0, black 54px, transparent 0, transparent calc(100% - 54px), black 0, black calc(100% - 48px), transparent 0)",
+        "linear-gradient(to right, transparent 34px, black 0, black 54px, transparent 0, transparent calc(100% - 54px), black 0, black calc(100% - 48px), black calc(100% - 34px), transparent 0)",
     },
   },
 }));
