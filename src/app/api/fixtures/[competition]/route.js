@@ -1,32 +1,36 @@
 import { NextResponse } from 'next/server';
 
+const API_BASE_URL = 'https://api.football-data.org/v4';
+
+/**
+ * Formats a date as YYYY-MM-DD for the API
+ */
+function formatDateForApi(date) {
+    return date.toISOString().split('T')[0];
+}
+
 export async function GET(request, { params }) {
     const { competition: competitionCode } = await params;
     const { searchParams } = new URL(request.url);
-    const now = new Date();
 
-    // Default windows - 28 days forward, 7 days back
-    const isLookingForward = searchParams.get('direction') === 'future';
-    const defaultWindow = isLookingForward ? 28 : 7;
+    // Get required parameters
+    const dateFrom = searchParams.get('dateFrom');
+    const dateTo = searchParams.get('dateTo');
+    const direction = searchParams.get('direction');
 
-    // Ensure we await these params
-    const dateFrom = await Promise.resolve(searchParams.get('dateFrom')) || new Date(Date.UTC(
-        now.getUTCFullYear(),
-        now.getUTCMonth(),
-        now.getUTCDate() - (isLookingForward ? 0 : defaultWindow)
-    )).toISOString().split('T')[0];
+    if (!dateFrom || !dateTo) {
+        return NextResponse.json(
+            { error: 'Missing required date parameters' },
+            { status: 400 }
+        );
+    }
 
-    const dateTo = await Promise.resolve(searchParams.get('dateTo')) || new Date(Date.UTC(
-        now.getUTCFullYear(),
-        now.getUTCMonth(),
-        now.getUTCDate() + (isLookingForward ? defaultWindow : 0)
-    )).toISOString().split('T')[0];
-
-    console.log(`[API] Getting ${isLookingForward ? 'future' : 'past'} games scheduled from ${dateFrom} to ${dateTo} for ${competitionCode}`);
+    console.log(`[API] Getting ${direction} games for ${competitionCode}`);
+    console.log(`[API] Date range: ${dateFrom} to ${dateTo}`);
 
     try {
         const response = await fetch(
-            `https://api.football-data.org/v4/competitions/${competitionCode}/matches?dateFrom=${dateFrom}&dateTo=${dateTo}`,
+            `${API_BASE_URL}/competitions/${competitionCode}/matches?dateFrom=${dateFrom}&dateTo=${dateTo}`,
             {
                 headers: {
                     "X-Auth-Token": process.env.FOOTBALL_DATA_API_KEY,
@@ -34,24 +38,46 @@ export async function GET(request, { params }) {
             }
         );
 
+        // Handle different response scenarios
         if (!response.ok) {
             if (response.status === 429) {
                 console.log(`[API] Rate limit exceeded for ${competitionCode}`);
-                return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
+                return NextResponse.json(
+                    { error: 'Rate limit exceeded', isRateLimit: true },
+                    { status: 429 }
+                );
             }
+
             if (response.status === 204) {
                 console.log(`[API] No content returned for ${competitionCode}`);
-                return NextResponse.json({ matches: [] });
+                return NextResponse.json({ matches: [], message: 'No matches found' });
             }
+
             console.log(`[API] Error ${response.status} for ${competitionCode}`);
-            return NextResponse.json({ error: `API error: ${response.status}` }, { status: response.status });
+            return NextResponse.json(
+                { error: `API error: ${response.status}`, message: 'API request failed' },
+                { status: response.status }
+            );
         }
 
         const data = await response.json();
-        console.log(`[API] Found ${data.matches?.length || 0} matches for ${competitionCode}`);
-        return NextResponse.json(data);
+        const matchCount = data.matches?.length || 0;
+        console.log(`[API] Found ${matchCount} matches for ${competitionCode}`);
+
+        return NextResponse.json({
+            ...data,
+            meta: {
+                matchCount,
+                dateFrom,
+                dateTo,
+                direction
+            }
+        });
     } catch (error) {
         console.error('[API] Fetch error:', error);
-        return NextResponse.json({ error: 'Failed to fetch fixtures' }, { status: 500 });
+        return NextResponse.json(
+            { error: 'Failed to fetch fixtures', message: error.message },
+            { status: 500 }
+        );
     }
 }
