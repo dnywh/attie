@@ -223,7 +223,12 @@ export default function FixturesClient() {
     const windowEnd = customDateWindow?.end || dateWindow.end;
 
     if (showFutureFixtures) {
-      startDate.setHours(0, 0, 0, 0);
+      startDate.setHours(
+        currentDate.getHours(),
+        currentDate.getMinutes(),
+        0,
+        0
+      ); // Keep current time for future fixtures
       endDate.setDate(currentDate.getDate() + windowEnd);
       endDate.setHours(23, 59, 59, 999);
     } else {
@@ -269,25 +274,6 @@ export default function FixturesClient() {
         competitionCode,
       }));
 
-      // For future fixtures, if no matches found and we have attempts left,
-      // try looking further ahead with a bigger window
-      if (showFutureFixtures && matches.length === 0 && maxAttempts > 1) {
-        console.log(
-          `No fixtures found, extending window to ${
-            windowEnd + 14
-          } days ahead...`
-        );
-        const nextWindow = {
-          start: windowStart,
-          end: windowEnd + 14, // Look 2 weeks further each time
-        };
-        return fetchFixturesForCompetition(
-          competitionCode,
-          nextWindow,
-          maxAttempts - 1
-        );
-      }
-
       updateCache(cacheKey, matches);
       return matches;
     } catch (error) {
@@ -301,13 +287,12 @@ export default function FixturesClient() {
     const loadInitialFixtures = async () => {
       setLoading(true);
       setFixtures([]);
-      setHasReachedEnd(false); // Reset end state when direction changes
+      setHasReachedEnd(false);
 
       try {
-        // Set initial window based on direction
         const initialWindow = {
           start: 7,
-          end: showFutureFixtures ? 28 : 7,
+          end: 28,
         };
         setDateWindow(initialWindow);
 
@@ -323,11 +308,7 @@ export default function FixturesClient() {
 
         const matches = await Promise.all(
           initialCodes.map((competitionCode) =>
-            fetchFixturesForCompetition(
-              competitionCode,
-              initialWindow,
-              showFutureFixtures ? 3 : 1
-            )
+            fetchFixturesForCompetition(competitionCode, initialWindow)
           )
         );
 
@@ -337,18 +318,6 @@ export default function FixturesClient() {
         if (allMatches.length === 0) {
           console.log("No fixtures found in initial load");
           setHasReachedEnd(true);
-        } else if (showFutureFixtures) {
-          // Update the date window to match the earliest fixture found
-          const earliestFixture = new Date(
-            Math.min(...allMatches.map((m) => new Date(m.utcDate)))
-          );
-          const daysAhead = Math.ceil(
-            (earliestFixture - new Date()) / (1000 * 60 * 60 * 24)
-          );
-          setDateWindow({
-            start: 0,
-            end: Math.max(daysAhead + 14, 28),
-          });
         }
 
         setFixtures(sortFixtures(allMatches, showFutureFixtures));
@@ -397,45 +366,94 @@ export default function FixturesClient() {
   const handleLoadMore = async () => {
     setLoadingMore(true);
     try {
-      const windowIncrement = showFutureFixtures ? 14 : 7;
+      const INCREMENT_DAYS = 14; // Use same increment for both directions
       const newWindow = {
-        start: dateWindow.start + (showFutureFixtures ? 0 : windowIncrement),
-        end: dateWindow.end + (showFutureFixtures ? windowIncrement : 0),
+        start: dateWindow.start + (showFutureFixtures ? 0 : INCREMENT_DAYS),
+        end: dateWindow.end + (showFutureFixtures ? INCREMENT_DAYS : 0),
       };
 
-      const matches = await Promise.all(
-        selectedCompetitions.map((competition) =>
-          fetchFixturesForCompetition(
-            COMPETITIONS[competition].code,
-            newWindow,
-            showFutureFixtures ? 2 : 1
+      console.log(`[Load More] Starting load more with window:`, newWindow);
+      let attempts = 3;
+      let foundFixtures = false;
+
+      // Get current fixture IDs for comparison
+      const existingFixtureIds = new Set(fixtures.map((f) => f.id));
+      let newFixturesCount = 0;
+
+      while (attempts > 0 && !foundFixtures) {
+        console.log(
+          `[Load More] Attempt ${4 - attempts} with window:`,
+          newWindow
+        );
+
+        const matches = await Promise.all(
+          selectedCompetitions.map((competition) =>
+            fetchFixturesForCompetition(
+              COMPETITIONS[competition].code,
+              newWindow
+            )
           )
-        )
-      );
+        );
 
-      const newFixtures = matches.flat();
+        const newFixtures = matches.flat();
+        // Count only fixtures that don't exist in our current set
+        const uniqueNewFixtures = newFixtures.filter(
+          (fixture) => !existingFixtureIds.has(fixture.id)
+        );
 
-      if (newFixtures.length === 0) {
-        setHasReachedEnd(true);
-        return;
+        console.log(
+          `[Load More] Found ${
+            uniqueNewFixtures.length
+          } new unique fixtures in attempt ${4 - attempts}`
+        );
+
+        if (uniqueNewFixtures.length > 0) {
+          foundFixtures = true;
+          newFixturesCount += uniqueNewFixtures.length;
+
+          setFixtures((prevFixtures) => {
+            const combined = [...prevFixtures, ...newFixtures];
+            const unique = Array.from(
+              new Map(combined.map((f) => [f.id, f])).values()
+            );
+            const sorted = sortFixtures(unique, showFutureFixtures);
+            console.log(
+              `[Load More] Updated fixtures list to ${sorted.length} total fixtures (${newFixturesCount} new in this window)`
+            );
+            return sorted;
+          });
+          setDateWindow(newWindow);
+          console.log(
+            `[Load More] Success: loaded ${
+              uniqueNewFixtures.length
+            } new fixtures for window ${
+              showFutureFixtures ? newWindow.end : newWindow.start
+            } days ${showFutureFixtures ? "ahead" : "back"}`
+          );
+        } else {
+          // If no new fixtures found, increase window and try again
+          console.log(
+            `[Load More] No new fixtures found, increasing window size`
+          );
+          newWindow.start += showFutureFixtures ? 0 : INCREMENT_DAYS;
+          newWindow.end += showFutureFixtures ? INCREMENT_DAYS : 0;
+          attempts--;
+        }
       }
 
-      setFixtures((prevFixtures) => {
-        const combined = [...prevFixtures, ...newFixtures];
-        const unique = Array.from(
-          new Map(combined.map((f) => [f.id, f])).values()
+      // Check if we found any new fixtures in this entire window (across all attempts)
+      if (newFixturesCount === 0) {
+        console.log(
+          "[Load More] No new fixtures found in entire window after all attempts, marking as end"
         );
-        return sortFixtures(unique, showFutureFixtures);
-      });
-
-      setDateWindow(newWindow);
-      console.log(
-        `Successfully loaded ${newFixtures.length} fixtures for window ${
-          showFutureFixtures ? newWindow.end : newWindow.start
-        } days ${showFutureFixtures ? "ahead" : "back"}`
-      );
+        setHasReachedEnd(true);
+      } else {
+        console.log(
+          `[Load More] Found ${newFixturesCount} new fixtures in this window`
+        );
+      }
     } catch (error) {
-      console.error("Failed to load more fixtures:", error);
+      console.error("[Load More] Error:", error);
       if (error.message?.includes("429")) {
         alert("Rate limit exceeded. Please try again in a minute.");
       } else {
@@ -673,21 +691,26 @@ export default function FixturesClient() {
                 </Fragment>
               ))}
 
-              {!hasReachedEnd ? (
-                <Button onClick={handleLoadMore} disabled={loadingMore}>
-                  {loadingMore ? (
-                    <LoadingText>Loading</LoadingText>
-                  ) : (
-                    "Load more"
-                  )}
-                </Button>
-              ) : (
-                <EmptyState>
-                  <SelectionExplainerText>
-                    End of fixtures list
-                  </SelectionExplainerText>
-                </EmptyState>
-              )}
+              {(() => {
+                console.log(
+                  `[Render] hasReachedEnd: ${hasReachedEnd}, fixtures length: ${fixtures.length}`
+                );
+                return !hasReachedEnd ? (
+                  <Button onClick={handleLoadMore} disabled={loadingMore}>
+                    {loadingMore ? (
+                      <LoadingText>Loading</LoadingText>
+                    ) : (
+                      "Load more"
+                    )}
+                  </Button>
+                ) : (
+                  <EmptyState>
+                    <SelectionExplainerText>
+                      End of fixtures list
+                    </SelectionExplainerText>
+                  </EmptyState>
+                );
+              })()}
             </AllFixturesList>
           ) : (
             <EmptyState>
