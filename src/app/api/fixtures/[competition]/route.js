@@ -5,20 +5,23 @@ export async function GET(request, { params }) {
     const { searchParams } = new URL(request.url);
     const now = new Date();
 
-    // Get dates from query params or use default 7-day window
+    // Default to looking 28 days ahead for future fixtures, 7 days back for past
+    const isLookingForward = searchParams.get('direction') === 'future';
+    const defaultWindow = isLookingForward ? 28 : 7;
+
     const dateFrom = searchParams.get('dateFrom') || new Date(Date.UTC(
         now.getUTCFullYear(),
         now.getUTCMonth(),
-        now.getUTCDate() - 7
+        now.getUTCDate() - (isLookingForward ? 0 : defaultWindow)
     )).toISOString().split('T')[0];
 
     const dateTo = searchParams.get('dateTo') || new Date(Date.UTC(
         now.getUTCFullYear(),
         now.getUTCMonth(),
-        now.getUTCDate() + 7
+        now.getUTCDate() + (isLookingForward ? defaultWindow : 0)
     )).toISOString().split('T')[0];
 
-    console.log(`Getting games scheduled from ${dateFrom} to ${dateTo} for ${competitionCode}`);
+    console.log(`Getting ${isLookingForward ? 'future' : 'past'} games scheduled from ${dateFrom} to ${dateTo} for ${competitionCode}`);
 
     try {
         const response = await fetch(

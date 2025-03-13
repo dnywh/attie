@@ -185,19 +185,21 @@ export default function FixturesClient() {
   const [loading, setLoading] = useState(true);
   const [useSoundEffects, setUseSoundEffects] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [hasReachedEnd, setHasReachedEnd] = useState(false);
   const [dateWindow, setDateWindow] = useState({
     start: 7,
-    end: 7,
+    end: showFutureFixtures ? 28 : 7,
   });
 
   const fetchFixturesForCompetition = async (
     competitionCode,
-    customDateWindow
+    customDateWindow,
+    maxAttempts = 3
   ) => {
     const now = Date.now();
     const cacheKey = `${competitionCode}-${
       customDateWindow?.start || dateWindow.start
-    }-${customDateWindow?.end || dateWindow.end}-${showFutureFixtures}`; // Add direction to cache key
+    }-${customDateWindow?.end || dateWindow.end}-${showFutureFixtures}`;
 
     // Clear cache when switching directions
     if (showFutureFixtures !== fixturesCache.get("direction")) {
@@ -208,7 +210,6 @@ export default function FixturesClient() {
 
     const cached = fixturesCache.get(cacheKey);
 
-    // Return cached data if fresh enough
     if (cached && now - cached.timestamp < CACHE_DURATION) {
       console.log(`Using cached data for ${competitionCode}`);
       return cached.data;
@@ -222,15 +223,13 @@ export default function FixturesClient() {
     const windowEnd = customDateWindow?.end || dateWindow.end;
 
     if (showFutureFixtures) {
-      // For future fixtures: start from today up to N days ahead
-      startDate.setHours(0, 0, 0, 0); // Start of today
+      startDate.setHours(0, 0, 0, 0);
       endDate.setDate(currentDate.getDate() + windowEnd);
-      endDate.setHours(23, 59, 59, 999); // End of the last day
+      endDate.setHours(23, 59, 59, 999);
     } else {
-      // For past fixtures: start from N days ago up to today
       startDate.setDate(currentDate.getDate() - windowStart);
-      startDate.setHours(0, 0, 0, 0); // Start of first day
-      endDate.setHours(23, 59, 59, 999); // End of today
+      startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(23, 59, 59, 999);
     }
 
     const dateFrom = startDate.toISOString().split("T")[0];
@@ -244,7 +243,9 @@ export default function FixturesClient() {
 
     try {
       const res = await fetch(
-        `/api/fixtures/${competitionCode}?dateFrom=${dateFrom}&dateTo=${dateTo}`
+        `/api/fixtures/${competitionCode}?dateFrom=${dateFrom}&dateTo=${dateTo}&direction=${
+          showFutureFixtures ? "future" : "past"
+        }`
       );
 
       if (!res.ok) {
@@ -268,11 +269,30 @@ export default function FixturesClient() {
         competitionCode,
       }));
 
+      // For future fixtures, if no matches found and we have attempts left,
+      // try looking further ahead with a bigger window
+      if (showFutureFixtures && matches.length === 0 && maxAttempts > 1) {
+        console.log(
+          `No fixtures found, extending window to ${
+            windowEnd + 14
+          } days ahead...`
+        );
+        const nextWindow = {
+          start: windowStart,
+          end: windowEnd + 14, // Look 2 weeks further each time
+        };
+        return fetchFixturesForCompetition(
+          competitionCode,
+          nextWindow,
+          maxAttempts - 1
+        );
+      }
+
       updateCache(cacheKey, matches);
       return matches;
     } catch (error) {
       console.error(`Error fetching fixtures for ${competitionCode}:`, error);
-      throw error; // Re-throw to handle rate limiting in handleLoadMore
+      throw error;
     }
   };
 
@@ -280,14 +300,16 @@ export default function FixturesClient() {
   useEffect(() => {
     const loadInitialFixtures = async () => {
       setLoading(true);
-      setFixtures([]); // Clear fixtures when direction changes
+      setFixtures([]);
+      setHasReachedEnd(false); // Reset end state when direction changes
 
       try {
-        // Reset date window when direction changes
-        setDateWindow({
+        // Set initial window based on direction
+        const initialWindow = {
           start: 7,
-          end: 7,
-        });
+          end: showFutureFixtures ? 28 : 7,
+        };
+        setDateWindow(initialWindow);
 
         const initialCodes = selectedCompetitions.map(
           (l) => COMPETITIONS[l].code
@@ -301,7 +323,11 @@ export default function FixturesClient() {
 
         const matches = await Promise.all(
           initialCodes.map((competitionCode) =>
-            fetchFixturesForCompetition(competitionCode)
+            fetchFixturesForCompetition(
+              competitionCode,
+              initialWindow,
+              showFutureFixtures ? 3 : 1
+            )
           )
         );
 
@@ -310,6 +336,19 @@ export default function FixturesClient() {
 
         if (allMatches.length === 0) {
           console.log("No fixtures found in initial load");
+          setHasReachedEnd(true);
+        } else if (showFutureFixtures) {
+          // Update the date window to match the earliest fixture found
+          const earliestFixture = new Date(
+            Math.min(...allMatches.map((m) => new Date(m.utcDate)))
+          );
+          const daysAhead = Math.ceil(
+            (earliestFixture - new Date()) / (1000 * 60 * 60 * 24)
+          );
+          setDateWindow({
+            start: 0,
+            end: Math.max(daysAhead + 14, 28),
+          });
         }
 
         setFixtures(sortFixtures(allMatches, showFutureFixtures));
@@ -324,7 +363,7 @@ export default function FixturesClient() {
     };
 
     loadInitialFixtures();
-  }, [showFutureFixtures]); // Only re-run when direction changes
+  }, [showFutureFixtures]);
 
   const handleCompetitionChange = async (event) => {
     const competition = event.target.name;
@@ -358,46 +397,42 @@ export default function FixturesClient() {
   const handleLoadMore = async () => {
     setLoadingMore(true);
     try {
-      // Increase the window by 7 days
+      const windowIncrement = showFutureFixtures ? 14 : 7;
       const newWindow = {
-        start: dateWindow.start + 7,
-        end: dateWindow.end + 7,
+        start: dateWindow.start + (showFutureFixtures ? 0 : windowIncrement),
+        end: dateWindow.end + (showFutureFixtures ? windowIncrement : 0),
       };
 
       const matches = await Promise.all(
         selectedCompetitions.map((competition) =>
-          fetchFixturesForCompetition(COMPETITIONS[competition].code, newWindow)
+          fetchFixturesForCompetition(
+            COMPETITIONS[competition].code,
+            newWindow,
+            showFutureFixtures ? 2 : 1
+          )
         )
       );
 
-      // Merge new fixtures with existing ones, removing duplicates
       const newFixtures = matches.flat();
 
-      // If no new fixtures were found, alert the user but don't update the window
       if (newFixtures.length === 0) {
-        alert(
-          `No ${
-            showFutureFixtures ? "upcoming" : "past"
-          } fixtures found in the next window. This might be because the season is ${
-            showFutureFixtures ? "yet to be scheduled" : "completed"
-          }.`
-        );
+        setHasReachedEnd(true);
         return;
       }
 
       setFixtures((prevFixtures) => {
         const combined = [...prevFixtures, ...newFixtures];
-        // Remove duplicates based on fixture ID
         const unique = Array.from(
           new Map(combined.map((f) => [f.id, f])).values()
         );
         return sortFixtures(unique, showFutureFixtures);
       });
 
-      // Only update the date window if we found new fixtures
       setDateWindow(newWindow);
       console.log(
-        `Successfully loaded ${newFixtures.length} fixtures for ${newWindow.start} to ${newWindow.end}`
+        `Successfully loaded ${newFixtures.length} fixtures for window ${
+          showFutureFixtures ? newWindow.end : newWindow.start
+        } days ${showFutureFixtures ? "ahead" : "back"}`
       );
     } catch (error) {
       console.error("Failed to load more fixtures:", error);
@@ -593,9 +628,11 @@ export default function FixturesClient() {
                   fixtures.filter((fixture) => {
                     const fixtureDate = new Date(fixture.utcDate);
                     const now = new Date();
+                    // Set now to start of day for future comparison (to include today's games in future list)
+                    // now.setHours(0, 0, 0, 0);
                     return showFutureFixtures
-                      ? fixtureDate >= now // Future fixtures
-                      : fixtureDate <= now; // Past fixtures
+                      ? fixtureDate >= now
+                      : fixtureDate <= now;
                   })
                 )
               ).map(([groupingKey, dateFixtures], index, array) => (
@@ -636,7 +673,7 @@ export default function FixturesClient() {
                 </Fragment>
               ))}
 
-              {fixtures.length > 0 ? (
+              {!hasReachedEnd ? (
                 <Button onClick={handleLoadMore} disabled={loadingMore}>
                   {loadingMore ? (
                     <LoadingText>Loading</LoadingText>
