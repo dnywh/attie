@@ -43,7 +43,7 @@ export const dashedBorder = ({ theme }) => ({
     paddingTop: "1.5rem",
     // Dashed border generator
     // https://codepen.io/amit_sheen/pen/xxZeyjO
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.background.page,
     backgroundImage:
         "none, repeating-linear-gradient(90deg, rgb(255 255 255 / 30%), rgb(255 255 255 / 30%) 3px, transparent 3px, transparent 6px, rgb(0 0 0 / 95%) 1.25rem)",
     // backgroundPosition: "0 0, 0 0, 100% 0, 0 100%",
@@ -105,8 +105,8 @@ export const elevatedCard = ({ theme }) => ({
 
 // Scores, dropdowns
 export const bleedingWhiteCard = ({ theme }) => ({
-    backgroundColor: theme.colors.foreground,
+    backgroundColor: theme.colors.background.focus,
     border: `1px solid ${theme.colors.text.primary}`,
     borderRadius: "2px",
-    boxShadow: `0.5px 1.5px 0 0 ${theme.colors.foreground}`,
+    boxShadow: `0.5px 1.5px 0 0 ${theme.colors.background.focus}`,
 });

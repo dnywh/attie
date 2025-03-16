@@ -32,13 +32,13 @@ const Container = styled("div")(({ theme }) => ({
     {
       props: { isKnown: true },
       style: {
-        background: theme.colors.foreground,
+        background: theme.colors.background.focus,
       },
     },
     {
       props: { isKnown: false },
       style: {
-        background: theme.colors.mid.quaternary,
+        background: theme.colors.background.crest,
       },
     },
   ],

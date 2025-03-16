@@ -339,7 +339,7 @@ const ControlBar = styled("section")(({ theme }) => ({
   gap: "0.5rem",
   padding: "0.5rem",
   alignItems: "center",
-  backgroundColor: theme.colors.mid.secondary,
+  backgroundColor: theme.colors.background.interstitial,
   overflowX: "hidden",
 
   border: `1px solid ${theme.colors.text.primary}`,

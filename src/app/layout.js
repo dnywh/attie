@@ -90,7 +90,7 @@ const Body = styled("body")(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   gap: "3rem",
-  backgroundColor: theme.colors.background,
+  backgroundColor: theme.colors.background.page,
 }));
 
 export default function RootLayout({ children }) {

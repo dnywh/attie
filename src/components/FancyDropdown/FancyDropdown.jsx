@@ -40,7 +40,7 @@ const DialogHeader = styled("header")(({ theme }) => ({
   position: "sticky",
   top: "0",
   // Sticky styling
-  backgroundColor: theme.colors.mid.secondary,
+  backgroundColor: theme.colors.background.interstitial,
   padding: "0 0.75rem",
   minHeight: "3rem", // 48px
 
@@ -62,7 +62,7 @@ const StyledButton = styled("button")(({ theme }) => ({
   // padding: "0.65rem",
   padding: "0 2rem 0 0.5rem", // Account for icon on right
   color: theme.colors.text.primary,
-  backgroundColor: theme.colors.foreground,
+  backgroundColor: theme.colors.background.focus,
   alignItems: "center",
   ...mediumText,
   height: "2.5rem", // 40px
@@ -76,7 +76,7 @@ const StyledButton = styled("button")(({ theme }) => ({
 
   border: `1px solid ${theme.colors.text.primary}`,
   borderRadius: "2px",
-  boxShadow: `0.5px 1.5px 0 0 ${theme.colors.foreground}`,
+  boxShadow: `0.5px 1.5px 0 0 ${theme.colors.background.focus}`,
 
   transition: `transform ${theme.curves.springy}`,
   // transformOrigin: "bottom center",
@@ -113,8 +113,6 @@ const IconSpan = styled("span")({
 
 const ContentSpan = styled("span")({
   textAlign: "left",
-  textTransform: "uppercase",
-  letterSpacing: "0.015em",
   variants: [
     {
       props: { fillSpace: true },
@@ -137,7 +135,7 @@ const DialogInner = styled("div")(({ theme }) => ({
   bottom: "0.5rem",
   left: "50%",
   transform: "translateX(-50%)",
-  backgroundColor: theme.colors.mid.secondary,
+  backgroundColor: theme.colors.background.interstitial,
   padding: "0 0 1.75rem",
   width: "calc(100% - 1rem)",
   maxWidth: "30rem",

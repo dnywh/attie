@@ -16,7 +16,7 @@ const Visible = styled("div")(({ theme }) => ({
   flexDirection: "column",
   gap: "0.65rem",
   padding: "1rem",
-  backgroundColor: theme.colors.mid.secondary,
+  backgroundColor: theme.colors.background.interstitial,
   ...veryBasicCardStyle({ theme }),
 
   "& > h2, & > a": {

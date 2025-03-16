@@ -24,14 +24,14 @@ export default withPigment(nextConfig, {
             smooth: "200ms ease",
         },
         colors: {
-            background: "#FA6565",
-            mid: {
-                primary: "#FEE272", // Yellow cards
-                secondary: "#AEF4F5", // Blue interstitials
-                tertiary: "#D8D4C4", // Brown/gray cards
-                quaternary: "rgb(245, 245, 245)" // TBD team crests
+            background: {
+                page: "#FA6565", // Pink page
+                card: "#FEE272", // Yellow cards
+                interstitial: "#AEF4F5", // Blue interstitials
+                informational: "#D8D4C4", // Brown/gray cards
+                crest: "rgb(245, 245, 245)", // TBD team crests
+                focus: "#FFFFFF", // White
             },
-            foreground: "#FFFFFF",
             text: {
                 primary: "#000000",
                 tertiary: "rgb(128, 128, 128)", // TBD team names
