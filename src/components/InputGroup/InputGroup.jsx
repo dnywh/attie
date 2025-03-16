@@ -16,9 +16,7 @@ const StyledDiv = styled("div")(({ theme }) => ({
     margin: "0 0.75rem 0 0",
   },
 
-  "&:hover": {
-    cursor: "pointer",
-  },
+  cursor: "pointer",
 }));
 
 function InputGroup({ children, ...props }) {

@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, Fragment } from "react";
 import Link from "next/link";
-import { Field, Fieldset, Legend } from "@headlessui/react";
+import { Field, Fieldset, Legend, Label, Checkbox } from "@headlessui/react";
 
 import Select from "@/components/Select";
 import Fixture from "@/components/Fixture";
@@ -93,7 +93,7 @@ export default function FixturesClient() {
                 {Object.entries(COMPETITIONS)
                   .filter(([, competition]) => competition.tier !== "paid")
                   .map(([competitionId, competition]) => (
-                    <InputGroup
+                    <StyledField
                       key={competitionId}
                       data-active={
                         selectedCompetitions.includes(competitionId)
@@ -101,17 +101,19 @@ export default function FixturesClient() {
                           : undefined
                       }
                     >
-                      <input
-                        type="checkbox"
-                        id={competitionId}
-                        name={competitionId}
+                      <StyledCheckbox
                         checked={selectedCompetitions.includes(competitionId)}
-                        onChange={(e) => handleCompetitionChange(e.target.name)}
-                      />
-                      <InputLabel htmlFor={competitionId}>
-                        {competition.name}
-                      </InputLabel>
-                    </InputGroup>
+                        name={competitionId}
+                        onChange={() => handleCompetitionChange(competitionId)}
+                      >
+                        {selectedCompetitions.includes(competitionId) ? (
+                          <ScoresHiddenIcon />
+                        ) : (
+                          <ScoresRevealedIcon />
+                        )}
+                      </StyledCheckbox>
+                      <InputLabel>{competition.name}</InputLabel>
+                    </StyledField>
                   ))}
               </FieldsetItems>
             </StyledFieldset>
@@ -326,6 +328,21 @@ export default function FixturesClient() {
     </Main>
   );
 }
+
+const StyledField = styled(Field)(({ theme }) => ({
+  display: "flex",
+  // gap: "1rem",
+  flexDirection: "row-reverse",
+  alignItems: "center",
+  // cursor: "pointer",
+  "&:hover": {
+    background: "lightyellow",
+  },
+}));
+
+const StyledCheckbox = styled(Checkbox)(({ theme }) => ({
+  padding: "0.75rem",
+}));
 
 const Main = styled("main")({
   display: "flex",
