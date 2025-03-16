@@ -20,6 +20,12 @@ import { dashedBorder } from "@/styles/commonStyles";
 import { formatDateForDisplay, groupFixturesByDate } from "@/utils/dates";
 import { useFixtures } from "@/hooks/useFixtures";
 
+import ScoresHiddenIcon from "@/components/ScoresHiddenIcon";
+import ScoresRevealedIcon from "@/components/ScoresRevealedIcon";
+import FixturesBackwardIcon from "@/components/FixturesBackwardIcon";
+import FixturesForwardIcon from "@/components/FixturesForwardIcon";
+import FootballIcon from "@/components/FootballIcon";
+
 import { styled } from "@pigment-css/react";
 
 export default function FixturesClient() {
@@ -50,7 +56,7 @@ export default function FixturesClient() {
     <Main>
       <ControlBar>
         <FancyDropdown
-          icon="⚽️"
+          icon={<FootballIcon />}
           label={
             selectedCompetitions.length
               ? selectedCompetitions.join(", ")
@@ -64,8 +70,20 @@ export default function FixturesClient() {
               <HeadingBanner as="label" htmlFor="sport">
                 1. Sport
               </HeadingBanner>
-              <Select id="sport" name="sport">
+              <Select id="sport" name="sport" defaultValue="football">
+                <option value="american-football" disabled>
+                  American Football
+                </option>
+                <option value="baskeball" disabled>
+                  Basketball
+                </option>
                 <option value="football">Football</option>
+                <option value="rugby-league" disabled>
+                  Rugby League
+                </option>
+                <option value="rugby-union" disabled>
+                  Rugby Union
+                </option>
               </Select>
             </StyledFieldset>
 
@@ -99,7 +117,7 @@ export default function FixturesClient() {
             </StyledFieldset>
             <SelectionExplainerText>
               Are we missing your favourite sport or competition?{" "}
-              <Link href="mailto:?body=Please replace the email address with 'hello' at this domain.">
+              <Link href="mailto:?body=Please replace the email address with 'danny' at this domain.">
                 Let us know
               </Link>
               .
@@ -107,7 +125,9 @@ export default function FixturesClient() {
           </>
         </FancyDropdown>
         {!showFutureFixtures && (
-          <FancyDropdown icon={showAllScores ? "👀" : "⚫️"}>
+          <FancyDropdown
+            icon={showAllScores ? <ScoresRevealedIcon /> : <ScoresHiddenIcon />}
+          >
             <StyledFieldset>
               <HeadingBanner as={Legend}>Score visibility</HeadingBanner>
               <FieldsetItems>
@@ -172,7 +192,15 @@ export default function FixturesClient() {
             </SelectionExplainerText>
           </FancyDropdown>
         )}
-        <FancyDropdown icon={showFutureFixtures ? "🗓️" : "🕥"}>
+        <FancyDropdown
+          icon={
+            showFutureFixtures ? (
+              <FixturesForwardIcon />
+            ) : (
+              <FixturesBackwardIcon />
+            )
+          }
+        >
           <StyledFieldset>
             <HeadingBanner as={Legend}>Fixture direction</HeadingBanner>
             <FieldsetItems>

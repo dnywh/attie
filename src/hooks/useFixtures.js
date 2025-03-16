@@ -8,7 +8,7 @@ export function useFixtures() {
     const [showFutureFixtures, setShowFutureFixtures] = useState(false);
     const [selectedCompetitions, setSelectedCompetitions] = useState([
         "premier-league",
-        "champions-league",
+        // "champions-league",
     ]);
     const [fixtures, setFixtures] = useState([]);
     const [loading, setLoading] = useState(true);

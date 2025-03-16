@@ -21,6 +21,13 @@ export const smallText = ({
     textTransform: "uppercase",
 });
 
+export const mediumText = ({
+    fontSize: "0.75rem",
+    lineHeight: "100%",
+    letterSpacing: "0.75em",
+    textTransform: "uppercase",
+});
+
 export const teamText = ({
     fontWeight: "500",
     fontSize: "0.875rem",

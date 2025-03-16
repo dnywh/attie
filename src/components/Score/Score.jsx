@@ -16,7 +16,7 @@ const Block = styled("div")(({ theme }) => ({
     transform: "scale(1.1)",
   },
   "&:active": {
-    transform: "scale(0.85)",
+    transform: "scale(0.9)",
   },
 
   variants: [

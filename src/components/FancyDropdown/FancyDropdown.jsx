@@ -9,13 +9,16 @@ import {
   DialogTitle,
 } from "@headlessui/react";
 import Button from "@/components/Button";
+import CountDot from "@/components/CountDot";
+import DropdownIcon from "@/components/DropdownIcon";
+import FootballIcon from "@/components/FootballIcon";
 import { styled, keyframes } from "@pigment-css/react";
 // import {
 //   createCardStyle,
 //   veryBasicCardStyle,
 //   smallCardStyle,
 // } from "@/styles/commonStyles";
-import { teamText } from "@/styles/commonStyles";
+import { teamText, mediumText, ellipsizedText } from "@/styles/commonStyles";
 
 const scrollShadow = keyframes({
   from: {
@@ -42,6 +45,7 @@ const DialogHeader = styled("header")(({ theme }) => ({
   minHeight: "3rem", // 48px
 
   "@supports (animation-timeline: scroll())": {
+    zIndex: "1",
     // https://ryanmulligan.dev/blog/sticky-header-scroll-shadow/
     // https://mskelton.dev/blog/css-scroll-animations
     "--header-border-color": theme.colors.text.primary,
@@ -55,11 +59,12 @@ const DialogHeader = styled("header")(({ theme }) => ({
 const StyledButton = styled("button")(({ theme }) => ({
   display: "flex",
   gap: "0.65rem",
-  padding: "0.65rem",
+  // padding: "0.65rem",
+  padding: "0 2rem 0 0.5rem", // Account for icon on right
   color: theme.colors.text.primary,
   backgroundColor: theme.colors.foreground,
   alignItems: "center",
-  ...teamText,
+  ...mediumText,
   height: "2.5rem", // 40px
   // textWrap: "noWrap",
   overflow: "hidden",
@@ -79,17 +84,11 @@ const StyledButton = styled("button")(({ theme }) => ({
   "&:hover": {
     transform: "translateY(-1.5px) scale(1.005)",
   },
-  // "&:active": {
-  //   transform: "translateY(0) scale(0.965)",
-  // },
-
-  "&::after": {
-    content: '"▾"',
-    // display: "block",
-    // flexGrow: 1,
-    // borderBottom: "1px solid black",
-    // margin: "0.5rem 0",
+  "&:active": {
+    transform: "translateY(0) scale(0.965)",
   },
+
+  position: "relative", // For SVG
 
   variants: [
     {
@@ -121,26 +120,11 @@ const ContentSpan = styled("span")({
       props: { fillSpace: true },
       style: {
         flexGrow: 1,
-        overflow: "hidden",
-        whiteSpace: "nowrap",
-        textOverflow: "ellipsis",
+        ...ellipsizedText,
       },
     },
   ],
 });
-
-const CountSpan = styled("span")(({ theme }) => ({
-  fontSize: "0.75rem",
-  backgroundColor: "#FEE272",
-  color: "black",
-  width: "1.5rem",
-  height: "1.5rem",
-  borderRadius: "0.75rem",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  flexShrink: 0,
-}));
 
 // Dialog styles
 const StyledDialog = styled(Dialog)({
@@ -198,7 +182,7 @@ const StyledDialogBackdropTwo = styled(DialogBackdrop)({
 });
 
 function FancyDropdown({
-  icon = "•",
+  icon = <FootballIcon />,
   label,
   fillSpace = false,
   count,
@@ -221,7 +205,8 @@ function FancyDropdown({
       <StyledButton fillSpace={fillSpace} onClick={open}>
         <IconSpan>{icon}</IconSpan>
         {label && <ContentSpan fillSpace={fillSpace}>{label}</ContentSpan>}
-        {count > 0 && <CountSpan>{count > 9 ? "9+" : count}</CountSpan>}
+        {count > 0 && <CountDot>{count > 9 ? "9+" : count}</CountDot>}
+        <DropdownIcon size="small" />
       </StyledButton>
 
       <StyledDialog open={isOpen} onClose={() => setIsOpen(false)}>
