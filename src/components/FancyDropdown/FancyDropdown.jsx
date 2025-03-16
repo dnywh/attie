@@ -79,9 +79,9 @@ const StyledButton = styled("button")(({ theme }) => ({
   "&:hover": {
     transform: "translateY(-1.5px) scale(1.005)",
   },
-  "&:active": {
-    transform: "translateY(0) scale(0.965)",
-  },
+  // "&:active": {
+  //   transform: "translateY(0) scale(0.965)",
+  // },
 
   "&::after": {
     content: '"▾"',
