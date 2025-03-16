@@ -1,5 +1,5 @@
-import { styled } from "@pigment-css/react";
 import { teamText, ellipsizedText } from "@/styles/commonStyles";
+import { styled } from "@pigment-css/react";
 
 const StyledLabel = styled("label")(({ theme }) => ({
   ...ellipsizedText,

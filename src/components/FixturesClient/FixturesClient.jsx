@@ -1,8 +1,9 @@
 "use client";
 import { useState, useEffect, Fragment } from "react";
 import Link from "next/link";
-import { Fieldset, Legend } from "@headlessui/react";
+import { Field, Fieldset, Legend } from "@headlessui/react";
 
+import Select from "@/components/Select";
 import Fixture from "@/components/Fixture";
 import FancyDropdown from "@/components/FancyDropdown";
 import HeadingBanner from "@/components/HeadingBanner";
@@ -63,7 +64,7 @@ export default function FixturesClient() {
               <HeadingBanner as="label" htmlFor="sport">
                 1. Sport
               </HeadingBanner>
-              <Select name="sport" id="sport">
+              <Select id="sport" name="sport">
                 <option value="football">Football</option>
               </Select>
             </StyledFieldset>
@@ -318,7 +319,7 @@ const ControlBar = styled("section")(({ theme }) => ({
   borderRadius: "3px",
 }));
 
-const Select = styled("select")({
+const StyledSelect = styled("select")({
   width: "100%",
   padding: "0.5rem",
 });
