@@ -22,9 +22,10 @@ export const smallText = ({
 });
 
 export const mediumText = ({
+    fontWeight: "500",
     fontSize: "0.75rem",
     lineHeight: "100%",
-    letterSpacing: "0.75em",
+    letterSpacing: "0.075em",
     textTransform: "uppercase",
 });
 
