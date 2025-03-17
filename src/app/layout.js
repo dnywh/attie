@@ -1,6 +1,7 @@
 // Supports weights 100-900
 import '@fontsource-variable/jost/wght-italic.css';
 import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import { globalCss, styled } from "@pigment-css/react";
 import '@pigment-css/react/styles.css';
 
@@ -99,6 +100,7 @@ export default function RootLayout({ children }) {
       <Body>
         {children}
         <Analytics />
+        <SpeedInsights />
       </Body>
     </html>
   );
