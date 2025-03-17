@@ -51,13 +51,14 @@ const Wrapper = styled("div")(({ theme }) => ({
 
   "&:hover": {
     transform: "scale(1.005)",
+    background: theme.colors.background.focus.hover,
   },
   "&:active": {
     transform: "translateY(0) scale(0.965)",
   },
 
   "&:focus-within": {
-    background: "lightyellow",
+    background: theme.colors.background.focus.active,
     boxShadow: "0 0 0 2px rgba(0,0,0,0.1)",
   },
   background: "white",

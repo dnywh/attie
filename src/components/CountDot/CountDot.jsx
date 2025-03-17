@@ -13,9 +13,9 @@ const StyledCount = styled("span")(({ theme }) => ({
   letterSpacing: 0, // Override mediumText presets so text is truely centered
   display: "grid",
   placeItems: "center",
-  borderRadius: "0.75rem",
   backgroundColor: theme.colors.background.card,
   color: theme.colors.text.primary,
   width: "1.25rem",
   height: "1.25rem",
+  borderRadius: "50%",
 }));

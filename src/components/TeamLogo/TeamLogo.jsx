@@ -32,7 +32,7 @@ const Container = styled("div")(({ theme }) => ({
     {
       props: { isKnown: true },
       style: {
-        background: theme.colors.background.focus,
+        background: theme.colors.background.foremost,
       },
     },
     {

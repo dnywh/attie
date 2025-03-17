@@ -105,8 +105,8 @@ export const elevatedCard = ({ theme }) => ({
 
 // Scores, dropdowns
 export const bleedingWhiteCard = ({ theme }) => ({
-    backgroundColor: theme.colors.background.focus,
+    backgroundColor: theme.colors.background.foremost,
     border: `1px solid ${theme.colors.text.primary}`,
     borderRadius: "2px",
-    boxShadow: `0.5px 1.5px 0 0 ${theme.colors.background.focus}`,
+    boxShadow: `0.5px 1.5px 0 0 ${theme.colors.background.foremost}`,
 });

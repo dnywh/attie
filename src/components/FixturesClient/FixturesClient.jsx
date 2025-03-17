@@ -1,7 +1,15 @@
 "use client";
 import { useState, useEffect, Fragment } from "react";
 import Link from "next/link";
-import { Field, Fieldset, Legend, Label, Checkbox } from "@headlessui/react";
+import {
+  Field,
+  Fieldset,
+  Legend,
+  Label,
+  Checkbox,
+  Radio,
+  RadioGroup,
+} from "@headlessui/react";
 
 import Select from "@/components/Select";
 import Fixture from "@/components/Fixture";
@@ -93,23 +101,18 @@ export default function FixturesClient() {
                 {Object.entries(COMPETITIONS)
                   .filter(([, competition]) => competition.tier !== "paid")
                   .map(([competitionId, competition]) => (
-                    <StyledField
-                      key={competitionId}
-                      data-active={
-                        selectedCompetitions.includes(competitionId)
-                          ? true
-                          : undefined
-                      }
-                    >
+                    <StyledField key={competitionId}>
                       <StyledCheckbox
                         checked={selectedCompetitions.includes(competitionId)}
                         name={competitionId}
                         onChange={() => handleCompetitionChange(competitionId)}
                       >
                         {selectedCompetitions.includes(competitionId) ? (
-                          <ScoresHiddenIcon />
+                          <CheckboxOn>
+                            <FootballIcon />
+                          </CheckboxOn>
                         ) : (
-                          <ScoresRevealedIcon />
+                          <CheckboxOff />
                         )}
                       </StyledCheckbox>
                       <InputLabel>{competition.name}</InputLabel>
@@ -119,7 +122,7 @@ export default function FixturesClient() {
             </StyledFieldset>
             <SelectionExplainerText>
               Are we missing your favourite sport or competition?{" "}
-              <Link href="mailto:?body=Please replace the email address with 'danny' at this domain.">
+              <Link href="mailto:?body=Please replace the email address with “danny” at this domain.">
                 Let us know
               </Link>
               .
@@ -133,63 +136,61 @@ export default function FixturesClient() {
             <StyledFieldset>
               <HeadingBanner as={Legend}>Score visibility</HeadingBanner>
               <FieldsetItems>
-                <InputGroup>
-                  <input
-                    type="radio"
-                    id="hide-scores"
-                    name="score-visibility"
-                    value="hidden"
-                    checked={!showAllScores}
-                    onChange={() => setShowAllScores(false)}
-                  />
-                  <InputLabel htmlFor="hide-scores">Hide all scores</InputLabel>
-                </InputGroup>
-
-                <InputGroup>
-                  <input
-                    type="radio"
-                    id="show-scores"
-                    name="score-visibility"
-                    value="visible"
-                    checked={showAllScores}
-                    onChange={() => setShowAllScores(true)}
-                  />
-                  <InputLabel htmlFor="show-scores">Show all scores</InputLabel>
-                </InputGroup>
+                <RadioGroup
+                  value={showAllScores}
+                  onChange={setShowAllScores}
+                  aria-label="Score visibility"
+                >
+                  <StyledField>
+                    <StyledRadio value={false}>
+                      <RadioIcon>
+                        {!showAllScores && <FootballIcon />}
+                      </RadioIcon>
+                    </StyledRadio>
+                    <InputLabel>Hide all scores</InputLabel>
+                  </StyledField>
+                  <StyledField>
+                    <StyledRadio value={true}>
+                      <RadioIcon>{showAllScores && <FootballIcon />}</RadioIcon>
+                    </StyledRadio>
+                    <InputLabel>Show all scores</InputLabel>
+                  </StyledField>
+                </RadioGroup>
               </FieldsetItems>
             </StyledFieldset>
+
             {!showAllScores && (
               <StyledFieldset>
                 <HeadingBanner as={Legend}>Sound effects</HeadingBanner>
                 <FieldsetItems>
-                  <InputGroup>
-                    <input
-                      type="radio"
-                      id="sound-on"
-                      name="sound-effects"
-                      value="audible"
-                      checked={useSoundEffects}
-                      onChange={() => setUseSoundEffects(true)}
-                    />
-                    <InputLabel htmlFor="sound-on">Sound on</InputLabel>
-                  </InputGroup>
-                  <InputGroup>
-                    <input
-                      type="radio"
-                      id="sound-off"
-                      name="sound-effects"
-                      value="muted"
-                      checked={!useSoundEffects}
-                      onChange={() => setUseSoundEffects(false)}
-                    />
-                    <InputLabel htmlFor="sound-off">Sound off</InputLabel>
-                  </InputGroup>
+                  <RadioGroup
+                    value={useSoundEffects}
+                    onChange={setUseSoundEffects}
+                    aria-label="Sound effects"
+                  >
+                    <StyledField>
+                      <StyledRadio value={true}>
+                        <RadioIcon>
+                          {useSoundEffects && <FootballIcon />}
+                        </RadioIcon>
+                      </StyledRadio>
+                      <InputLabel>Sound on</InputLabel>
+                    </StyledField>
+                    <StyledField>
+                      <StyledRadio value={false}>
+                        <RadioIcon>
+                          {!useSoundEffects && <FootballIcon />}
+                        </RadioIcon>
+                      </StyledRadio>
+                      <InputLabel>Sound off</InputLabel>
+                    </StyledField>
+                  </RadioGroup>
                 </FieldsetItems>
               </StyledFieldset>
             )}
             <SelectionExplainerText>
               {showAllScores
-                ? "Reveals all scores, just like any other sports results app (Seriously?)."
+                ? "Reveals all scores, just like any other sports results app. Boring!"
                 : "Hides all scores. Tap the black circles to reveal individual scores."}
             </SelectionExplainerText>
           </FancyDropdown>
@@ -206,34 +207,33 @@ export default function FixturesClient() {
           <StyledFieldset>
             <HeadingBanner as={Legend}>Fixture direction</HeadingBanner>
             <FieldsetItems>
-              <InputGroup>
-                <input
-                  type="radio"
-                  id="backward-fixtures"
-                  name="fixture-direction"
-                  value="backwards"
-                  checked={!showFutureFixtures}
-                  onChange={() => setShowFutureFixtures(false)}
-                />
-                <InputLabel htmlFor="backward-fixtures">Backwards</InputLabel>
-              </InputGroup>
-
-              <InputGroup>
-                <input
-                  type="radio"
-                  id="forward-fixtures"
-                  name="fixture-direction"
-                  value="forwards"
-                  checked={showFutureFixtures}
-                  onChange={() => setShowFutureFixtures(true)}
-                />
-                <InputLabel htmlFor="forward-fixtures">Forwards</InputLabel>
-              </InputGroup>
+              <RadioGroup
+                value={showFutureFixtures}
+                onChange={setShowFutureFixtures}
+                aria-label="Fixture direction"
+              >
+                <StyledField>
+                  <StyledRadio value={false}>
+                    <RadioIcon>
+                      {!showFutureFixtures && <FootballIcon />}
+                    </RadioIcon>
+                  </StyledRadio>
+                  <InputLabel>Backwards</InputLabel>
+                </StyledField>
+                <StyledField>
+                  <StyledRadio value={true}>
+                    <RadioIcon>
+                      {showFutureFixtures && <FootballIcon />}
+                    </RadioIcon>
+                  </StyledRadio>
+                  <InputLabel>Forwards</InputLabel>
+                </StyledField>
+              </RadioGroup>
             </FieldsetItems>
           </StyledFieldset>
           <SelectionExplainerText>
             {showFutureFixtures
-              ? "Shows upcoming fixtures, from today into to the future."
+              ? "Shows upcoming fixtures, from today foward."
               : "Shows in-progress or finished fixtures, from today back."}
           </SelectionExplainerText>
         </FancyDropdown>
@@ -243,7 +243,9 @@ export default function FixturesClient() {
         {loading ? (
           <EmptyState>
             <SelectionExplainerText>
-              <LoadingText>Loading fixtures</LoadingText>
+              <LoadingText>
+                Loading {showFutureFixtures ? "upcoming" : "prior"} fixtures
+              </LoadingText>
             </SelectionExplainerText>
           </EmptyState>
         ) : fixtures?.length > 0 ? (
@@ -329,21 +331,72 @@ export default function FixturesClient() {
   );
 }
 
+// Begin form styles
+const CheckboxIconBase = styled("div")(({ theme }) => ({
+  width: "1.5rem",
+  height: "1.5rem",
+  borderRadius: "50%",
+  display: "grid",
+  placeItems: "center",
+}));
+
+const CheckboxOn = styled(CheckboxIconBase)(({ theme }) => ({
+  backgroundColor: theme.colors.background.card,
+  "& svg": {
+    margin: "0 0 2px 1px", // Optical offset for pseudo printing misalignment
+  },
+}));
+
+const CheckboxOff = styled(CheckboxIconBase)(({ theme }) => ({
+  backgroundColor: theme.colors.background.foremost,
+  border: `1px dashed ${theme.colors.text.primary}`,
+}));
+
+const RadioIcon = styled(CheckboxIconBase)(({ theme }) => ({
+  backgroundColor: theme.colors.background.foremost,
+  border: `1px dashed ${theme.colors.text.primary}`,
+  "[data-headlessui-state~='checked'] &": {
+    backgroundColor: theme.colors.background.card,
+    border: "none",
+  },
+  "&": {
+    backgroundColor: theme.colors.background.foremost,
+    border: `1px dashed ${theme.colors.text.primary}`,
+  },
+}));
+
 const StyledField = styled(Field)(({ theme }) => ({
   display: "flex",
   // gap: "1rem",
   flexDirection: "row-reverse",
-  alignItems: "center",
+  alignItems: "stretch", // Not center, so they can be tapped
   // cursor: "pointer",
   "&:hover": {
-    background: "lightyellow",
+    background: theme.colors.background.focus.hover,
+  },
+  "&:focus-within": {
+    background: theme.colors.background.focus.active,
+    // boxShadow: "0 0 0 2px rgba(0,0,0,0.1)",
   },
 }));
 
 const StyledCheckbox = styled(Checkbox)(({ theme }) => ({
   padding: "0.75rem",
+  outline: "none", // See focus-within
 }));
 
+const StyledRadio = styled(Radio)(({ theme }) => ({
+  padding: "0.75rem",
+  outline: "none", // See focus-within
+}));
+
+const StyledFieldset = styled(Fieldset)({
+  display: "flex",
+  flexDirection: "column",
+  gap: "0.25rem", // 4px gap
+});
+
+// Begin page-specific styles
 const Main = styled("main")({
   display: "flex",
   flexDirection: "column",
@@ -363,17 +416,6 @@ const ControlBar = styled("section")(({ theme }) => ({
   boxShadow: `0 3px 0 0 ${theme.colors.text.primary}`,
   borderRadius: "3px",
 }));
-
-const StyledSelect = styled("select")({
-  width: "100%",
-  padding: "0.5rem",
-});
-
-const StyledFieldset = styled(Fieldset)({
-  display: "flex",
-  flexDirection: "column",
-  gap: "0.25rem", // 4px gap
-});
 
 const AllFixturesList = styled("ul")({
   display: "flex",

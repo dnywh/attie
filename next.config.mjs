@@ -30,7 +30,11 @@ export default withPigment(nextConfig, {
                 interstitial: "#AEF4F5", // Blue interstitials
                 informational: "#D8D4C4", // Brown/gray cards
                 crest: "rgb(245, 245, 245)", // TBD team crests
-                focus: "#FFFFFF", // White
+                foremost: "#FFFFFF", // White
+                focus: {
+                    hover: "hsl(48deg 99% 96%)", // Light shade of same yellow as colors.background.card
+                    active: "hsl(48deg 99% 92%)", // Slighter darker shade of above
+                },
             },
             text: {
                 primary: "#000000",

@@ -62,7 +62,7 @@ const StyledButton = styled("button")(({ theme }) => ({
   // padding: "0.65rem",
   padding: "0 2rem 0 0.5rem", // Account for icon on right
   color: theme.colors.text.primary,
-  backgroundColor: theme.colors.background.focus,
+  backgroundColor: theme.colors.background.foremost,
   alignItems: "center",
   ...mediumText,
   height: "2.5rem", // 40px
@@ -76,7 +76,7 @@ const StyledButton = styled("button")(({ theme }) => ({
 
   border: `1px solid ${theme.colors.text.primary}`,
   borderRadius: "2px",
-  boxShadow: `0.5px 1.5px 0 0 ${theme.colors.background.focus}`,
+  boxShadow: `0.5px 1.5px 0 0 ${theme.colors.background.foremost}`,
 
   transition: `transform ${theme.curves.springy}`,
   // transformOrigin: "bottom center",
