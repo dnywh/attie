@@ -1,17 +1,14 @@
 "use client";
 import { useState, useEffect, Fragment } from "react";
 import Link from "next/link";
-import { Legend, Checkbox } from "@headlessui/react";
-
+import { Legend } from "@headlessui/react";
 import Select from "@/components/Select";
 import Fixture from "@/components/Fixture";
 import FancyDropdown from "@/components/FancyDropdown";
 import HeadingBanner from "@/components/HeadingBanner";
 import Button from "@/components/Button";
 import Fieldset from "@/components/Fieldset";
-import FieldLabel from "@/components/FieldLabel";
-import FieldRow from "@/components/FieldRow";
-import FieldCheckboxRow from "@/components/FieldRadioRow";
+import FieldCheckboxRow from "@/components/FieldCheckboxRow";
 import FieldRadioRow from "@/components/FieldRadioRow";
 import RadioGroup from "@/components/RadioGroup";
 import CheckboxGroup from "@/components/CheckboxGroup";
@@ -100,31 +97,14 @@ export default function FixturesClient() {
                 {Object.entries(COMPETITIONS)
                   .filter(([, competition]) => competition.tier !== "paid")
                   .map(([competitionId, competition]) => (
-                    // <FieldCheckboxRow
-                    //   key={competitionId}
-                    //   name={competitionId}
-                    //   checked={selectedCompetitions.includes(competitionId)}
-                    //   onChange={() => handleCompetitionChange(competitionId)}
-                    // >
-                    //   {competition.name}
-                    // </FieldCheckboxRow>
-
-                    <FieldRow key={competitionId}>
-                      <StyledCheckbox
-                        checked={selectedCompetitions.includes(competitionId)}
-                        name={competitionId}
-                        onChange={() => handleCompetitionChange(competitionId)}
-                      >
-                        {selectedCompetitions.includes(competitionId) ? (
-                          <CheckboxOn>
-                            <FootballIcon />
-                          </CheckboxOn>
-                        ) : (
-                          <CheckboxOff />
-                        )}
-                      </StyledCheckbox>
-                      <FieldLabel>{competition.name}</FieldLabel>
-                    </FieldRow>
+                    <FieldCheckboxRow
+                      key={competitionId}
+                      name={competitionId}
+                      checked={selectedCompetitions.includes(competitionId)}
+                      onChange={() => handleCompetitionChange(competitionId)}
+                    >
+                      {competition.name}
+                    </FieldCheckboxRow>
                   ))}
               </CheckboxGroup>
             </Fieldset>
@@ -293,33 +273,6 @@ export default function FixturesClient() {
   );
 }
 
-// Begin form styles
-const CheckboxIconBase = styled("div")(({ theme }) => ({
-  width: "1.5rem",
-  height: "1.5rem",
-  borderRadius: "50%",
-  display: "grid",
-  placeItems: "center",
-}));
-
-const CheckboxOn = styled(CheckboxIconBase)(({ theme }) => ({
-  backgroundColor: theme.colors.background.card,
-  "& svg": {
-    margin: "0 0 2px 1px", // Optical offset for pseudo printing misalignment
-  },
-}));
-
-const CheckboxOff = styled(CheckboxIconBase)(({ theme }) => ({
-  backgroundColor: theme.colors.background.foremost,
-  border: `1px dashed ${theme.colors.text.primary}`,
-}));
-
-const StyledCheckbox = styled(Checkbox)(({ theme }) => ({
-  padding: "0.75rem",
-  outline: "none", // See focus-within
-}));
-
-// Begin page-specific styles
 const Main = styled("main")({
   display: "flex",
   flexDirection: "column",
