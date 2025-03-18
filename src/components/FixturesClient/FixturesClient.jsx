@@ -33,6 +33,7 @@ import ScoresRevealedIcon from "@/components/ScoresRevealedIcon";
 import FixturesBackwardIcon from "@/components/FixturesBackwardIcon";
 import FixturesForwardIcon from "@/components/FixturesForwardIcon";
 import FootballIcon from "@/components/FootballIcon";
+import RadioDotIcon from "@/components/RadioDotIcon";
 
 import { styled } from "@pigment-css/react";
 
@@ -82,10 +83,13 @@ export default function FixturesClient() {
                 <option value="american-football" disabled>
                   American Football
                 </option>
+                <option value="aussie-rules" disabled>
+                  Aussie Rules
+                </option>
                 <option value="baskeball" disabled>
                   Basketball
                 </option>
-                <option value="football">Football</option>
+                <option value="football">Football (Soccer)</option>
                 <option value="rugby-league" disabled>
                   Rugby League
                 </option>
@@ -144,14 +148,14 @@ export default function FixturesClient() {
                   <StyledField>
                     <StyledRadio value={false}>
                       <RadioIcon>
-                        {!showAllScores && <FootballIcon />}
+                        {!showAllScores && <RadioDotIcon />}
                       </RadioIcon>
                     </StyledRadio>
                     <InputLabel>Hide all scores</InputLabel>
                   </StyledField>
                   <StyledField>
                     <StyledRadio value={true}>
-                      <RadioIcon>{showAllScores && <FootballIcon />}</RadioIcon>
+                      <RadioIcon>{showAllScores && <RadioDotIcon />}</RadioIcon>
                     </StyledRadio>
                     <InputLabel>Show all scores</InputLabel>
                   </StyledField>
@@ -171,7 +175,7 @@ export default function FixturesClient() {
                     <StyledField>
                       <StyledRadio value={true}>
                         <RadioIcon>
-                          {useSoundEffects && <FootballIcon />}
+                          {useSoundEffects && <RadioDotIcon />}
                         </RadioIcon>
                       </StyledRadio>
                       <InputLabel>Sound on</InputLabel>
@@ -179,7 +183,7 @@ export default function FixturesClient() {
                     <StyledField>
                       <StyledRadio value={false}>
                         <RadioIcon>
-                          {!useSoundEffects && <FootballIcon />}
+                          {!useSoundEffects && <RadioDotIcon />}
                         </RadioIcon>
                       </StyledRadio>
                       <InputLabel>Sound off</InputLabel>
@@ -215,7 +219,7 @@ export default function FixturesClient() {
                 <StyledField>
                   <StyledRadio value={false}>
                     <RadioIcon>
-                      {!showFutureFixtures && <FootballIcon />}
+                      {!showFutureFixtures && <RadioDotIcon />}
                     </RadioIcon>
                   </StyledRadio>
                   <InputLabel>Backwards</InputLabel>
@@ -223,7 +227,7 @@ export default function FixturesClient() {
                 <StyledField>
                   <StyledRadio value={true}>
                     <RadioIcon>
-                      {showFutureFixtures && <FootballIcon />}
+                      {showFutureFixtures && <RadioDotIcon />}
                     </RadioIcon>
                   </StyledRadio>
                   <InputLabel>Forwards</InputLabel>
@@ -356,7 +360,11 @@ const RadioIcon = styled(CheckboxIconBase)(({ theme }) => ({
   backgroundColor: theme.colors.background.foremost,
   border: `1px dashed ${theme.colors.text.primary}`,
   "[data-headlessui-state~='checked'] &": {
+    // Match CheckboxOn styling
     backgroundColor: theme.colors.background.card,
+    "& svg": {
+      margin: "0 0 2px 1px", // Optical offset for pseudo printing misalignment
+    },
     border: "none",
   },
   "&": {
