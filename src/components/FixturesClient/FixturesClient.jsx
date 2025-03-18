@@ -41,6 +41,8 @@ export default function FixturesClient() {
     hasReachedEnd,
     hasRateLimitError,
     showFutureFixtures,
+    selectedSport,
+    setSelectedSport,
     selectedCompetitions,
     setShowFutureFixtures,
     handleCompetitionChange,
@@ -71,16 +73,19 @@ export default function FixturesClient() {
               <HeadingBanner as="label" htmlFor="sport">
                 1. Sport
               </HeadingBanner>
-              <Select id="sport" name="sport" defaultValue="football">
+              <Select
+                id="sport"
+                name="sport"
+                value={selectedSport}
+                onChange={(e) => setSelectedSport(e.target.value)}
+              >
                 <option value="american-football" disabled>
                   American Football
                 </option>
                 <option value="aussie-rules" disabled>
                   Aussie Rules
                 </option>
-                <option value="baskeball" disabled>
-                  Basketball
-                </option>
+                <option value="baskeball">Basketball</option>
                 <option value="football">Football</option>
                 <option value="rugby-league" disabled>
                   Rugby League
@@ -89,6 +94,7 @@ export default function FixturesClient() {
                   Rugby Union
                 </option>
               </Select>
+              <p>Your selected sport is: {selectedSport}</p>
             </Fieldset>
 
             <Fieldset>

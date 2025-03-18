@@ -6,6 +6,7 @@ import { sortFixtures } from '@/utils/dates';
 
 export function useFixtures() {
     const [showFutureFixtures, setShowFutureFixtures] = useState(false);
+    const [selectedSport, setSelectedSport] = useState("football");
     const [selectedCompetitions, setSelectedCompetitions] = useState([
         "premier-league",
         // "champions-league",
@@ -307,10 +308,12 @@ export function useFixtures() {
         hasReachedEnd,
         hasRateLimitError,
         showFutureFixtures,
+        selectedSport,
         selectedCompetitions,
 
         // Actions
         setShowFutureFixtures,
+        setSelectedSport,
         handleCompetitionChange,
         handleLoadMore,
         loadInitialFixtures,
