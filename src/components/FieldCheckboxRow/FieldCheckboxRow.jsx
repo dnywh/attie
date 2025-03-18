@@ -1,26 +1,26 @@
-import { Radio } from "@headlessui/react";
+import { Checkbox } from "@headlessui/react";
 import FieldRow from "@/components/FieldRow";
 import FieldLabel from "@/components/FieldLabel";
-import RadioDotIcon from "@/components/RadioDotIcon";
+import FootballIcon from "@/components/FootballIcon";
 import { styled } from "@pigment-css/react";
 
-function FieldRadioRow({ value, children, ...props }) {
+function FieldCheckboxRow({ key, checked, onChange, children, ...props }) {
   return (
-    <FieldRow>
-      <StyledRadio value={value} {...props}>
-        <RadioIconContainer>
-          <RadioDotIcon />
-        </RadioIconContainer>
-      </StyledRadio>
+    <FieldRow key={key}>
+      <StyledCheckbox checked={checked} onChange={onChange} {...props}>
+        <CheckboxIconContainer>
+          <FootballIcon />
+        </CheckboxIconContainer>
+      </StyledCheckbox>
       <FieldLabel>{children}</FieldLabel>
     </FieldRow>
   );
 }
 
-export default FieldRadioRow;
+export default FieldCheckboxRow;
 
-// TODO: Abstract and share with FieldCheckboxRow
-const StyledRadio = styled(Radio)(({ theme }) => ({
+// TODO: Abstract and share with FieldRadioRow
+const StyledCheckbox = styled(Checkbox)(({ theme }) => ({
   padding: "0.75rem",
   outline: "none", // See focus-within
 }));
@@ -33,7 +33,7 @@ const CheckboxIconBase = styled("div")(({ theme }) => ({
   placeItems: "center",
 }));
 
-const RadioIconContainer = styled(CheckboxIconBase)(({ theme }) => ({
+const CheckboxIconContainer = styled(CheckboxIconBase)(({ theme }) => ({
   backgroundColor: theme.colors.background.foremost,
   border: `1px dashed ${theme.colors.text.primary}`,
   "& svg": {
@@ -46,8 +46,5 @@ const RadioIconContainer = styled(CheckboxIconBase)(({ theme }) => ({
       opacity: 1,
     },
     border: "none",
-  },
-  "[data-headlessui-state~='disabled'] &": {
-    opacity: 0.35, // The parent is dulled but let's dull the icon contents even more
   },
 }));

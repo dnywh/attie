@@ -6,7 +6,7 @@ const StyledCheckboxGroup = styled("div")(({ theme }) => ({
 }));
 
 function CheckboxGroup({ children, ...props }) {
-  return <StyledCheckboxGroup>{children}</StyledCheckboxGroup>;
+  return <StyledCheckboxGroup {...props}>{children}</StyledCheckboxGroup>;
 }
 
 export default CheckboxGroup;

@@ -8,9 +8,11 @@ const StyledRadioGroup = styled(HeadlessRadioGroup)(({ theme }) => ({
     {
       props: { disabled: true },
       style: {
-        opacity: 0.35,
         pointerEvents: "none",
         cursor: "not-allowed",
+        "& label, & span": {
+          opacity: 0.35, // Dull the contents without dulling the background fill
+        },
       },
     },
   ],

@@ -11,6 +11,7 @@ import Button from "@/components/Button";
 import Fieldset from "@/components/Fieldset";
 import FieldLabel from "@/components/FieldLabel";
 import FieldRow from "@/components/FieldRow";
+import FieldCheckboxRow from "@/components/FieldRadioRow";
 import FieldRadioRow from "@/components/FieldRadioRow";
 import RadioGroup from "@/components/RadioGroup";
 import CheckboxGroup from "@/components/CheckboxGroup";
@@ -99,6 +100,15 @@ export default function FixturesClient() {
                 {Object.entries(COMPETITIONS)
                   .filter(([, competition]) => competition.tier !== "paid")
                   .map(([competitionId, competition]) => (
+                    // <FieldCheckboxRow
+                    //   key={competitionId}
+                    //   name={competitionId}
+                    //   checked={selectedCompetitions.includes(competitionId)}
+                    //   onChange={() => handleCompetitionChange(competitionId)}
+                    // >
+                    //   {competition.name}
+                    // </FieldCheckboxRow>
+
                     <FieldRow key={competitionId}>
                       <StyledCheckbox
                         checked={selectedCompetitions.includes(competitionId)}
