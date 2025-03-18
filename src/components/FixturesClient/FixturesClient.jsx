@@ -17,8 +17,8 @@ import FancyDropdown from "@/components/FancyDropdown";
 import HeadingBanner from "@/components/HeadingBanner";
 import Button from "@/components/Button";
 import FieldsetItems from "@/components/FieldsetItems";
-import InputLabel from "@/components/InputLabel";
-import InputGroup from "@/components/InputGroup";
+import FieldLabel from "@/components/FieldLabel";
+import FieldRow from "@/components/FieldRow";
 import LoadingText from "@/components/LoadingText";
 import SelectionExplainerText from "@/components/SelectionExplainerText";
 import Interstitial from "@/components/Interstitial";
@@ -89,7 +89,7 @@ export default function FixturesClient() {
                 <option value="baskeball" disabled>
                   Basketball
                 </option>
-                <option value="football">Football (Soccer)</option>
+                <option value="football">Football</option>
                 <option value="rugby-league" disabled>
                   Rugby League
                 </option>
@@ -105,7 +105,7 @@ export default function FixturesClient() {
                 {Object.entries(COMPETITIONS)
                   .filter(([, competition]) => competition.tier !== "paid")
                   .map(([competitionId, competition]) => (
-                    <StyledField key={competitionId}>
+                    <FieldRow key={competitionId}>
                       <StyledCheckbox
                         checked={selectedCompetitions.includes(competitionId)}
                         name={competitionId}
@@ -119,8 +119,8 @@ export default function FixturesClient() {
                           <CheckboxOff />
                         )}
                       </StyledCheckbox>
-                      <InputLabel>{competition.name}</InputLabel>
-                    </StyledField>
+                      <FieldLabel>{competition.name}</FieldLabel>
+                    </FieldRow>
                   ))}
               </FieldsetItems>
             </StyledFieldset>
@@ -133,6 +133,7 @@ export default function FixturesClient() {
             </SelectionExplainerText>
           </>
         </FancyDropdown>
+
         {!showFutureFixtures && (
           <FancyDropdown
             icon={showAllScores ? <ScoresRevealedIcon /> : <ScoresHiddenIcon />}
@@ -145,20 +146,20 @@ export default function FixturesClient() {
                   onChange={setShowAllScores}
                   aria-label="Score visibility"
                 >
-                  <StyledField>
+                  <FieldRow>
                     <StyledRadio value={false}>
                       <RadioIcon>
                         {!showAllScores && <RadioDotIcon />}
                       </RadioIcon>
                     </StyledRadio>
-                    <InputLabel>Hide all scores</InputLabel>
-                  </StyledField>
-                  <StyledField>
+                    <FieldLabel>Hide all scores</FieldLabel>
+                  </FieldRow>
+                  <FieldRow>
                     <StyledRadio value={true}>
                       <RadioIcon>{showAllScores && <RadioDotIcon />}</RadioIcon>
                     </StyledRadio>
-                    <InputLabel>Show all scores</InputLabel>
-                  </StyledField>
+                    <FieldLabel>Show all scores</FieldLabel>
+                  </FieldRow>
                 </RadioGroup>
               </FieldsetItems>
             </StyledFieldset>
@@ -172,22 +173,22 @@ export default function FixturesClient() {
                     onChange={setUseSoundEffects}
                     aria-label="Sound effects"
                   >
-                    <StyledField>
+                    <FieldRow>
                       <StyledRadio value={true}>
                         <RadioIcon>
                           {useSoundEffects && <RadioDotIcon />}
                         </RadioIcon>
                       </StyledRadio>
-                      <InputLabel>Sound on</InputLabel>
-                    </StyledField>
-                    <StyledField>
+                      <FieldLabel>Sound on</FieldLabel>
+                    </FieldRow>
+                    <FieldRow>
                       <StyledRadio value={false}>
                         <RadioIcon>
                           {!useSoundEffects && <RadioDotIcon />}
                         </RadioIcon>
                       </StyledRadio>
-                      <InputLabel>Sound off</InputLabel>
-                    </StyledField>
+                      <FieldLabel>Sound off</FieldLabel>
+                    </FieldRow>
                   </RadioGroup>
                 </FieldsetItems>
               </StyledFieldset>
@@ -216,28 +217,28 @@ export default function FixturesClient() {
                 onChange={setShowFutureFixtures}
                 aria-label="Fixture direction"
               >
-                <StyledField>
+                <FieldRow>
                   <StyledRadio value={false}>
                     <RadioIcon>
                       {!showFutureFixtures && <RadioDotIcon />}
                     </RadioIcon>
                   </StyledRadio>
-                  <InputLabel>Backwards</InputLabel>
-                </StyledField>
-                <StyledField>
+                  <FieldLabel>Backwards</FieldLabel>
+                </FieldRow>
+                <FieldRow>
                   <StyledRadio value={true}>
                     <RadioIcon>
                       {showFutureFixtures && <RadioDotIcon />}
                     </RadioIcon>
                   </StyledRadio>
-                  <InputLabel>Forwards</InputLabel>
-                </StyledField>
+                  <FieldLabel>Forwards</FieldLabel>
+                </FieldRow>
               </RadioGroup>
             </FieldsetItems>
           </StyledFieldset>
           <SelectionExplainerText>
             {showFutureFixtures
-              ? "Shows upcoming fixtures, from today foward."
+              ? "Shows upcoming fixtures, from today into the future."
               : "Shows in-progress or finished fixtures, from today back."}
           </SelectionExplainerText>
         </FancyDropdown>
@@ -248,7 +249,7 @@ export default function FixturesClient() {
           <EmptyState>
             <SelectionExplainerText>
               <LoadingText>
-                Loading {showFutureFixtures ? "upcoming" : "prior"} fixtures
+                Loading {showFutureFixtures && "upcoming"} fixtures
               </LoadingText>
             </SelectionExplainerText>
           </EmptyState>
@@ -370,21 +371,6 @@ const RadioIcon = styled(CheckboxIconBase)(({ theme }) => ({
   "&": {
     backgroundColor: theme.colors.background.foremost,
     border: `1px dashed ${theme.colors.text.primary}`,
-  },
-}));
-
-const StyledField = styled(Field)(({ theme }) => ({
-  display: "flex",
-  // gap: "1rem",
-  flexDirection: "row-reverse",
-  alignItems: "stretch", // Not center, so they can be tapped
-  // cursor: "pointer",
-  "&:hover": {
-    background: theme.colors.background.focus.hover,
-  },
-  "&:focus-within": {
-    background: theme.colors.background.focus.active,
-    // boxShadow: "0 0 0 2px rgba(0,0,0,0.1)",
   },
 }));
 

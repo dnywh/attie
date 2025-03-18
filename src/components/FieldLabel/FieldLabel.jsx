@@ -2,7 +2,7 @@ import { Label as HeadlessLabel } from "@headlessui/react";
 import { teamText, ellipsizedText } from "@/styles/commonStyles";
 import { styled } from "@pigment-css/react";
 
-const StyledLabel = styled(HeadlessLabel)(({ theme }) => ({
+const FieldLabel = styled(HeadlessLabel)(({ theme }) => ({
   flex: 1, // Take full width
   ...teamText,
   ...ellipsizedText,
@@ -16,7 +16,7 @@ const StyledLabel = styled(HeadlessLabel)(({ theme }) => ({
 }));
 
 function InputLabel({ children, ...props }) {
-  return <StyledLabel {...props}>{children}</StyledLabel>;
+  return <FieldLabel {...props}>{children}</FieldLabel>;
 }
 
 export default InputLabel;

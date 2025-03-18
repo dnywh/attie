@@ -43,7 +43,7 @@ const StyledSelect = styled(HeadlessSelect)(({ theme }) => ({
 }));
 
 const Wrapper = styled("div")(({ theme }) => ({
-  cursor: "pointer",
+  // cursor: "pointer",
   color: theme.colors.text.primary,
   ...bleedingWhiteCard({ theme }),
 

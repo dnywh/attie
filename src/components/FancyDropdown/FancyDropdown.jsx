@@ -44,8 +44,9 @@ const DialogHeader = styled("header")(({ theme }) => ({
   padding: "0 0.75rem",
   minHeight: "3rem", // 48px
 
+  zIndex: "1", // Prevent Select component from stacking above
+
   "@supports (animation-timeline: scroll())": {
-    zIndex: "1",
     // https://ryanmulligan.dev/blog/sticky-header-scroll-shadow/
     // https://mskelton.dev/blog/css-scroll-animations
     "--header-border-color": theme.colors.text.primary,

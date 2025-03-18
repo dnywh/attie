@@ -79,13 +79,13 @@ button {
   border: none;
   color: unset;
   background: none;
-  cursor: pointer;
+  // cursor: pointer;
   }
 `
 
 const Body = styled("body")(({ theme }) => ({
   fontFamily: "'Jost Variable', Futura, Helvetica, Arial, sans-serif",
-  padding: "2rem 1rem",
+  padding: "2rem 0.75rem",
   maxWidth: "40rem",
   margin: "0 auto",
   display: "flex",
