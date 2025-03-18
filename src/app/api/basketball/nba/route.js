@@ -21,7 +21,7 @@ export async function GET(request) {
         const response = await api.nba.getGames({
             start_date: dateFrom,
             end_date: dateTo,
-            per_page: 100, // Maximum allowed
+            per_page: 72, // 25–100, with 64 being the average in a week
             ...(cursor && { cursor })
         });
 

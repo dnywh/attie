@@ -219,15 +219,15 @@ export default function FixturesClient() {
                 })
               )
             ).map(([groupingKey, dateFixtures], index, array) => (
-              <Fragment key={index}>
+              <Fragment key={groupingKey}>
                 <DateGroup>
                   <HeadingBanner sticky="true">
                     {formatDateForDisplay(dateFixtures[0].localDate)}
                   </HeadingBanner>
                   <DateFixturesList>
-                    {dateFixtures.map((fixture, index) => (
+                    {dateFixtures.map((fixture) => (
                       <Fixture
-                        key={index}
+                        key={fixture.id}
                         fixture={fixture}
                         showAllScores={showAllScores}
                         useSoundEffects={useSoundEffects}
