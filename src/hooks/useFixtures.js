@@ -297,7 +297,7 @@ export function useFixtures() {
         } finally {
             setLoadingMore(false);
         }
-    }, [dateWindow, fixtures, selectedCompetitions, showFutureFixtures, hasRateLimitError]);
+    }, [fetchFixturesForCompetition, dateWindow, fixtures, selectedCompetitions, showFutureFixtures, hasRateLimitError]);
 
     return {
         // State
