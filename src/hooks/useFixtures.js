@@ -9,9 +9,7 @@ export function useFixtures() {
     const [showFutureFixtures, setShowFutureFixtures] = useState(false);
     const [selectedSport, setSelectedSport] = useState("football");
     const [selectedCompetitions, setSelectedCompetitions] = useState([
-        // "nba",
         "premier-league",
-        // "champions-league",
     ]);
     const [fixtures, setFixtures] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -31,12 +29,32 @@ export function useFixtures() {
     // Add new state for cursor
     const [nextCursor, setNextCursor] = useState(null);
 
-    // Clear fixtures and cache when sport changes
-    useEffect(() => {
-        console.log("[Sport Change] Clearing fixtures and cache");
+    // Modified sport change handler
+    const handleSportChange = useCallback((newSport) => {
+        console.log(`[Sport Change] Switching to ${newSport}`);
+
+        // Get default competition for the new sport
+        const defaultCompetition = Object.keys(COMPETITIONS).find(
+            (key) => COMPETITIONS[key].sport === newSport && COMPETITIONS[key].tier === 'free'
+        );
+
+        if (!defaultCompetition) {
+            console.error(`[Sport Change] No default competition found for ${newSport}`);
+            return;
+        }
+
+        setSelectedSport(newSport);
+        setSelectedCompetitions([defaultCompetition]);
         fixturesCache.clear();
         setFixtures([]);
-        setSelectedCompetitions(selectedSport === "basketball" ? ["nba"] : ["premier-league"]);
+        setNextCursor(null);
+        setCurrentPage(1);
+        setHasReachedEnd(false);
+    }, []);
+
+    // Replace direct setSelectedSport usage with handleSportChange
+    useEffect(() => {
+        console.log("[Sport Change] Clearing fixtures and cache");
         loadInitialFixtures();
     }, [selectedSport]);
 
@@ -286,7 +304,7 @@ export function useFixtures() {
 
         // Actions
         setShowFutureFixtures,
-        setSelectedSport,
+        setSelectedSport: handleSportChange,
         handleCompetitionChange,
         handleLoadMore,
         loadInitialFixtures,

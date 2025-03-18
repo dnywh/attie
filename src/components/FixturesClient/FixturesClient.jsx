@@ -16,7 +16,11 @@ import LoadingText from "@/components/LoadingText";
 import SelectionExplainerText from "@/components/SelectionExplainerText";
 import Interstitial from "@/components/Interstitial";
 
-import { COMPETITIONS } from "@/constants/competitions";
+import {
+  COMPETITIONS,
+  SPORTS,
+  getCompetitionsForSport,
+} from "@/constants/competitions";
 import { dashedBorder } from "@/styles/commonStyles";
 import { formatDateForDisplay, groupFixturesByDate } from "@/utils/dates";
 import { useFixtures } from "@/hooks/useFixtures";
@@ -57,10 +61,9 @@ export default function FixturesClient() {
   }, [showFutureFixtures]);
 
   // Filter competitions based on selected sport
-  const availableCompetitions = Object.entries(COMPETITIONS).filter(
-    ([, competition]) =>
-      competition.sport === selectedSport && competition.tier !== "paid"
-  );
+  const availableCompetitions = Object.entries(
+    getCompetitionsForSport(selectedSport)
+  ).filter(([, competition]) => competition.tier !== "paid");
 
   const selectedSportIcon =
     selectedSport === "basketball" ? <BasketballIcon /> : <FootballIcon />;
@@ -91,20 +94,17 @@ export default function FixturesClient() {
                 value={selectedSport}
                 onChange={(e) => setSelectedSport(e.target.value)}
               >
-                <option value="american-football" disabled>
-                  American Football
-                </option>
-                <option value="aussie-rules" disabled>
-                  Aussie Rules
-                </option>
-                <option value="baskeball">Basketball</option>
-                <option value="football">Football</option>
-                <option value="rugby-league" disabled>
-                  Rugby League
-                </option>
-                <option value="rugby-union" disabled>
-                  Rugby Union
-                </option>
+                {Object.values(SPORTS).map((sport) => (
+                  <option
+                    key={sport}
+                    value={sport}
+                    disabled={
+                      sport !== SPORTS.FOOTBALL && sport !== SPORTS.BASKETBALL
+                    }
+                  >
+                    {sport.charAt(0).toUpperCase() + sport.slice(1)}
+                  </option>
+                ))}
               </Select>
             </Fieldset>
 
@@ -126,7 +126,7 @@ export default function FixturesClient() {
             </Fieldset>
             <SelectionExplainerText>
               Are we missing your favourite sport or competition?{" "}
-              <Link href="mailto:?body=Please replace the email address with “danny” at this domain.">
+              <Link href="mailto:?body=Please replace the email address with `danny` at this domain.">
                 Let us know
               </Link>
               .

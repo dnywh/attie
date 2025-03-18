@@ -1,93 +1,131 @@
+export const SPORTS = {
+    AMERICAN_FOOTBALL: 'american football',
+    AUSSIE_RULES: 'aussie rules football',
+    BASKETBALL: 'basketball',
+    FOOTBALL: 'football',
+    RUGBY_LEAGUE: 'rugby league',
+    RUGBY_UNION: 'rugby union',
+    // ... future sports
+};
+
+export const COMPETITION_TYPES = {
+    LEAGUE: 'league',
+    CUP: 'cup',
+};
+
+export const TIERS = {
+    FREE: 'free',
+    PAID: 'paid',
+};
+
 export const COMPETITIONS = {
     'premier-league': {
-        sport: 'football',
+        sport: SPORTS.FOOTBALL,
         code: 'PL',
         name: 'Premier League',
-        type: 'league',
-        tier: 'free',
+        type: COMPETITION_TYPES.LEAGUE,
+        tier: TIERS.FREE,
+        defaultForSport: true,
     },
     'champions-league': {
-        sport: 'football',
+        sport: SPORTS.FOOTBALL,
         code: 'CL',
         name: 'UEFA Champions League',
-        type: 'cup',
-        tier: 'free',
+        type: COMPETITION_TYPES.CUP,
+        tier: TIERS.FREE,
     },
     'europa-league': {
-        sport: 'football',
+        sport: SPORTS.FOOTBALL,
         code: 'EL',
         name: 'UEFA Europa League',
-        type: 'cup',
-        tier: 'paid',
+        type: COMPETITION_TYPES.CUP,
+        tier: TIERS.PAID,
     },
     'primera-division': {
-        sport: 'football',
+        sport: SPORTS.FOOTBALL,
         code: 'PD',
         name: 'La Liga',
-        type: 'league',
-        tier: 'free',
+        type: COMPETITION_TYPES.LEAGUE,
+        tier: TIERS.FREE,
     },
     'championship': {
-        sport: 'football',
+        sport: SPORTS.FOOTBALL,
         code: 'ELC',
         name: 'Championship',
-        type: 'league',
-        tier: 'free',
+        type: COMPETITION_TYPES.LEAGUE,
+        tier: TIERS.FREE,
     },
     'serie-a': {
-        sport: 'football',
+        sport: SPORTS.FOOTBALL,
         code: 'SA',
         name: 'Serie A',
-        type: 'league',
-        tier: 'free',
+        type: COMPETITION_TYPES.LEAGUE,
+        tier: TIERS.FREE,
     },
     'bundesliga': {
-        sport: 'football',
+        sport: SPORTS.FOOTBALL,
         code: 'BL1',
         name: 'Bundesliga',
-        type: 'league',
-        tier: 'free',
+        type: COMPETITION_TYPES.LEAGUE,
+        tier: TIERS.FREE,
     },
     'ligue-1': {
-        sport: 'football',
+        sport: SPORTS.FOOTBALL,
         code: 'FL1',
         name: 'Ligue 1',
-        type: 'league',
-        tier: 'free',
+        type: COMPETITION_TYPES.LEAGUE,
+        tier: TIERS.FREE,
     },
     'liga-portugal': {
-        sport: 'football',
+        sport: SPORTS.FOOTBALL,
         code: 'PPL',
         name: 'Primeira Liga',
-        type: 'league',
-        tier: 'free',
+        type: COMPETITION_TYPES.LEAGUE,
+        tier: TIERS.FREE,
     },
     'eredivisie': {
-        sport: 'football',
+        sport: SPORTS.FOOTBALL,
         code: 'DED',
         name: 'Eredivise',
-        type: 'league',
-        tier: 'free',
+        type: COMPETITION_TYPES.LEAGUE,
+        tier: TIERS.FREE,
     },
     'brasileirao': {
-        sport: 'football',
+        sport: SPORTS.FOOTBALL,
         code: 'BSA',
         name: 'Brasileiro Série A',
-        type: 'league',
-        tier: 'free',
+        type: COMPETITION_TYPES.LEAGUE,
+        tier: TIERS.FREE,
     },
     'fa-cup': {
-        sport: 'football',
+        sport: SPORTS.FOOTBALL,
         code: 'FAC',
         name: 'FA Cup',
-        type: 'cup',
-        tier: 'paid',
+        type: COMPETITION_TYPES.CUP,
+        tier: TIERS.PAID,
     },
     'nba': {
-        sport: 'basketball',
+        sport: SPORTS.BASKETBALL,
         code: 'nba',
         name: 'NBA',
-        type: 'league',
-        tier: 'free',
+        type: COMPETITION_TYPES.LEAGUE,
+        tier: TIERS.FREE,
+        defaultForSport: true,
     },
+};
+
+// Helper functions
+export const getDefaultCompetitionForSport = (sport) => {
+    return Object.entries(COMPETITIONS).find(
+        ([_, comp]) => comp.sport === sport && comp.defaultForSport
+    )?.[0];
+};
+
+export const getCompetitionsForSport = (sport) => {
+    return Object.entries(COMPETITIONS)
+        .filter(([_, comp]) => comp.sport === sport)
+        .reduce((acc, [key, value]) => {
+            acc[key] = value;
+            return acc;
+        }, {});
 };
