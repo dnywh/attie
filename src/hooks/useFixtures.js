@@ -235,10 +235,24 @@ export function useFixtures() {
             } else {
                 // Add competition
                 setSelectedCompetitions((prev) => [...prev, competition]);
+
+                // Get new matches
                 const newMatches = await fetchFixturesForCompetition(competitionCode);
-                setFixtures((prevFixtures) =>
-                    sortFixtures([...prevFixtures, ...newMatches], showFutureFixtures)
-                );
+
+                // Merge with existing fixtures, ensuring uniqueness by ID
+                setFixtures((prevFixtures) => {
+                    const combined = [...prevFixtures, ...newMatches];
+                    const unique = Array.from(
+                        new Map(combined.map((fixture) => [fixture.id, fixture])).values()
+                    );
+                    console.log(
+                        `[Competition Change] Merging fixtures:`,
+                        `\n  Previous count: ${prevFixtures.length}`,
+                        `\n  New matches: ${newMatches.length}`,
+                        `\n  Combined unique: ${unique.length}`
+                    );
+                    return sortFixtures(unique, showFutureFixtures);
+                });
             }
         } catch (error) {
             console.error("[Competition Change] Error:", error);

@@ -190,7 +190,6 @@ function FancyDropdown({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   function open() {
-    console.log("opening...");
     setIsOpen(true);
   }
 
