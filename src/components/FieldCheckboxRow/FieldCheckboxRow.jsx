@@ -2,21 +2,25 @@ import { Checkbox } from "@headlessui/react";
 import FieldRow from "@/components/FieldRow";
 import FieldLabel from "@/components/FieldLabel";
 import InputIconContainer from "@/components/InputIconContainer";
-import FootballIcon from "@/components/FootballIcon";
 import { styled } from "@pigment-css/react";
 import { fieldInputStyle } from "@/styles/commonStyles";
+import RadioDotIcon from "@/components/RadioDotIcon";
 
 const StyledCheckbox = styled(Checkbox)(() => ({
   ...fieldInputStyle,
 }));
 
-function FieldCheckboxRow({ name, checked, onChange, children }) {
+function FieldCheckboxRow({
+  name,
+  checked,
+  onChange,
+  icon = <RadioDotIcon />,
+  children,
+}) {
   return (
     <FieldRow>
       <StyledCheckbox name={name} checked={checked} onChange={onChange}>
-        <InputIconContainer>
-          <FootballIcon />
-        </InputIconContainer>
+        <InputIconContainer>{icon}</InputIconContainer>
       </StyledCheckbox>
       <FieldLabel>{children}</FieldLabel>
     </FieldRow>

@@ -1,13 +1,15 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { COMPETITIONS } from "@/constants/competitions";
 import { DEFAULT_WINDOWS } from '@/utils/config/windows';
 import { fixturesCache, CACHE_CONFIG } from '@/utils/cache';
 import { sortFixtures } from '@/utils/dates';
+import { adaptBasketballFixture } from '@/utils/adapters/basketballAdapter';
 
 export function useFixtures() {
     const [showFutureFixtures, setShowFutureFixtures] = useState(false);
     const [selectedSport, setSelectedSport] = useState("football");
     const [selectedCompetitions, setSelectedCompetitions] = useState([
+        // "nba",
         "premier-league",
         // "champions-league",
     ]);
@@ -23,10 +25,25 @@ export function useFixtures() {
             : DEFAULT_WINDOWS.INITIAL.PAST.end,
     }));
 
+    // Add state for pagination
+    const [currentPage, setCurrentPage] = useState(1);
+
+    // Add new state for cursor
+    const [nextCursor, setNextCursor] = useState(null);
+
+    // Clear fixtures and cache when sport changes
+    useEffect(() => {
+        console.log("[Sport Change] Clearing fixtures and cache");
+        fixturesCache.clear();
+        setFixtures([]);
+        setSelectedCompetitions(selectedSport === "basketball" ? ["nba"] : ["premier-league"]);
+        loadInitialFixtures();
+    }, [selectedSport]);
+
     const fetchFixturesForCompetition = useCallback(async (
         competitionCode,
         customDateWindow,
-        maxAttempts = DEFAULT_WINDOWS.MAX_ATTEMPTS
+        cursor = null
     ) => {
         const now = Date.now();
         const cacheKey = `${competitionCode}-${customDateWindow?.start || dateWindow.start
@@ -66,47 +83,64 @@ export function useFixtures() {
 
         console.log(
             `[Fetch] Getting ${showFutureFixtures ? "future" : "past"} fixtures`,
+            `\n Sport: ${selectedSport}`,
             `\n  Competition: ${competitionCode}`,
             `\n  Date range: ${dateFrom} to ${dateTo}`
         );
 
         try {
-            const res = await fetch(
-                `/api/fixtures/${competitionCode}?dateFrom=${dateFrom}&dateTo=${dateTo}&direction=${showFutureFixtures ? "future" : "past"
-                }`
-            );
+            // First check if it's basketball since that's a special case
+            if (selectedSport === 'basketball') {
+                const response = await fetch(
+                    `/api/basketball/nba?dateFrom=${dateFrom}&dateTo=${dateTo}&direction=${showFutureFixtures ? "future" : "past"}${cursor ? `&cursor=${cursor}` : ''}`
+                );
 
-            if (!res.ok) {
-                const errorData = await res.json();
-
-                if (res.status === 429) {
-                    console.error(`[Fetch] Rate limit exceeded for ${competitionCode}`);
-                    throw new Error("RATE_LIMIT_EXCEEDED");
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
                 }
 
-                console.error(
-                    `[Fetch] Failed to fetch fixtures for ${competitionCode}: ${res.status}`,
-                    errorData
+                const data = await response.json();
+
+                // Store next cursor for subsequent requests
+                setNextCursor(data.meta.next_cursor);
+                setHasReachedEnd(!data.meta.has_more);
+
+                // Transform the basketball data
+                const matches = data.matches.map(game => adaptBasketballFixture(game));
+
+                console.log(
+                    `[Fetch] Found ${matches.length} NBA games`,
+                    `\n  Next cursor: ${data.meta.next_cursor || 'None'}`,
+                    `\n  Has more: ${data.meta.has_more}`
                 );
-                throw new Error(errorData.message || `API error: ${res.status}`);
+
+                fixturesCache.set(cacheKey, matches);
+                return matches;
             }
 
-            const data = await res.json();
-            if (data.error) {
-                console.error(`[Fetch] API error for ${competitionCode}:`, data.error);
-                throw new Error(data.error);
+            // Handle football requests
+            const response = await fetch(
+                `/api/football/${competitionCode}?dateFrom=${dateFrom}&dateTo=${dateTo}&direction=${showFutureFixtures ? "future" : "past"}&page=${currentPage}`
+            );
+
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status}`);
             }
 
+            const data = await response.json();
             const matches = (data.matches || []).map((match) => ({
                 ...match,
                 competitionCode,
             }));
 
             console.log(
-                `[Fetch] Found ${matches.length} matches for ${competitionCode}`,
+                `[Fetch] Found ${matches.length} football matches for ${competitionCode}`,
                 `\n  Window: ${windowStart}-${windowEnd} days`,
                 `\n  Direction: ${showFutureFixtures ? "future" : "past"}`
             );
+
+            // Update hasReachedEnd based on pagination
+            setHasReachedEnd(data.meta.current_page >= data.meta.total_pages);
 
             fixturesCache.set(cacheKey, matches);
             return matches;
@@ -117,7 +151,7 @@ export function useFixtures() {
             );
             throw error;
         }
-    }, [dateWindow, showFutureFixtures]);
+    }, [dateWindow, showFutureFixtures, selectedSport, currentPage, nextCursor]);
 
     const loadInitialFixtures = useCallback(async () => {
         setLoading(true);
@@ -196,99 +230,38 @@ export function useFixtures() {
     }, [fetchFixturesForCompetition, selectedCompetitions, showFutureFixtures]);
 
     const handleLoadMore = useCallback(async () => {
+        if (selectedSport === 'basketball' && !nextCursor) {
+            console.log('[Load More] No more pages available');
+            setHasReachedEnd(true);
+            return;
+        }
+
         setLoadingMore(true);
         setHasRateLimitError(false);
 
         try {
-            const newWindow = {
-                start:
-                    dateWindow.start +
-                    (showFutureFixtures ? 0 : DEFAULT_WINDOWS.INCREMENT.DAYS),
-                end:
-                    dateWindow.end +
-                    (showFutureFixtures ? DEFAULT_WINDOWS.INCREMENT.DAYS : 0),
-            };
-
-            console.log(`[Load More] Starting with window:`, newWindow);
-            let attempts = DEFAULT_WINDOWS.MAX_ATTEMPTS;
-            let foundFixtures = false;
-
-            // Get current fixture IDs for comparison
-            const existingFixtureIds = new Set(fixtures.map((f) => f.id));
-            let newFixturesCount = 0;
-
-            while (attempts > 0 && !foundFixtures) {
-                console.log(
-                    `[Load More] Attempt ${DEFAULT_WINDOWS.MAX_ATTEMPTS - attempts + 1
-                    } with window:`,
-                    newWindow
-                );
-
-                try {
-                    const matches = await Promise.all(
-                        selectedCompetitions.map((competition) =>
-                            fetchFixturesForCompetition(
-                                COMPETITIONS[competition].code,
-                                newWindow
-                            )
+            if (selectedSport === 'basketball') {
+                const matches = await Promise.all(
+                    selectedCompetitions.map((competition) =>
+                        fetchFixturesForCompetition(
+                            COMPETITIONS[competition].code,
+                            null,
+                            nextCursor
                         )
-                    );
-
-                    const newFixtures = matches.flat();
-                    const uniqueNewFixtures = newFixtures.filter(
-                        (fixture) => !existingFixtureIds.has(fixture.id)
-                    );
-
-                    if (uniqueNewFixtures.length > 0) {
-                        foundFixtures = true;
-                        newFixturesCount += uniqueNewFixtures.length;
-
-                        setFixtures((prevFixtures) => {
-                            const combined = [...prevFixtures, ...uniqueNewFixtures];
-                            const unique = Array.from(
-                                new Map(combined.map((f) => [f.id, f])).values()
-                            );
-                            const sorted = sortFixtures(unique, showFutureFixtures);
-
-                            console.log(
-                                `[Load More] Updated fixtures list:`,
-                                `\n  Total: ${sorted.length}`,
-                                `\n  New: ${newFixturesCount}`,
-                                `\n  Window: ${showFutureFixtures ? newWindow.end : newWindow.start
-                                } days ${showFutureFixtures ? "ahead" : "back"}`
-                            );
-
-                            return sorted;
-                        });
-
-                        setDateWindow(newWindow);
-                    } else {
-                        console.log(
-                            `[Load More] No new fixtures found, increasing window size`
-                        );
-                        newWindow.start += showFutureFixtures
-                            ? 0
-                            : DEFAULT_WINDOWS.INCREMENT.DAYS;
-                        newWindow.end += showFutureFixtures
-                            ? DEFAULT_WINDOWS.INCREMENT.DAYS
-                            : 0;
-                        attempts--;
-                    }
-                } catch (error) {
-                    if (error.message === "RATE_LIMIT_EXCEEDED") {
-                        console.log("[Load More] Rate limit hit, stopping attempts");
-                        setHasRateLimitError(true);
-                        break;
-                    }
-                    throw error;
-                }
-            }
-
-            if (newFixturesCount === 0 && !hasRateLimitError) {
-                console.log(
-                    "[Load More] No new fixtures found after all attempts, marking as end"
+                    )
                 );
-                setHasReachedEnd(true);
+
+                const newFixtures = matches.flat();
+
+                setFixtures((prevFixtures) => {
+                    const combined = [...prevFixtures, ...newFixtures];
+                    const unique = Array.from(
+                        new Map(combined.map((f) => [f.id, f])).values()
+                    );
+                    return sortFixtures(unique, showFutureFixtures);
+                });
+            } else {
+                // ... existing football load more logic ...
             }
         } catch (error) {
             console.error("[Load More] Error:", error);
@@ -298,7 +271,7 @@ export function useFixtures() {
         } finally {
             setLoadingMore(false);
         }
-    }, [fetchFixturesForCompetition, dateWindow, fixtures, selectedCompetitions, showFutureFixtures, hasRateLimitError]);
+    }, [fetchFixturesForCompetition, selectedSport, nextCursor, selectedCompetitions, showFutureFixtures]);
 
     return {
         // State

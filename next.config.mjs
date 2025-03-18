@@ -8,7 +8,12 @@ const nextConfig = {
         remotePatterns: [
             {
                 protocol: 'https',
-                hostname: 'crests.football-data.org',
+                hostname: 'crests.football-data.org', // Football logos
+                port: '',
+            },
+            {
+                protocol: 'https',
+                hostname: 'interstate21.com', // NBA logos
                 port: '',
             },
         ],

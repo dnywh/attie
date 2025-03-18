@@ -26,6 +26,7 @@ import ScoresRevealedIcon from "@/components/ScoresRevealedIcon";
 import FixturesBackwardIcon from "@/components/FixturesBackwardIcon";
 import FixturesForwardIcon from "@/components/FixturesForwardIcon";
 import FootballIcon from "@/components/FootballIcon";
+import BasketballIcon from "@/components/BasketballIcon";
 
 import { styled } from "@pigment-css/react";
 
@@ -55,14 +56,25 @@ export default function FixturesClient() {
     loadInitialFixtures();
   }, [showFutureFixtures]);
 
+  // Filter competitions based on selected sport
+  const availableCompetitions = Object.entries(COMPETITIONS).filter(
+    ([, competition]) =>
+      competition.sport === selectedSport && competition.tier !== "paid"
+  );
+
+  const selectedSportIcon =
+    selectedSport === "basketball" ? <BasketballIcon /> : <FootballIcon />;
+
   return (
     <Main>
       <ControlBar>
         <FancyDropdown
-          icon={<FootballIcon />}
+          icon={selectedSportIcon}
           label={
             selectedCompetitions.length
-              ? selectedCompetitions.join(", ")
+              ? selectedCompetitions
+                  .map((id) => COMPETITIONS[id].name)
+                  .join(", ")
               : "Nothing selected"
           }
           count={selectedCompetitions.length}
@@ -94,24 +106,22 @@ export default function FixturesClient() {
                   Rugby Union
                 </option>
               </Select>
-              <p>Your selected sport is: {selectedSport}</p>
             </Fieldset>
 
             <Fieldset>
               <HeadingBanner as={Legend}>2. Competitions</HeadingBanner>
               <CheckboxGroup>
-                {Object.entries(COMPETITIONS)
-                  .filter(([, competition]) => competition.tier !== "paid")
-                  .map(([competitionId, competition]) => (
-                    <FieldCheckboxRow
-                      key={competitionId}
-                      name={competitionId}
-                      checked={selectedCompetitions.includes(competitionId)}
-                      onChange={() => handleCompetitionChange(competitionId)}
-                    >
-                      {competition.name}
-                    </FieldCheckboxRow>
-                  ))}
+                {availableCompetitions.map(([competitionId, competition]) => (
+                  <FieldCheckboxRow
+                    icon={selectedSportIcon}
+                    key={competitionId}
+                    name={competitionId}
+                    checked={selectedCompetitions.includes(competitionId)}
+                    onChange={() => handleCompetitionChange(competitionId)}
+                  >
+                    {competition.name}
+                  </FieldCheckboxRow>
+                ))}
               </CheckboxGroup>
             </Fieldset>
             <SelectionExplainerText>
@@ -209,15 +219,15 @@ export default function FixturesClient() {
                 })
               )
             ).map(([groupingKey, dateFixtures], index, array) => (
-              <Fragment key={groupingKey}>
+              <Fragment key={index}>
                 <DateGroup>
                   <HeadingBanner sticky="true">
                     {formatDateForDisplay(dateFixtures[0].localDate)}
                   </HeadingBanner>
                   <DateFixturesList>
-                    {dateFixtures.map((fixture) => (
+                    {dateFixtures.map((fixture, index) => (
                       <Fixture
-                        key={fixture.id}
+                        key={index}
                         fixture={fixture}
                         showAllScores={showAllScores}
                         useSoundEffects={useSoundEffects}
