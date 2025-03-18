@@ -4,6 +4,11 @@ import FieldLabel from "@/components/FieldLabel";
 import InputIconContainer from "@/components/InputIconContainer";
 import FootballIcon from "@/components/FootballIcon";
 import { styled } from "@pigment-css/react";
+import { fieldInputStyle } from "@/styles/commonStyles";
+
+const StyledCheckbox = styled(Checkbox)(() => ({
+  ...fieldInputStyle,
+}));
 
 function FieldCheckboxRow({ name, checked, onChange, children }) {
   return (
@@ -19,9 +24,3 @@ function FieldCheckboxRow({ name, checked, onChange, children }) {
 }
 
 export default FieldCheckboxRow;
-
-// TODO: Abstract and share with FieldRadioRow
-const StyledCheckbox = styled(Checkbox)(({ theme }) => ({
-  padding: "0.75rem",
-  outline: "none", // See focus-within
-}));

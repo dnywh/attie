@@ -4,6 +4,11 @@ import FieldLabel from "@/components/FieldLabel";
 import InputIconContainer from "@/components/InputIconContainer";
 import RadioDotIcon from "@/components/RadioDotIcon";
 import { styled } from "@pigment-css/react";
+import { fieldInputStyle } from "@/styles/commonStyles";
+
+const StyledRadio = styled(Radio)(() => ({
+  ...fieldInputStyle,
+}));
 
 function FieldRadioRow({ value, children, ...props }) {
   return (
@@ -19,9 +24,3 @@ function FieldRadioRow({ value, children, ...props }) {
 }
 
 export default FieldRadioRow;
-
-// TODO: Abstract and share with FieldCheckboxRow
-const StyledRadio = styled(Radio)(({ theme }) => ({
-  padding: "0.75rem",
-  outline: "none", // See focus-within
-}));

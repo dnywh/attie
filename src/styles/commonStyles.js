@@ -7,6 +7,11 @@
 //     borderRadius: "0px",
 // });
 
+export const fieldInputStyle = {
+    padding: "0.75rem",
+    outline: "none", // See focus-within
+};
+
 export const fieldsetGroupStyle = ({ theme }) => ({
     display: "flex",
     flexDirection: "column",
@@ -48,8 +53,6 @@ export const teamText = ({
     textTransform: "uppercase",
 });
 
-
-
 export const dashedBorder = ({ theme }) => ({
     paddingTop: "1.5rem",
     // Dashed border generator
@@ -81,7 +84,6 @@ export const interactiveStyles = ({
     }
 })
 
-
 // Helper function to ensure consistent parameter handling
 const createCardStyle = ({ shadowSize = 4, borderRadius = 3, interactive = false }) =>
     ({ theme }) => ({
@@ -102,8 +104,6 @@ export const smallCardStyleInteractive = ({ theme }) => ({
 
 // Export the creator function for custom cases
 export { createCardStyle };
-
-
 
 // Running list of common styles
 
