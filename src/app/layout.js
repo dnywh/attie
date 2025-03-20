@@ -8,8 +8,7 @@ import '@pigment-css/react/styles.css';
 import FixturesHeader from '@/components/FixturesHeader';
 
 export const metadata = {
-  title: "Attie",
-  tagLine: "The anti-score scores app.", // TODO SEO
+  title: "Attie: the anti-score scores app",
   description: "Don’t spoil the game. Get the results without the scores.",
 };
 

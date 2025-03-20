@@ -15,14 +15,15 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }) {
     const preset = await PRESETS[params.preset];
 
+    // TODO: can I just run `if (!preset) return` and have it fall back to the metadata from the main layout? If not, share that content somewhere higher, like in constants
     if (!preset) return {
-        title: 'Attie: Sports results without spoilers',
-        description: 'Watch delayed sports matches without knowing the score.'
+        title: 'Attie: the anti-score scores app',
+        description: 'Don’t spoil the game. Get the results without the scores.'
     };
 
     return {
-        title: `Attie: ${preset.name} without the scores`,
-        description: `Don't spoil your ${preset.sport} highlights. Get the ${preset.name} results without knowing the scores.`,
+        title: `Attie: ${preset.name} results without the scores`,
+        description: `See who played ${preset.sport} overnight without spoiling the results. Attie shows recent ${preset.name} games with scores hidden by default.`,
         // Optional: Add OpenGraph metadata for better social sharing
         //   openGraph: {
         //     title: `Watch ${preset.name} without spoilers`,

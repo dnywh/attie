@@ -4,19 +4,22 @@ export const PRESETS = {
 
     // Individual competition presets
     'nfl': {
-        name: 'National Football League (NFL)',
+        name: 'NFL',
+        longName: 'National Football League',
         sport: 'americanFootball',
         competitions: ['nfl'],
         direction: false
     },
     'mlb': {
-        name: 'Major League Baseball (MLB)',
+        name: 'MLB',
+        longName: 'Major League Baseball',
         sport: 'baseball',
         competitions: ['mlb'],
         direction: false
     },
     'nba': {
-        name: 'National Basketball League (NBA)',
+        name: 'NBA',
+        longName: 'National Basketball League',
         sport: 'basketball',
         competitions: ['nba'],
         direction: false
