@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Image from "next/image";
 import { styled } from "@pigment-css/react";
 
@@ -49,7 +50,12 @@ const StyledImage = styled(Image)({
   height: `auto`,
 });
 
-function TeamLogo({ src, alt, isHomeTeam, isKnown = true }) {
+function TeamLogo({ src, alt, isHomeTeam, isKnown: initialIsKnown = true }) {
+  const [imageLoadFailed, setImageLoadFailed] = useState(false);
+
+  // Combine the initial isKnown prop with the image load state
+  const isKnown = initialIsKnown && !imageLoadFailed;
+
   return (
     <Container
       data-orientation={isHomeTeam ? "home" : "away"}
@@ -62,6 +68,12 @@ function TeamLogo({ src, alt, isHomeTeam, isKnown = true }) {
           width={PHYSICAL_SIZE}
           height={PHYSICAL_SIZE}
           priority
+          onError={() => {
+            console.log(
+              `Failed to load team logo, falling back to base TeamLogo styles.\nSource: ${src}`
+            );
+            setImageLoadFailed(true);
+          }}
         />
       )}
     </Container>
