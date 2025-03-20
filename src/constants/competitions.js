@@ -142,7 +142,7 @@ export const COMPETITIONS = {
             endpoint: '/v1/games',
         }
     },
-    'mba': {
+    'mlb': {
         sport: SPORTS.BASEBALL,
         code: 'mlb',
         name: 'MLB',

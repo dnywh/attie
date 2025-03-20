@@ -32,6 +32,7 @@ import FixturesForwardIcon from "@/components/FixturesForwardIcon";
 import { SPORT_CONFIG } from "@/config/sportConfig";
 
 import { styled } from "@pigment-css/react";
+import { DEFAULTS } from "@/constants/defaults";
 
 export default function FixturesClient() {
   // Basic state
@@ -48,6 +49,7 @@ export default function FixturesClient() {
     selectedSport,
     setSelectedSport,
     selectedCompetitions,
+    setSelectedCompetitions,
     setShowFutureFixtures,
     handleCompetitionChange,
     // handleLoadMore,
@@ -71,6 +73,38 @@ export default function FixturesClient() {
   };
 
   const selectedSportIcon = getSportIcon(selectedSport);
+
+  // Handle initial URL params
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    // Set initial values from URL or use the defaults
+    const urlSport = params.get("sport");
+    const urlCompetitions = params.get("competitions")?.split(",");
+    const urlDirection = params.get("direction") === "forwards"; // Boolean
+
+    if (urlSport) setSelectedSport(urlSport);
+    if (urlCompetitions) setSelectedCompetitions(urlCompetitions);
+    if (params.has("direction")) setShowFutureFixtures(urlDirection);
+  }, []); // Run once on mount
+
+  // Update URL to show params when the selections change
+  useEffect(() => {
+    const params = new URLSearchParams();
+
+    // Only add these params if they differ from the defaults
+    if (selectedSport !== DEFAULTS.SPORT) {
+      params.set("sport", selectedSport);
+    }
+    if (!arraysEqual(selectedCompetitions, DEFAULTS.COMPETITIONS)) {
+      params.set("competitions", selectedCompetitions.join(","));
+    }
+    if (showFutureFixtures !== DEFAULTS.DIRECTION) {
+      params.set("direction", showFutureFixtures ? "forwards" : "backwards");
+    }
+
+    const newUrl = params.toString() ? `/?${params}` : "/";
+    window.history.replaceState({}, "", newUrl);
+  }, [selectedSport, selectedCompetitions, showFutureFixtures]);
 
   return (
     <Main>
@@ -333,3 +367,9 @@ const EmptyState = styled("div")(({ theme }) => ({
   gap: "0.5rem",
   ...dashedBorder({ theme }),
 }));
+
+// Helper function to compare arrays
+function arraysEqual(a, b) {
+  if (a.length !== b.length) return false;
+  return a.every((item, index) => item === b[index]);
+}

@@ -4,6 +4,7 @@ import { DEFAULT_WINDOWS } from '@/utils/config/windows';
 import { fixturesCache, CACHE_CONFIG } from '@/utils/cache';
 import { sortFixtures } from '@/utils/dates';
 import { adaptFixture } from '@/utils/adapters';
+import { DEFAULTS } from "@/constants/defaults";
 
 const buildApiUrl = (apiConfig, params) => {
     const { baseUrl } = apiConfig;
@@ -24,11 +25,28 @@ const buildApiUrl = (apiConfig, params) => {
 };
 
 export function useFixtures() {
-    const [showFutureFixtures, setShowFutureFixtures] = useState(false);
-    const [selectedSport, setSelectedSport] = useState("americanFootball");
-    const [selectedCompetitions, setSelectedCompetitions] = useState([
-        "nfl",
-    ]);
+    // Get initial values from URL or use defaults
+    // Doing these checks prevents unnecessarily loading the default values into state if a user comes directly from params
+    const getInitialValues = () => {
+        if (typeof window === 'undefined') return {
+            sport: DEFAULTS.SPORT,
+            competitions: DEFAULTS.COMPETITIONS,
+            direction: DEFAULTS.DIRECTION
+        };
+
+        const params = new URLSearchParams(window.location.search);
+        return {
+            sport: params.get('sport') || DEFAULTS.SPORT,
+            competitions: params.get('competitions')?.split(',') || DEFAULTS.COMPETITIONS,
+            direction: params.get('direction') === 'forwards' || DEFAULTS.DIRECTION
+        };
+    };
+
+    // Initialize state with URL values
+    const initialValues = getInitialValues();
+    const [showFutureFixtures, setShowFutureFixtures] = useState(initialValues.direction);
+    const [selectedSport, setSelectedSport] = useState(initialValues.sport);
+    const [selectedCompetitions, setSelectedCompetitions] = useState(initialValues.competitions);
     const [fixtures, setFixtures] = useState([]);
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
@@ -331,6 +349,7 @@ export function useFixtures() {
         // Actions
         setShowFutureFixtures,
         setSelectedSport: handleSportChange,
+        setSelectedCompetitions,
         handleCompetitionChange,
         // handleLoadMore,
         loadInitialFixtures,
