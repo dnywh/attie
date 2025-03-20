@@ -35,9 +35,14 @@ import { styled } from "@pigment-css/react";
 import { DEFAULTS } from "@/constants/defaults";
 
 export default function FixturesClient() {
-  // Basic state
+  const [isClient, setIsClient] = useState(false);
   const [showAllScores, setShowAllScores] = useState(false);
   const [useSoundEffects, setUseSoundEffects] = useState(true);
+
+  useEffect(() => {
+    setIsClient(true); // Avoid hydration issues as described below
+  }, []);
+
   // More complicated state via useFixtures hook
   const {
     fixtures,
@@ -106,6 +111,30 @@ export default function FixturesClient() {
     window.history.replaceState({}, "", newUrl);
   }, [selectedSport, selectedCompetitions, showFutureFixtures]);
 
+  // Prevent hydration mismatch by not rendering dynamic content on server
+  // I.e. render same static loading content by default on both server and client
+  if (!isClient) {
+    return (
+      <Main>
+        <ControlBar>
+          <FancyDropdown
+            icon={null} // No icon during SSR
+            label="Loading..."
+            fillSpace={true}
+          />
+          <FancyDropdown icon={<ScoresHiddenIcon />} />
+          <FancyDropdown icon={<FixturesBackwardIcon />} />
+        </ControlBar>
+        <EmptyState>
+          <SelectionExplainerText>
+            <LoadingText>Loading fixtures</LoadingText>
+          </SelectionExplainerText>
+        </EmptyState>
+      </Main>
+    );
+  }
+
+  // Then, on client, re-render with dynamic content once available
   return (
     <Main>
       <ControlBar>
