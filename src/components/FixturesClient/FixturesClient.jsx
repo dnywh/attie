@@ -79,7 +79,15 @@ export default function FixturesClient({ presetParams }) {
 
   const selectedSportIcon = getSportIcon(selectedSport);
 
-  // Keep the URL updating effect
+  // Helper function to compare arrays with null safety
+  function arraysEqual(a, b) {
+    // Handle cases where either array is undefined/null
+    if (!a || !b) return a === b;
+    if (a.length !== b.length) return false;
+    return a.every((item, index) => item === b[index]);
+  }
+
+  // Update the URL params comparison logic
   useEffect(() => {
     if (!isClient) return; // Don't update URL during SSR
 
@@ -87,14 +95,24 @@ export default function FixturesClient({ presetParams }) {
 
     // Compare against provided defaults or global defaults
     const compareDefaults = presetParams || DEFAULTS;
+    console.log("compareDefaults:", compareDefaults);
 
-    if (selectedSport !== compareDefaults.sport) {
+    if (selectedSport !== (compareDefaults.sport || DEFAULTS.SPORT)) {
       params.set("sport", selectedSport);
     }
-    if (!arraysEqual(selectedCompetitions, compareDefaults.competitions)) {
+
+    if (
+      !arraysEqual(
+        selectedCompetitions,
+        compareDefaults.competitions || DEFAULTS.COMPETITIONS
+      )
+    ) {
       params.set("competitions", selectedCompetitions.join(","));
     }
-    if (showFutureFixtures !== compareDefaults.direction) {
+
+    if (
+      showFutureFixtures !== (compareDefaults.direction ?? DEFAULTS.DIRECTION)
+    ) {
       params.set("direction", showFutureFixtures ? "forwards" : "backwards");
     }
 
@@ -395,9 +413,3 @@ const EmptyState = styled("div")(({ theme }) => ({
   gap: "0.5rem",
   ...dashedBorder({ theme }),
 }));
-
-// Helper function to compare arrays
-function arraysEqual(a, b) {
-  if (a.length !== b.length) return false;
-  return a.every((item, index) => item === b[index]);
-}
