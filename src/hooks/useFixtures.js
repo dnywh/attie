@@ -24,29 +24,18 @@ const buildApiUrl = (apiConfig, params) => {
     return url;
 };
 
-export function useFixtures() {
-    // Get initial values from URL or use defaults
-    // Doing these checks prevents unnecessarily loading the default values into state if a user comes directly from params
-    const getInitialValues = () => {
-        if (typeof window === 'undefined') return {
-            sport: DEFAULTS.SPORT,
-            competitions: DEFAULTS.COMPETITIONS,
-            direction: DEFAULTS.DIRECTION
-        };
-
-        const params = new URLSearchParams(window.location.search);
-        return {
-            sport: params.get('sport') || DEFAULTS.SPORT,
-            competitions: params.get('competitions')?.split(',') || DEFAULTS.COMPETITIONS,
-            direction: params.get('direction') === 'forwards' || DEFAULTS.DIRECTION
-        };
-    };
-
-    // Initialize state with URL values
-    const initialValues = getInitialValues();
-    const [showFutureFixtures, setShowFutureFixtures] = useState(initialValues.direction);
-    const [selectedSport, setSelectedSport] = useState(initialValues.sport);
-    const [selectedCompetitions, setSelectedCompetitions] = useState(initialValues.competitions);
+export function useFixtures(initialParams) {
+    // InitialP
+    // Use provided params (i.e. searchParams or presetParams), or fallback to defaults
+    const [showFutureFixtures, setShowFutureFixtures] = useState(
+        initialParams?.direction ?? DEFAULTS.DIRECTION
+    );
+    const [selectedSport, setSelectedSport] = useState(
+        initialParams?.sport ?? DEFAULTS.SPORT
+    );
+    const [selectedCompetitions, setSelectedCompetitions] = useState(
+        initialParams?.competitions ?? DEFAULTS.COMPETITIONS
+    );
     const [fixtures, setFixtures] = useState([]);
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);

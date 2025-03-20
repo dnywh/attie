@@ -34,7 +34,7 @@ import { SPORT_CONFIG } from "@/config/sportConfig";
 import { styled } from "@pigment-css/react";
 import { DEFAULTS } from "@/constants/defaults";
 
-export default function FixturesClient({ defaultParams }) {
+export default function FixturesClient({ presetParams }) {
   const [isClient, setIsClient] = useState(false);
   const [showAllScores, setShowAllScores] = useState(false);
   const [useSoundEffects, setUseSoundEffects] = useState(true);
@@ -43,7 +43,7 @@ export default function FixturesClient({ defaultParams }) {
     setIsClient(true); // Avoid hydration issues as described below
   }, []);
 
-  // More complicated state via useFixtures hook
+  // Pass presetParams to useFixtures
   const {
     fixtures,
     loading,
@@ -59,7 +59,7 @@ export default function FixturesClient({ defaultParams }) {
     handleCompetitionChange,
     // handleLoadMore,
     loadInitialFixtures,
-  } = useFixtures();
+  } = useFixtures(presetParams);
 
   // Initial load
   useEffect(() => {
@@ -79,38 +79,36 @@ export default function FixturesClient({ defaultParams }) {
 
   const selectedSportIcon = getSportIcon(selectedSport);
 
-  // Handle initial URL params
+  // Keep the URL updating effect
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    // Set initial values from URL or use the defaults
-    const urlSport = params.get("sport") || defaultParams?.sport;
-    const urlCompetitions =
-      params.get("competitions")?.split(",") || defaultParams?.competitions;
-    const urlDirection = params.get("direction") === "forwards"; // Boolean
+    if (!isClient) return; // Don't update URL during SSR
 
-    if (urlSport) setSelectedSport(urlSport);
-    if (urlCompetitions) setSelectedCompetitions(urlCompetitions);
-    if (params.has("direction")) setShowFutureFixtures(urlDirection);
-  }, [defaultParams]);
-
-  // Update URL to show params when the selections change
-  useEffect(() => {
     const params = new URLSearchParams();
 
-    // Only add these params if they differ from the defaults
-    if (selectedSport !== DEFAULTS.SPORT) {
+    // Compare against provided defaults or global defaults
+    const compareDefaults = presetParams || DEFAULTS;
+
+    if (selectedSport !== compareDefaults.sport) {
       params.set("sport", selectedSport);
     }
-    if (!arraysEqual(selectedCompetitions, DEFAULTS.COMPETITIONS)) {
+    if (!arraysEqual(selectedCompetitions, compareDefaults.competitions)) {
       params.set("competitions", selectedCompetitions.join(","));
     }
-    if (showFutureFixtures !== DEFAULTS.DIRECTION) {
+    if (showFutureFixtures !== compareDefaults.direction) {
       params.set("direction", showFutureFixtures ? "forwards" : "backwards");
     }
 
-    const newUrl = params.toString() ? `/?${params}` : "/";
+    const newUrl = params.toString()
+      ? `${window.location.pathname}?${params}`
+      : window.location.pathname;
     window.history.replaceState({}, "", newUrl);
-  }, [selectedSport, selectedCompetitions, showFutureFixtures]);
+  }, [
+    selectedSport,
+    selectedCompetitions,
+    showFutureFixtures,
+    isClient,
+    presetParams,
+  ]);
 
   // Prevent hydration mismatch by not rendering dynamic content on server
   // I.e. render same static loading content by default on both server and client
