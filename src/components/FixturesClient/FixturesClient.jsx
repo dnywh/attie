@@ -97,8 +97,12 @@ export default function FixturesClient({ presetParams }) {
     const compareDefaults = presetParams || DEFAULTS;
     console.log("compareDefaults:", compareDefaults);
 
+    // Track if we've deviated from the preset
+    let hasDeviatedFromPreset = false;
+
     if (selectedSport !== (compareDefaults.sport || DEFAULTS.SPORT)) {
       params.set("sport", selectedSport);
+      hasDeviatedFromPreset = true;
     }
 
     if (
@@ -108,17 +112,22 @@ export default function FixturesClient({ presetParams }) {
       )
     ) {
       params.set("competitions", selectedCompetitions.join(","));
+      hasDeviatedFromPreset = true;
     }
 
     if (
       showFutureFixtures !== (compareDefaults.direction ?? DEFAULTS.DIRECTION)
     ) {
       params.set("direction", showFutureFixtures ? "forwards" : "backwards");
+      hasDeviatedFromPreset = true;
     }
 
-    const newUrl = params.toString()
-      ? `${window.location.pathname}?${params}`
-      : window.location.pathname;
+    // If we've deviated from the preset, use root path
+    // Otherwise, keep the current path (which might include the preset)
+    const basePath = hasDeviatedFromPreset ? "/" : window.location.pathname;
+
+    const newUrl = params.toString() ? `${basePath}?${params}` : basePath;
+
     window.history.replaceState({}, "", newUrl);
   }, [
     selectedSport,
