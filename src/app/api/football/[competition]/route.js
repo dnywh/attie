@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { APP_CONFIG } from '@/constants/config';
 
 const API_BASE_URL = 'https://api.football-data.org/v4';
 
@@ -34,6 +35,7 @@ export async function GET(request, { params }) {
             {
                 headers: {
                     "X-Auth-Token": process.env.FOOTBALL_DATA_API_KEY,
+                    "User-Agent": APP_CONFIG.USER_AGENT,
                 },
             }
         );

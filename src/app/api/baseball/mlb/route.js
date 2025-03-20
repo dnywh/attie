@@ -1,7 +1,11 @@
 import { BalldontlieAPI } from "@balldontlie/sdk";
+import { APP_CONFIG } from '@/constants/config';
 
 const api = new BalldontlieAPI({
-    apiKey: process.env.BALL_DONT_LIE_API_KEY
+    apiKey: process.env.BALL_DONT_LIE_API_KEY,
+    headers: {
+        'User-Agent': APP_CONFIG.USER_AGENT
+    }
 });
 
 export async function GET(request) {

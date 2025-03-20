@@ -25,7 +25,6 @@ const buildApiUrl = (apiConfig, params) => {
 };
 
 export function useFixtures(initialParams) {
-    // InitialP
     // Use provided params (i.e. searchParams or presetParams), or fallback to defaults
     const [showFutureFixtures, setShowFutureFixtures] = useState(
         initialParams?.direction ?? DEFAULTS.DIRECTION
@@ -140,7 +139,7 @@ export function useFixtures(initialParams) {
                     direction: showFutureFixtures ? "future" : "past",
                     cursor,
                     page: currentPage
-                })
+                }),
             );
 
             if (!response.ok) {
