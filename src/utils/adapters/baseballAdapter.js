@@ -4,7 +4,6 @@ const STATUS_MAP = {
 };
 
 export function adaptBaseballFixture(fixture) {
-    // TODO: Implement MLB-specific adaptation
     return {
         id: fixture.id.toString(),
         utcDate: fixture.date,
@@ -26,8 +25,8 @@ export function adaptBaseballFixture(fixture) {
         },
         score: {
             fullTime: {
-                home: fixture.home_team_score,
-                away: fixture.away_team_score
+                home: fixture.home_team_data.runs,
+                away: fixture.away_team_data.runs
             }
         }
     };

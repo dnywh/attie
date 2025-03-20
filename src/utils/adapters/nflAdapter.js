@@ -1,28 +1,32 @@
+const STATUS_MAP = {
+    'Final': 'FINISHED',
+    // Anything that I don't have mapped will just come through raw, as indicated below
+};
+
 export function adaptNFLFixture(fixture) {
-    // TODO: Implement NFL-specific adaptation
     return {
         id: fixture.id.toString(),
-        utcDate: fixture.startTime,
-        localDate: new Date(fixture.startTime).toLocaleDateString(),
-        status: fixture.status,
+        utcDate: fixture.date,
+        localDate: fixture.date, // Doesn't exist in schema, delete
+        status: STATUS_MAP[fixture.status] || fixture.status,
         competition: {
             name: 'NFL',
             type: 'LEAGUE'
         },
         homeTeam: {
-            name: fixture.homeTeam.name,
-            shortName: fixture.homeTeam.abbreviation,
-            // Add NFL-specific team logo URL pattern
+            name: fixture.home_team.full_name, // Green Bay Packers
+            shortName: fixture.home_team.name, // Packers
+            crest: `https://a1.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/scoreboard/${fixture.home_team.abbreviation}.png&h=112&w=112`, // GB
         },
         awayTeam: {
-            name: fixture.awayTeam.name,
-            shortName: fixture.awayTeam.abbreviation,
-            // Add NFL-specific team logo URL pattern
+            name: fixture.visitor_team.full_name,
+            shortName: fixture.visitor_team.name,
+            crest: `https://a1.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/scoreboard/${fixture.visitor_team.abbreviation}.png&h=112&w=112`,
         },
         score: {
             fullTime: {
-                home: fixture.homeScore,
-                away: fixture.awayScore
+                home: fixture.home_team_score,
+                away: fixture.visitor_team_score
             }
         }
     };

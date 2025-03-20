@@ -1,5 +1,5 @@
 export const SPORTS = {
-    AMERICAN_FOOTBALL: 'american football',
+    AMERICAN_FOOTBALL: 'americanFootball',
     // AUSSIE_RULES: 'aussie rules football',
     BASEBALL: 'baseball',
     BASKETBALL: 'basketball',

@@ -25,9 +25,9 @@ const buildApiUrl = (apiConfig, params) => {
 
 export function useFixtures() {
     const [showFutureFixtures, setShowFutureFixtures] = useState(false);
-    const [selectedSport, setSelectedSport] = useState("football");
+    const [selectedSport, setSelectedSport] = useState("americanFootball");
     const [selectedCompetitions, setSelectedCompetitions] = useState([
-        "premier-league",
+        "nfl",
     ]);
     const [fixtures, setFixtures] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -173,8 +173,8 @@ export function useFixtures() {
                 baseUrl: `/api/baseball/${competitionCode}`,
                 paginationType: 'cursor',
             },
-            'american football': {
-                baseUrl: `/api/nfl/${competitionCode}`,
+            americanFootball: {
+                baseUrl: `/api/american-football/${competitionCode}`,
                 paginationType: 'cursor',
             },
         };
@@ -315,7 +315,7 @@ export function useFixtures() {
     //         setLoadingMore(false);
     //     }
     // }, [fetchFixturesForCompetition, selectedSport, nextCursor, selectedCompetitions, showFutureFixtures]);
-    const handleLoadMore = console.log("Load more coming soon")
+    // const handleLoadMore = console.log("Load more coming soon")
 
     return {
         // State
@@ -332,7 +332,7 @@ export function useFixtures() {
         setShowFutureFixtures,
         setSelectedSport: handleSportChange,
         handleCompetitionChange,
-        handleLoadMore,
+        // handleLoadMore,
         loadInitialFixtures,
     };
 } 

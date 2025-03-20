@@ -1,3 +1,4 @@
+import { adaptNFLFixture } from '@/utils/adapters/nflAdapter';
 import { adaptBaseballFixture } from '@/utils/adapters/baseballAdapter';
 import { adaptBasketballFixture } from '@/utils/adapters/basketballAdapter';
 import { adaptFootballFixture } from '@/utils/adapters/footballAdapter';
@@ -11,8 +12,8 @@ export const adaptFixture = (rawFixture, sport) => {
             return adaptBasketballFixture(rawFixture);
         case 'baseball':
             return adaptBaseballFixture(rawFixture);
-        case 'american football':
-            return adaptAmericanFootballFixture(rawFixture);
+        case 'americanFootball': // TODO for all others: case 'nfl', i.e. competition, since the adaptation is competition-based, not sport-based
+            return adaptNFLFixture(rawFixture);
         default:
             throw new Error(`Sport ${sport} not supported`);
     }

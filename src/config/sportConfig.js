@@ -19,7 +19,7 @@ export const SPORT_CONFIG = {
         scoreLabel: 'Runs',
         defaultView: 'innings',
     },
-    'american football': {
+    americanFootball: {
         icon: AmericanFootballIcon,
         scoreLabel: 'Points',
         defaultView: 'quarters',
