@@ -5,6 +5,8 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import { globalCss, styled } from "@pigment-css/react";
 import '@pigment-css/react/styles.css';
 
+import FixturesHeader from '@/components/FixturesHeader';
+
 export const metadata = {
   title: "Attie",
   tagLine: "The anti-score scores app.", // TODO SEO
@@ -98,6 +100,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <Body>
+        <FixturesHeader />
         {children}
         <Analytics />
         <SpeedInsights />

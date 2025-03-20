@@ -36,5 +36,8 @@ export default async function PresetPage({ params }) {
     const preset = await PRESETS[params.preset];
     // Return client accordingly
     // This return statement can be customised with a welcome banner or whatever
+    // FixturesHeader in shared layout
+    // If passing custom props to header, uncomment and set props:
+    // <FixturesHeader />
     return <FixturesClient presetParams={preset} />
 } 
