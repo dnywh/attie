@@ -34,7 +34,7 @@ import { SPORT_CONFIG } from "@/config/sportConfig";
 import { styled } from "@pigment-css/react";
 import { DEFAULTS } from "@/constants/defaults";
 
-export default function FixturesClient() {
+export default function FixturesClient({ defaultParams }) {
   const [isClient, setIsClient] = useState(false);
   const [showAllScores, setShowAllScores] = useState(false);
   const [useSoundEffects, setUseSoundEffects] = useState(true);
@@ -83,14 +83,15 @@ export default function FixturesClient() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     // Set initial values from URL or use the defaults
-    const urlSport = params.get("sport");
-    const urlCompetitions = params.get("competitions")?.split(",");
+    const urlSport = params.get("sport") || defaultParams?.sport;
+    const urlCompetitions =
+      params.get("competitions")?.split(",") || defaultParams?.competitions;
     const urlDirection = params.get("direction") === "forwards"; // Boolean
 
     if (urlSport) setSelectedSport(urlSport);
     if (urlCompetitions) setSelectedCompetitions(urlCompetitions);
     if (params.has("direction")) setShowFutureFixtures(urlDirection);
-  }, []); // Run once on mount
+  }, [defaultParams]);
 
   // Update URL to show params when the selections change
   useEffect(() => {
