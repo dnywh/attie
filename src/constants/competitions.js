@@ -1,11 +1,11 @@
 export const SPORTS = {
     AMERICAN_FOOTBALL: 'american football',
-    AUSSIE_RULES: 'aussie rules football',
+    // AUSSIE_RULES: 'aussie rules football',
+    BASEBALL: 'baseball',
     BASKETBALL: 'basketball',
     FOOTBALL: 'football',
-    RUGBY_LEAGUE: 'rugby league',
-    RUGBY_UNION: 'rugby union',
-    // ... future sports
+    // RUGBY_LEAGUE: 'rugby league',
+    // RUGBY_UNION: 'rugby union',
 };
 
 export const COMPETITION_TYPES = {
@@ -26,6 +26,10 @@ export const COMPETITIONS = {
         type: COMPETITION_TYPES.LEAGUE,
         tier: TIERS.FREE,
         defaultForSport: true,
+        api: {
+            provider: 'football-data',
+            endpoint: '/v4/competitions/PL/matches',
+        },
     },
     'champions-league': {
         sport: SPORTS.FOOTBALL,
@@ -33,13 +37,10 @@ export const COMPETITIONS = {
         name: 'UEFA Champions League',
         type: COMPETITION_TYPES.CUP,
         tier: TIERS.FREE,
-    },
-    'europa-league': {
-        sport: SPORTS.FOOTBALL,
-        code: 'EL',
-        name: 'UEFA Europa League',
-        type: COMPETITION_TYPES.CUP,
-        tier: TIERS.PAID,
+        api: {
+            provider: 'football-data',
+            endpoint: '/v4/competitions/CL/matches',
+        },
     },
     'primera-division': {
         sport: SPORTS.FOOTBALL,
@@ -47,6 +48,10 @@ export const COMPETITIONS = {
         name: 'La Liga',
         type: COMPETITION_TYPES.LEAGUE,
         tier: TIERS.FREE,
+        api: {
+            provider: 'football-data',
+            endpoint: '/v4/competitions/CL/matches',
+        },
     },
     'championship': {
         sport: SPORTS.FOOTBALL,
@@ -54,6 +59,10 @@ export const COMPETITIONS = {
         name: 'Championship',
         type: COMPETITION_TYPES.LEAGUE,
         tier: TIERS.FREE,
+        api: {
+            provider: 'football-data',
+            endpoint: '/v4/competitions/CL/matches',
+        },
     },
     'serie-a': {
         sport: SPORTS.FOOTBALL,
@@ -61,6 +70,10 @@ export const COMPETITIONS = {
         name: 'Serie A',
         type: COMPETITION_TYPES.LEAGUE,
         tier: TIERS.FREE,
+        api: {
+            provider: 'football-data',
+            endpoint: '/v4/competitions/CL/matches',
+        },
     },
     'bundesliga': {
         sport: SPORTS.FOOTBALL,
@@ -68,6 +81,10 @@ export const COMPETITIONS = {
         name: 'Bundesliga',
         type: COMPETITION_TYPES.LEAGUE,
         tier: TIERS.FREE,
+        api: {
+            provider: 'football-data',
+            endpoint: '/v4/competitions/CL/matches',
+        },
     },
     'ligue-1': {
         sport: SPORTS.FOOTBALL,
@@ -75,6 +92,10 @@ export const COMPETITIONS = {
         name: 'Ligue 1',
         type: COMPETITION_TYPES.LEAGUE,
         tier: TIERS.FREE,
+        api: {
+            provider: 'football-data',
+            endpoint: '/v4/competitions/CL/matches',
+        },
     },
     'liga-portugal': {
         sport: SPORTS.FOOTBALL,
@@ -82,6 +103,10 @@ export const COMPETITIONS = {
         name: 'Primeira Liga',
         type: COMPETITION_TYPES.LEAGUE,
         tier: TIERS.FREE,
+        api: {
+            provider: 'football-data',
+            endpoint: '/v4/competitions/CL/matches',
+        },
     },
     'eredivisie': {
         sport: SPORTS.FOOTBALL,
@@ -89,6 +114,10 @@ export const COMPETITIONS = {
         name: 'Eredivise',
         type: COMPETITION_TYPES.LEAGUE,
         tier: TIERS.FREE,
+        api: {
+            provider: 'football-data',
+            endpoint: '/v4/competitions/CL/matches',
+        },
     },
     'brasileirao': {
         sport: SPORTS.FOOTBALL,
@@ -96,13 +125,10 @@ export const COMPETITIONS = {
         name: 'Brasileiro Série A',
         type: COMPETITION_TYPES.LEAGUE,
         tier: TIERS.FREE,
-    },
-    'fa-cup': {
-        sport: SPORTS.FOOTBALL,
-        code: 'FAC',
-        name: 'FA Cup',
-        type: COMPETITION_TYPES.CUP,
-        tier: TIERS.PAID,
+        api: {
+            provider: 'football-data',
+            endpoint: '/v4/competitions/CL/matches',
+        },
     },
     'nba': {
         sport: SPORTS.BASKETBALL,
@@ -111,7 +137,35 @@ export const COMPETITIONS = {
         type: COMPETITION_TYPES.LEAGUE,
         tier: TIERS.FREE,
         defaultForSport: true,
+        api: {
+            provider: 'balldontlie',
+            endpoint: '/v1/games',
+        }
     },
+    'mba': {
+        sport: SPORTS.BASEBALL,
+        code: 'mlb',
+        name: 'MLB',
+        type: COMPETITION_TYPES.LEAGUE,
+        tier: TIERS.FREE,
+        defaultForSport: true,
+        api: {
+            provider: 'balldontlie',
+            endpoint: 'mlb/v1/games',
+        }
+    },
+    'nfl': {
+        sport: SPORTS.AMERICAN_FOOTBALL,
+        code: 'nfl',
+        name: 'NFL',
+        type: COMPETITION_TYPES.LEAGUE,
+        tier: TIERS.FREE,
+        defaultForSport: true,
+        api: {
+            provider: 'balldontlie',
+            endpoint: 'nfl/v1/games',
+        }
+    }
 };
 
 // Helper functions

@@ -6,30 +6,29 @@ const api = new BalldontlieAPI({
 
 export async function GET(request) {
     const { searchParams } = new URL(request.url);
-    const dateFrom = searchParams.get('dateFrom');
-    const dateTo = searchParams.get('dateTo');
+    const dateA = searchParams.get('dateFrom');
+    const dateB = searchParams.get('dateTo');
     const cursor = searchParams.get('cursor');
     const direction = searchParams.get('direction');
 
-    console.log(`[NBA API] Getting ${direction} games:`, {
-        dateFrom,
-        dateTo,
+    console.log(`[MLB API] Getting ${direction} games:`, {
+        dateA,
+        dateB,
         cursor: cursor || 'No cursor (first page)'
     });
 
     try {
-        const response = await api.nba.getGames({
-            start_date: dateFrom,
-            end_date: dateTo,
-            per_page: 72, // 25–100, with 64 being the average in a week
+        const response = await api.mlb.getGames({
+            // Doesn't support date range, so use an array instead. E.g: ?dates[]=2024-01-01&dates[]=2024-01-02
+            dates: ["2024-09-01", "2024-09-10", "2024-09-11"], // dates: [dateA, dateB] etc
+            per_page: 25, // 25–100
             ...(cursor && { cursor })
         });
 
-        console.log(`[NBA API] Found ${response.data.length} games`, {
+        console.log(`[MLB API] Found ${response.data.length} games`, {
             next_cursor: response.meta.next_cursor,
             per_page: response.meta.per_page
         });
-
 
         console.log(Response.json({ matches: response.data }));
 
@@ -42,7 +41,7 @@ export async function GET(request) {
             }
         });
     } catch (error) {
-        console.error('[NBA API] Error:', error);
+        console.error('[MLB API] Error:', error);
         return Response.json(
             { error: 'Failed to fetch games', message: error.message },
             { status: 500 }

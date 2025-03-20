@@ -29,8 +29,7 @@ import ScoresHiddenIcon from "@/components/ScoresHiddenIcon";
 import ScoresRevealedIcon from "@/components/ScoresRevealedIcon";
 import FixturesBackwardIcon from "@/components/FixturesBackwardIcon";
 import FixturesForwardIcon from "@/components/FixturesForwardIcon";
-import FootballIcon from "@/components/FootballIcon";
-import BasketballIcon from "@/components/BasketballIcon";
+import { SPORT_CONFIG } from "@/config/sportConfig";
 
 import { styled } from "@pigment-css/react";
 
@@ -51,7 +50,7 @@ export default function FixturesClient() {
     selectedCompetitions,
     setShowFutureFixtures,
     handleCompetitionChange,
-    handleLoadMore,
+    // handleLoadMore,
     loadInitialFixtures,
   } = useFixtures();
 
@@ -65,8 +64,13 @@ export default function FixturesClient() {
     getCompetitionsForSport(selectedSport)
   ).filter(([, competition]) => competition.tier !== "paid");
 
-  const selectedSportIcon =
-    selectedSport === "basketball" ? <BasketballIcon /> : <FootballIcon />;
+  // Handle icon component for selected sport
+  const getSportIcon = (sport) => {
+    const SportIcon = SPORT_CONFIG[sport]?.icon;
+    return SportIcon ? <SportIcon /> : null;
+  };
+
+  const selectedSportIcon = getSportIcon(selectedSport);
 
   return (
     <Main>
@@ -95,13 +99,7 @@ export default function FixturesClient() {
                 onChange={(e) => setSelectedSport(e.target.value)}
               >
                 {Object.values(SPORTS).map((sport) => (
-                  <option
-                    key={sport}
-                    value={sport}
-                    disabled={
-                      sport !== SPORTS.FOOTBALL && sport !== SPORTS.BASKETBALL
-                    }
-                  >
+                  <option key={sport} value={sport}>
                     {sport.charAt(0).toUpperCase() + sport.slice(1)}
                   </option>
                 ))}
@@ -211,6 +209,7 @@ export default function FixturesClient() {
             {Object.entries(
               groupFixturesByDate(
                 fixtures.filter((fixture) => {
+                  console.log({ fixture });
                   const fixtureDate = new Date(fixture.utcDate);
                   const now = new Date();
                   return showFutureFixtures
@@ -252,7 +251,7 @@ export default function FixturesClient() {
               </Fragment>
             ))}
 
-            {(() => {
+            {/* {(() => {
               console.log(
                 `[Render] hasReachedEnd: ${hasReachedEnd}, fixtures length: ${fixtures.length}`
               );
@@ -273,7 +272,7 @@ export default function FixturesClient() {
                   </SelectionExplainerText>
                 </EmptyState>
               );
-            })()}
+            })()} */}
           </AllFixturesList>
         ) : (
           <EmptyState>

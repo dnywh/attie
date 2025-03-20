@@ -16,6 +16,11 @@ const nextConfig = {
                 hostname: 'interstate21.com', // NBA logos
                 port: '',
             },
+            {
+                protocol: 'https',
+                hostname: 'a1.espncdn.com', // NBA logos
+                port: '',
+            },
         ],
     },
 };

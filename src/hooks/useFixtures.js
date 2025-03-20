@@ -3,7 +3,25 @@ import { COMPETITIONS } from "@/constants/competitions";
 import { DEFAULT_WINDOWS } from '@/utils/config/windows';
 import { fixturesCache, CACHE_CONFIG } from '@/utils/cache';
 import { sortFixtures } from '@/utils/dates';
-import { adaptBasketballFixture } from '@/utils/adapters/basketballAdapter';
+import { adaptFixture } from '@/utils/adapters';
+
+const buildApiUrl = (apiConfig, params) => {
+    const { baseUrl } = apiConfig;
+    const queryParams = new URLSearchParams();
+
+    // Add common params
+    if (params.dateFrom) queryParams.set('dateFrom', params.dateFrom);
+    if (params.dateTo) queryParams.set('dateTo', params.dateTo);
+    if (params.direction) queryParams.set('direction', params.direction);
+
+    // Add pagination params based on sport
+    if (params.cursor) queryParams.set('cursor', params.cursor);
+    if (params.page) queryParams.set('page', params.page);
+
+    const url = `${baseUrl}${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    console.log('[API URL]', url);
+    return url;
+};
 
 export function useFixtures() {
     const [showFutureFixtures, setShowFutureFixtures] = useState(false);
@@ -107,38 +125,15 @@ export function useFixtures() {
         );
 
         try {
-            // First check if it's basketball since that's a special case
-            if (selectedSport === 'basketball') {
-                const response = await fetch(
-                    `/api/basketball/nba?dateFrom=${dateFrom}&dateTo=${dateTo}&direction=${showFutureFixtures ? "future" : "past"}${cursor ? `&cursor=${cursor}` : ''}`
-                );
-
-                if (!response.ok) {
-                    throw new Error(`API error: ${response.status}`);
-                }
-
-                const data = await response.json();
-
-                // Store next cursor for subsequent requests
-                setNextCursor(data.meta.next_cursor);
-                setHasReachedEnd(!data.meta.has_more);
-
-                // Transform the basketball data
-                const matches = data.matches.map(game => adaptBasketballFixture(game));
-
-                console.log(
-                    `[Fetch] Found ${matches.length} NBA games`,
-                    `\n  Next cursor: ${data.meta.next_cursor || 'None'}`,
-                    `\n  Has more: ${data.meta.has_more}`
-                );
-
-                fixturesCache.set(cacheKey, matches);
-                return matches;
-            }
-
-            // Handle football requests
+            const apiConfig = getApiConfig(selectedSport, competitionCode);
             const response = await fetch(
-                `/api/football/${competitionCode}?dateFrom=${dateFrom}&dateTo=${dateTo}&direction=${showFutureFixtures ? "future" : "past"}&page=${currentPage}`
+                buildApiUrl(apiConfig, {
+                    dateFrom,
+                    dateTo,
+                    direction: showFutureFixtures ? "future" : "past",
+                    cursor,
+                    page: currentPage
+                })
             );
 
             if (!response.ok) {
@@ -146,30 +141,46 @@ export function useFixtures() {
             }
 
             const data = await response.json();
-            const matches = (data.matches || []).map((match) => ({
-                ...match,
-                competitionCode,
-            }));
 
-            console.log(
-                `[Fetch] Found ${matches.length} football matches for ${competitionCode}`,
-                `\n  Window: ${windowStart}-${windowEnd} days`,
-                `\n  Direction: ${showFutureFixtures ? "future" : "past"}`
+            // Use the adapter pattern to standardize the data
+            const matches = data.matches.map(match =>
+                adaptFixture(match, selectedSport)
             );
 
-            // Update hasReachedEnd based on pagination
-            setHasReachedEnd(data.meta.current_page >= data.meta.total_pages);
+            // Handle pagination metadata consistently
+            // handlePaginationMeta(data.meta); TODO: Re-enable pagination later
 
             fixturesCache.set(cacheKey, matches);
             return matches;
         } catch (error) {
-            console.error(
-                `[Fetch] Error fetching fixtures for ${competitionCode}:`,
-                error
-            );
+            console.error(`[Fetch] Error:`, error);
             throw error;
         }
-    }, [dateWindow, showFutureFixtures, selectedSport, currentPage, nextCursor]);
+    }, [dateWindow, showFutureFixtures, selectedSport, currentPage]);
+
+    // Helper to get API configuration for each sport/competition
+    const getApiConfig = (sport, competitionCode) => {
+        const configs = {
+            football: {
+                baseUrl: `/api/football/${competitionCode}`,
+                paginationType: 'page',
+            },
+            basketball: {
+                baseUrl: `/api/basketball/${competitionCode}`,
+                paginationType: 'cursor',
+            },
+            baseball: {
+                baseUrl: `/api/baseball/${competitionCode}`,
+                paginationType: 'cursor',
+            },
+            'american football': {
+                baseUrl: `/api/nfl/${competitionCode}`,
+                paginationType: 'cursor',
+            },
+        };
+
+        return configs[sport] || configs.football;
+    };
 
     const loadInitialFixtures = useCallback(async () => {
         setLoading(true);
@@ -261,49 +272,50 @@ export function useFixtures() {
         }
     }, [fetchFixturesForCompetition, selectedCompetitions, showFutureFixtures]);
 
-    const handleLoadMore = useCallback(async () => {
-        if (selectedSport === 'basketball' && !nextCursor) {
-            console.log('[Load More] No more pages available');
-            setHasReachedEnd(true);
-            return;
-        }
+    // const handleLoadMore = useCallback(async () => {
+    //     if (selectedSport === 'basketball' && !nextCursor) {
+    //         console.log('[Load More] No more pages available');
+    //         setHasReachedEnd(true);
+    //         return;
+    //     }
 
-        setLoadingMore(true);
-        setHasRateLimitError(false);
+    //     setLoadingMore(true);
+    //     setHasRateLimitError(false);
 
-        try {
-            if (selectedSport === 'basketball') {
-                const matches = await Promise.all(
-                    selectedCompetitions.map((competition) =>
-                        fetchFixturesForCompetition(
-                            COMPETITIONS[competition].code,
-                            null,
-                            nextCursor
-                        )
-                    )
-                );
+    //     try {
+    //         if (selectedSport === 'basketball') {
+    //             const matches = await Promise.all(
+    //                 selectedCompetitions.map((competition) =>
+    //                     fetchFixturesForCompetition(
+    //                         COMPETITIONS[competition].code,
+    //                         null,
+    //                         nextCursor
+    //                     )
+    //                 )
+    //             );
 
-                const newFixtures = matches.flat();
+    //             const newFixtures = matches.flat();
 
-                setFixtures((prevFixtures) => {
-                    const combined = [...prevFixtures, ...newFixtures];
-                    const unique = Array.from(
-                        new Map(combined.map((f) => [f.id, f])).values()
-                    );
-                    return sortFixtures(unique, showFutureFixtures);
-                });
-            } else {
-                // ... existing football load more logic ...
-            }
-        } catch (error) {
-            console.error("[Load More] Error:", error);
-            if (error.message !== "RATE_LIMIT_EXCEEDED") {
-                alert("Failed to load more fixtures. Please try again.");
-            }
-        } finally {
-            setLoadingMore(false);
-        }
-    }, [fetchFixturesForCompetition, selectedSport, nextCursor, selectedCompetitions, showFutureFixtures]);
+    //             setFixtures((prevFixtures) => {
+    //                 const combined = [...prevFixtures, ...newFixtures];
+    //                 const unique = Array.from(
+    //                     new Map(combined.map((f) => [f.id, f])).values()
+    //                 );
+    //                 return sortFixtures(unique, showFutureFixtures);
+    //             });
+    //         } else {
+    //             // ... existing football load more logic ...
+    //         }
+    //     } catch (error) {
+    //         console.error("[Load More] Error:", error);
+    //         if (error.message !== "RATE_LIMIT_EXCEEDED") {
+    //             alert("Failed to load more fixtures. Please try again.");
+    //         }
+    //     } finally {
+    //         setLoadingMore(false);
+    //     }
+    // }, [fetchFixturesForCompetition, selectedSport, nextCursor, selectedCompetitions, showFutureFixtures]);
+    const handleLoadMore = console.log("Load more coming soon")
 
     return {
         // State
