@@ -14,9 +14,9 @@ export const adaptFixture = (rawFixture, sport) => {
             return adaptBasketballFixture(rawFixture);
         case 'baseball':
             return adaptBaseballFixture(rawFixture);
-        case 'americanFootball': // TODO for all others: case 'nfl', i.e. competition, since the adaptation is competition-based, not sport-based
+        case 'american-football': // TODO for all others: case 'nfl', i.e. competition, since the adaptation is competition-based, not sport-based
             return adaptNFLFixture(rawFixture);
-        case 'rugbyLeague':
+        case 'rugby-league':
             return adaptNRLFixture(rawFixture);
         default:
             throw new Error(`Sport ${sport} not supported`);

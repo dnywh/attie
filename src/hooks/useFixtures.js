@@ -173,29 +173,29 @@ export function useFixtures(initialParams) {
     // TODO: Shouldn't this be on the competitions.js file?
     const getApiConfig = (sport, competitionCode) => {
         const configs = {
-            football: {
+            'football': {
                 baseUrl: `/api/football/${competitionCode}`,
                 paginationType: 'page',
             },
-            rugbyLeague: {
+            'rugby-league': {
                 baseUrl: `/api/rugby-league/${competitionCode}`,
                 paginationType: 'page',
             },
-            basketball: {
+            'basketball': {
                 baseUrl: `/api/basketball/${competitionCode}`,
                 paginationType: 'cursor',
             },
-            baseball: {
+            'baseball': {
                 baseUrl: `/api/baseball/${competitionCode}`,
                 paginationType: 'cursor',
             },
-            americanFootball: {
+            'american-football': {
                 baseUrl: `/api/american-football/${competitionCode}`,
                 paginationType: 'cursor',
             },
         };
 
-        return configs[sport] || configs.football;
+        return configs[sport] || configs.football; // TODO, instead of falling back to football, show clear error message that the sport lookup didn't work
     };
 
     const loadInitialFixtures = useCallback(async () => {
