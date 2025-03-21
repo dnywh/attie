@@ -10,6 +10,7 @@ export const TIERS = {
     PAID: 'pro',
 };
 
+// Use nice, literal, camel-case names for the keys as these are used for slugs on individually generated competition pages
 export const COMPETITIONS = {
     'nrl': {
         sport: 'rugby-league',
@@ -23,7 +24,7 @@ export const COMPETITIONS = {
             endpoint: 'fooBar',
         },
     },
-    'epl': {
+    'premier-league': {
         sport: 'football',
         code: 'PL',
         name: 'Premier League',
@@ -46,9 +47,9 @@ export const COMPETITIONS = {
             endpoint: '/v4/competitions/CL/matches',
         },
     },
-    'primera-division': {
+    'la-liga': {
         sport: 'football',
-        code: 'PD',
+        code: 'PD', // Primera Division (La Liga)
         name: 'La Liga',
         type: COMPETITION_TYPES.LEAGUE,
         tier: TIERS.FREE,
@@ -126,7 +127,7 @@ export const COMPETITIONS = {
     'brasileirao': {
         sport: 'football',
         code: 'BSA',
-        name: 'Brasileiro Série A',
+        name: 'Brasileiro Série A', // Brasileirão
         type: COMPETITION_TYPES.LEAGUE,
         tier: TIERS.FREE,
         api: {
