@@ -25,7 +25,7 @@ const buildApiUrl = (apiConfig, params) => {
 };
 
 export function useFixtures(initialParams) {
-    // Use provided params (i.e. searchParams or presetParams), or fallback to defaults
+    // Use provided params (i.e. searchParams or initialParams set by a [competition] page), or fallback to defaults
     const [showFutureFixtures, setShowFutureFixtures] = useState(
         initialParams?.direction ?? DEFAULTS.DIRECTION
     );

@@ -29,12 +29,13 @@ import ScoresHiddenIcon from "@/components/ScoresHiddenIcon";
 import ScoresRevealedIcon from "@/components/ScoresRevealedIcon";
 import FixturesBackwardIcon from "@/components/FixturesBackwardIcon";
 import FixturesForwardIcon from "@/components/FixturesForwardIcon";
+import RadioDotIcon from "@/components/RadioDotIcon"; // Placeholder for sport icon when loading
 import { SPORT_CONFIG } from "@/config/sportConfig";
 
 import { styled } from "@pigment-css/react";
 import { DEFAULTS } from "@/constants/defaults";
 
-export default function FixturesClient({ presetParams }) {
+export default function FixturesClient({ initialParams }) {
   const [isClient, setIsClient] = useState(false);
   const [showAllScores, setShowAllScores] = useState(false);
   const [useSoundEffects, setUseSoundEffects] = useState(true);
@@ -43,7 +44,7 @@ export default function FixturesClient({ presetParams }) {
     setIsClient(true); // Avoid hydration issues as described below
   }, []);
 
-  // Pass presetParams to useFixtures
+  // Pass initialParams to useFixtures
   const {
     fixtures,
     loading,
@@ -59,7 +60,7 @@ export default function FixturesClient({ presetParams }) {
     handleCompetitionChange,
     // handleLoadMore,
     loadInitialFixtures,
-  } = useFixtures(presetParams);
+  } = useFixtures(initialParams);
 
   // Initial load
   useEffect(() => {
@@ -94,15 +95,15 @@ export default function FixturesClient({ presetParams }) {
     const params = new URLSearchParams();
 
     // Compare against provided defaults or global defaults
-    const compareDefaults = presetParams || DEFAULTS;
+    const compareDefaults = initialParams || DEFAULTS;
     console.log("compareDefaults:", compareDefaults);
 
-    // Track if we've deviated from the preset
-    let hasDeviatedFromPreset = false;
+    // Track if we've deviated from the initialParams
+    let hasDeviatedFromInitialParams = false;
 
     if (selectedSport !== (compareDefaults.sport || DEFAULTS.SPORT)) {
       params.set("sport", selectedSport);
-      hasDeviatedFromPreset = true;
+      hasDeviatedFromInitialParams = true;
     }
 
     if (
@@ -112,19 +113,21 @@ export default function FixturesClient({ presetParams }) {
       )
     ) {
       params.set("competitions", selectedCompetitions.join(","));
-      hasDeviatedFromPreset = true;
+      hasDeviatedFromInitialParams = true;
     }
 
     if (
       showFutureFixtures !== (compareDefaults.direction ?? DEFAULTS.DIRECTION)
     ) {
       params.set("direction", showFutureFixtures ? "forwards" : "backwards");
-      hasDeviatedFromPreset = true;
+      hasDeviatedFromInitialParams = true;
     }
 
-    // If we've deviated from the preset, use root path
-    // Otherwise, keep the current path (which might include the preset)
-    const basePath = hasDeviatedFromPreset ? "/" : window.location.pathname;
+    // If we've deviated from the initialParams, use root path
+    // Otherwise, keep the current path (which might include the initialParams)
+    const basePath = hasDeviatedFromInitialParams
+      ? "/"
+      : window.location.pathname;
 
     const newUrl = params.toString() ? `${basePath}?${params}` : basePath;
 
@@ -134,7 +137,7 @@ export default function FixturesClient({ presetParams }) {
     selectedCompetitions,
     showFutureFixtures,
     isClient,
-    presetParams,
+    initialParams,
   ]);
 
   // Prevent hydration mismatch by not rendering dynamic content on server
@@ -144,7 +147,7 @@ export default function FixturesClient({ presetParams }) {
       <Main>
         <ControlBar>
           <FancyDropdown
-            icon={null} // No icon during SSR
+            icon={<RadioDotIcon />} // Fallback icon on SSR. TODO: Make a proper sunburst logospin
             label="Loading..."
             fillSpace={true}
           />

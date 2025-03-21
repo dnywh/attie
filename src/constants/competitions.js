@@ -1,11 +1,8 @@
 export const SPORTS = {
     AMERICAN_FOOTBALL: 'americanFootball',
-    // AUSSIE_RULES: 'aussie rules football',
     BASEBALL: 'baseball',
     BASKETBALL: 'basketball',
     FOOTBALL: 'football',
-    // RUGBY_LEAGUE: 'rugby league',
-    // RUGBY_UNION: 'rugby union',
 };
 
 export const COMPETITION_TYPES = {
@@ -15,7 +12,7 @@ export const COMPETITION_TYPES = {
 
 export const TIERS = {
     FREE: 'free',
-    PAID: 'paid',
+    PAID: 'pro',
 };
 
 export const COMPETITIONS = {
