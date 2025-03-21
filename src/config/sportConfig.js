@@ -2,26 +2,34 @@ import FootballIcon from "@/components/FootballIcon";
 import BasketballIcon from "@/components/BasketballIcon";
 import BaseballIcon from "@/components/BaseballIcon";
 import AmericanFootballIcon from "@/components/AmericanFootballIcon";
+import RugbyLeagueIcon from "@/components/RugbyLeagueIcon";
 
-export const SPORT_CONFIG = {
+export const SPORTS = {
     football: {
+        key: 'football',
+        name: 'Football',
         icon: FootballIcon,
-        scoreLabel: 'Goals',
-        defaultView: 'full-time',
     },
     basketball: {
+        key: 'basketball',
+        name: 'Basketball',
         icon: BasketballIcon,
         scoreLabel: 'Points',
         defaultView: 'quarters',
     },
     baseball: {
+        key: 'baseball',
+        name: 'Baseball',
         icon: BaseballIcon,
-        scoreLabel: 'Runs',
-        defaultView: 'innings',
     },
     americanFootball: {
+        key: 'americanFootball',
+        name: 'American Football',
         icon: AmericanFootballIcon,
-        scoreLabel: 'Points',
-        defaultView: 'quarters',
     },
-}; 
+    rugbyLeague: {
+        key: 'rugbyLeague',
+        name: 'Rugby League',
+        icon: RugbyLeagueIcon,
+    },
+};

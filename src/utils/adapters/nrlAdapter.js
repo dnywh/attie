@@ -1,6 +1,7 @@
 // ESPN
 const STATUS_MAP = {
     'STATUS_FINAL': 'FINISHED',
+    'STATUS_SCHEDULED': 'SCHEDULED',
 };
 
 export function adaptNRLFixture(fixture) {
@@ -9,7 +10,7 @@ export function adaptNRLFixture(fixture) {
         id: fixture.id.toString(),
         utcDate: fixture.date,
         localDate: fixture.date, // Doesn't exist in schema, delete
-        status: STATUS_MAP[fixture.status.type.name] || fixture.status,
+        status: STATUS_MAP[fixture.status.type.name] || fixture.status.type.name,
         competition: {
             name: 'NRL', // Delete?
             type: 'LEAGUE' // Delete?

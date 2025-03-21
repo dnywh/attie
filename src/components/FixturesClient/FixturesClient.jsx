@@ -18,9 +18,10 @@ import Interstitial from "@/components/Interstitial";
 
 import {
   COMPETITIONS,
-  SPORTS,
   getCompetitionsForSport,
 } from "@/constants/competitions";
+import { SPORTS } from "@/config/sportConfig";
+
 import { dashedBorder } from "@/styles/commonStyles";
 import { formatDateForDisplay, groupFixturesByDate } from "@/utils/dates";
 import { useFixtures } from "@/hooks/useFixtures";
@@ -30,7 +31,6 @@ import ScoresRevealedIcon from "@/components/ScoresRevealedIcon";
 import FixturesBackwardIcon from "@/components/FixturesBackwardIcon";
 import FixturesForwardIcon from "@/components/FixturesForwardIcon";
 import RadioDotIcon from "@/components/RadioDotIcon"; // Placeholder for sport icon when loading
-import { SPORT_CONFIG } from "@/config/sportConfig";
 
 import { styled } from "@pigment-css/react";
 import { DEFAULTS } from "@/constants/defaults";
@@ -74,7 +74,7 @@ export default function FixturesClient({ initialParams }) {
 
   // Handle icon component for selected sport
   const getSportIcon = (sport) => {
-    const SportIcon = SPORT_CONFIG[sport]?.icon;
+    const SportIcon = SPORTS[sport]?.icon;
     return SportIcon ? <SportIcon /> : <RadioDotIcon />;
   };
 
@@ -191,8 +191,8 @@ export default function FixturesClient({ initialParams }) {
                 onChange={(e) => setSelectedSport(e.target.value)}
               >
                 {Object.values(SPORTS).map((sport) => (
-                  <option key={sport} value={sport}>
-                    {sport.charAt(0).toUpperCase() + sport.slice(1)}
+                  <option key={sport.key} value={sport.key}>
+                    {sport.name}
                   </option>
                 ))}
               </Select>

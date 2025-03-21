@@ -1,10 +1,4 @@
-export const SPORTS = {
-    AMERICAN_FOOTBALL: 'americanFootball',
-    BASEBALL: 'baseball',
-    BASKETBALL: 'basketball',
-    FOOTBALL: 'football',
-    RUBGY_LEAGUE: 'rugbyLeague',
-};
+import { SPORTS } from "@/config/sportConfig";
 
 export const COMPETITION_TYPES = {
     LEAGUE: 'league',
@@ -18,7 +12,7 @@ export const TIERS = {
 
 export const COMPETITIONS = {
     'nrl': {
-        sport: SPORTS.RUBGY_LEAGUE,
+        sport: SPORTS.rugbyLeague.key,
         code: 'nrl',
         name: 'NRL',
         type: COMPETITION_TYPES.LEAGUE,
@@ -30,7 +24,7 @@ export const COMPETITIONS = {
         },
     },
     'epl': {
-        sport: SPORTS.FOOTBALL,
+        sport: SPORTS.football.key,
         code: 'PL',
         name: 'Premier League',
         type: COMPETITION_TYPES.LEAGUE,
@@ -42,7 +36,7 @@ export const COMPETITIONS = {
         },
     },
     'champions-league': {
-        sport: SPORTS.FOOTBALL,
+        sport: SPORTS.football.key,
         code: 'CL',
         name: 'UEFA Champions League',
         type: COMPETITION_TYPES.CUP,
@@ -53,7 +47,7 @@ export const COMPETITIONS = {
         },
     },
     'primera-division': {
-        sport: SPORTS.FOOTBALL,
+        sport: SPORTS.football.key,
         code: 'PD',
         name: 'La Liga',
         type: COMPETITION_TYPES.LEAGUE,
@@ -64,7 +58,7 @@ export const COMPETITIONS = {
         },
     },
     'championship': {
-        sport: SPORTS.FOOTBALL,
+        sport: SPORTS.football.key,
         code: 'ELC',
         name: 'Championship',
         type: COMPETITION_TYPES.LEAGUE,
@@ -75,7 +69,7 @@ export const COMPETITIONS = {
         },
     },
     'serie-a': {
-        sport: SPORTS.FOOTBALL,
+        sport: SPORTS.football.key,
         code: 'SA',
         name: 'Serie A',
         type: COMPETITION_TYPES.LEAGUE,
@@ -86,7 +80,7 @@ export const COMPETITIONS = {
         },
     },
     'bundesliga': {
-        sport: SPORTS.FOOTBALL,
+        sport: SPORTS.football.key,
         code: 'BL1',
         name: 'Bundesliga',
         type: COMPETITION_TYPES.LEAGUE,
@@ -97,7 +91,7 @@ export const COMPETITIONS = {
         },
     },
     'ligue-1': {
-        sport: SPORTS.FOOTBALL,
+        sport: SPORTS.football.key,
         code: 'FL1',
         name: 'Ligue 1',
         type: COMPETITION_TYPES.LEAGUE,
@@ -108,7 +102,7 @@ export const COMPETITIONS = {
         },
     },
     'liga-portugal': {
-        sport: SPORTS.FOOTBALL,
+        sport: SPORTS.football.key,
         code: 'PPL',
         name: 'Primeira Liga',
         type: COMPETITION_TYPES.LEAGUE,
@@ -119,7 +113,7 @@ export const COMPETITIONS = {
         },
     },
     'eredivisie': {
-        sport: SPORTS.FOOTBALL,
+        sport: SPORTS.football.key,
         code: 'DED',
         name: 'Eredivise',
         type: COMPETITION_TYPES.LEAGUE,
@@ -130,7 +124,7 @@ export const COMPETITIONS = {
         },
     },
     'brasileirao': {
-        sport: SPORTS.FOOTBALL,
+        sport: SPORTS.football.key,
         code: 'BSA',
         name: 'Brasileiro Série A',
         type: COMPETITION_TYPES.LEAGUE,
@@ -141,7 +135,7 @@ export const COMPETITIONS = {
         },
     },
     'nba': {
-        sport: SPORTS.BASKETBALL,
+        sport: SPORTS.basketball.key,
         code: 'nba',
         name: 'NBA',
         type: COMPETITION_TYPES.LEAGUE,
@@ -153,7 +147,7 @@ export const COMPETITIONS = {
         }
     },
     'mlb': {
-        sport: SPORTS.BASEBALL,
+        sport: SPORTS.baseball.key,
         code: 'mlb',
         name: 'MLB',
         type: COMPETITION_TYPES.LEAGUE,
@@ -165,7 +159,7 @@ export const COMPETITIONS = {
         }
     },
     'nfl': {
-        sport: SPORTS.AMERICAN_FOOTBALL,
+        sport: SPORTS.americanFootball.key,
         code: 'nfl',
         name: 'NFL',
         type: COMPETITION_TYPES.LEAGUE,
