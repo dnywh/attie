@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation';
 import FixturesClient from "@/components/FixturesClient";
 import { COMPETITIONS } from '@/constants/competitions';
 
@@ -33,10 +34,20 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function CompetitionPage({ params }) {
+    const selectedCompetition = await params.competition;
+    // The dynamic generation of pages meanings that going to a non-existant slug will crash this React app once it tries to find its corresponding competition details
+    // We therefore should check if the passed path matches a competition before continuing
+    // Check if the page slug exists as a competition in COMPETITIONS
+    if (!COMPETITIONS[selectedCompetition]) {
+        console.log(`Invalid competition requested: ${selectedCompetition}`);
+        redirect('/');
+    }
+
+    // If we get here, the competition exists
     // Map competition URLs to actual sport and competition params
-    const selectedCompetition = {
-        competitions: [params.competition],// Just the key, nested in in an array since initialParams expects that format
-        sport: COMPETITIONS[params.competition].sport,
+    const selectedCompetitionParams = {
+        competitions: [selectedCompetition],// Just the key, nested in in an array since initialParams expects that format
+        sport: COMPETITIONS[selectedCompetition].sport,
         direction: false // Backwards by default
     }
 
@@ -45,5 +56,5 @@ export default async function CompetitionPage({ params }) {
     // FixturesHeader in shared layout
     // If passing custom props to header, uncomment and set props:
     // <FixturesHeader />
-    return <FixturesClient initialParams={selectedCompetition} />
+    return <FixturesClient initialParams={selectedCompetitionParams} />
 } 
