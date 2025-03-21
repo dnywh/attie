@@ -12,7 +12,7 @@ export const TIERS = {
 
 export const COMPETITIONS = {
     'nrl': {
-        sport: SPORTS.rugbyLeague.key,
+        sport: 'rugby-league',
         code: 'nrl',
         name: 'NRL',
         type: COMPETITION_TYPES.LEAGUE,
@@ -24,7 +24,7 @@ export const COMPETITIONS = {
         },
     },
     'epl': {
-        sport: SPORTS.football.key,
+        sport: 'football',
         code: 'PL',
         name: 'Premier League',
         type: COMPETITION_TYPES.LEAGUE,
@@ -36,7 +36,7 @@ export const COMPETITIONS = {
         },
     },
     'champions-league': {
-        sport: SPORTS.football.key,
+        sport: 'football',
         code: 'CL',
         name: 'UEFA Champions League',
         type: COMPETITION_TYPES.CUP,
@@ -47,7 +47,7 @@ export const COMPETITIONS = {
         },
     },
     'primera-division': {
-        sport: SPORTS.football.key,
+        sport: 'football',
         code: 'PD',
         name: 'La Liga',
         type: COMPETITION_TYPES.LEAGUE,
@@ -58,7 +58,7 @@ export const COMPETITIONS = {
         },
     },
     'championship': {
-        sport: SPORTS.football.key,
+        sport: 'football',
         code: 'ELC',
         name: 'Championship',
         type: COMPETITION_TYPES.LEAGUE,
@@ -69,7 +69,7 @@ export const COMPETITIONS = {
         },
     },
     'serie-a': {
-        sport: SPORTS.football.key,
+        sport: 'football',
         code: 'SA',
         name: 'Serie A',
         type: COMPETITION_TYPES.LEAGUE,
@@ -80,7 +80,7 @@ export const COMPETITIONS = {
         },
     },
     'bundesliga': {
-        sport: SPORTS.football.key,
+        sport: 'football',
         code: 'BL1',
         name: 'Bundesliga',
         type: COMPETITION_TYPES.LEAGUE,
@@ -91,7 +91,7 @@ export const COMPETITIONS = {
         },
     },
     'ligue-1': {
-        sport: SPORTS.football.key,
+        sport: 'football',
         code: 'FL1',
         name: 'Ligue 1',
         type: COMPETITION_TYPES.LEAGUE,
@@ -102,7 +102,7 @@ export const COMPETITIONS = {
         },
     },
     'liga-portugal': {
-        sport: SPORTS.football.key,
+        sport: 'football',
         code: 'PPL',
         name: 'Primeira Liga',
         type: COMPETITION_TYPES.LEAGUE,
@@ -113,7 +113,7 @@ export const COMPETITIONS = {
         },
     },
     'eredivisie': {
-        sport: SPORTS.football.key,
+        sport: 'football',
         code: 'DED',
         name: 'Eredivise',
         type: COMPETITION_TYPES.LEAGUE,
@@ -124,7 +124,7 @@ export const COMPETITIONS = {
         },
     },
     'brasileirao': {
-        sport: SPORTS.football.key,
+        sport: 'football',
         code: 'BSA',
         name: 'Brasileiro Série A',
         type: COMPETITION_TYPES.LEAGUE,
@@ -135,7 +135,7 @@ export const COMPETITIONS = {
         },
     },
     'nba': {
-        sport: SPORTS.basketball.key,
+        sport: 'basketball',
         code: 'nba',
         name: 'NBA',
         type: COMPETITION_TYPES.LEAGUE,
@@ -147,7 +147,7 @@ export const COMPETITIONS = {
         }
     },
     'mlb': {
-        sport: SPORTS.baseball.key,
+        sport: 'baseball',
         code: 'mlb',
         name: 'MLB',
         type: COMPETITION_TYPES.LEAGUE,
@@ -159,7 +159,7 @@ export const COMPETITIONS = {
         }
     },
     'nfl': {
-        sport: SPORTS.americanFootball.key,
+        sport: 'american-football',
         code: 'nfl',
         name: 'NFL',
         type: COMPETITION_TYPES.LEAGUE,

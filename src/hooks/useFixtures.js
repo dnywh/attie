@@ -59,7 +59,7 @@ export function useFixtures(initialParams) {
 
         // Get default competition for the new sport
         const defaultCompetition = Object.keys(COMPETITIONS).find(
-            (key) => COMPETITIONS[key].sport === newSport && COMPETITIONS[key].tier === 'free'
+            (key) => COMPETITIONS[key].sport === newSport && COMPETITIONS[key].defaultForSport
         );
 
         if (!defaultCompetition) {

@@ -6,30 +6,23 @@ import RugbyLeagueIcon from "@/components/RugbyLeagueIcon";
 
 export const SPORTS = {
     football: {
-        key: 'football',
         name: 'Football',
         icon: FootballIcon,
     },
     basketball: {
-        key: 'basketball',
         name: 'Basketball',
         icon: BasketballIcon,
-        scoreLabel: 'Points',
-        defaultView: 'quarters',
     },
     baseball: {
-        key: 'baseball',
         name: 'Baseball',
         icon: BaseballIcon,
     },
-    americanFootball: {
-        key: 'americanFootball',
+    'american-football': {
         name: 'American Football',
         icon: AmericanFootballIcon,
     },
-    rugbyLeague: {
-        key: 'rugbyLeague',
+    'rugby-league': {
         name: 'Rugby League',
-        icon: RugbyLeagueIcon,
+        icon: AmericanFootballIcon,
     },
 };

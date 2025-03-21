@@ -190,8 +190,8 @@ export default function FixturesClient({ initialParams }) {
                 value={selectedSport}
                 onChange={(e) => setSelectedSport(e.target.value)}
               >
-                {Object.values(SPORTS).map((sport) => (
-                  <option key={sport.key} value={sport.key}>
+                {Object.entries(SPORTS).map(([sportKey, sport]) => (
+                  <option key={sportKey} value={sportKey}>
                     {sport.name}
                   </option>
                 ))}
@@ -301,7 +301,6 @@ export default function FixturesClient({ initialParams }) {
             {Object.entries(
               groupFixturesByDate(
                 fixtures.filter((fixture) => {
-                  console.log({ fixture });
                   const fixtureDate = new Date(fixture.utcDate);
                   const now = new Date();
                   return showFutureFixtures
