@@ -1,3 +1,4 @@
+import { adaptAFLFixture } from '@/utils/adapters/aflAdapter';
 import { adaptNRLFixture } from '@/utils/adapters/nrlAdapter';
 import { adaptNFLFixture } from '@/utils/adapters/nflAdapter';
 import { adaptBaseballFixture } from '@/utils/adapters/baseballAdapter';
@@ -8,6 +9,8 @@ import { adaptFootballFixture } from '@/utils/adapters/footballAdapter';
 export const adaptFixture = (rawFixture, sport) => {
     // TODO switch competition, not sport (since adaptation is almost always competition-based)
     switch (sport) {
+        case 'aussie-rules':
+            return adaptAFLFixture(rawFixture);
         case 'football':
             return adaptFootballFixture(rawFixture);
         case 'basketball':

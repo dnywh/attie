@@ -173,6 +173,10 @@ export function useFixtures(initialParams) {
     // TODO: Shouldn't this be on the competitions.js file?
     const getApiConfig = (sport, competitionCode) => {
         const configs = {
+            'aussie-rules': {
+                baseUrl: `/api/aussie-rules/${competitionCode}`,
+                paginationType: 'page',
+            },
             'football': {
                 baseUrl: `/api/football/${competitionCode}`,
                 paginationType: 'page',

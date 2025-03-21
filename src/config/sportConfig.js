@@ -5,6 +5,10 @@ import AmericanFootballIcon from "@/components/AmericanFootballIcon";
 import RugbyLeagueIcon from "@/components/RugbyLeagueIcon";
 
 export const SPORTS = {
+    'aussie-rules': {
+        name: "Aussie Rules",
+        icon: AmericanFootballIcon,
+    },
     'football': {
         name: 'Football',
         icon: FootballIcon,

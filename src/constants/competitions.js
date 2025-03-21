@@ -12,6 +12,18 @@ export const TIERS = {
 
 // Use nice, literal, camel-case names for the keys as these are used for slugs on individually generated competition pages
 export const COMPETITIONS = {
+    'afl': {
+        sport: 'aussie-rules',
+        code: 'afl',
+        name: 'AFL',
+        type: COMPETITION_TYPES.LEAGUE,
+        tier: TIERS.FREE,
+        defaultForSport: true,
+        api: {
+            provider: 'espn',
+            endpoint: 'fooBar',
+        },
+    },
     'nrl': {
         sport: 'rugby-league',
         code: 'nrl',

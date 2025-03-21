@@ -5,7 +5,6 @@ const STATUS_MAP = {
 };
 
 export function adaptNRLFixture(fixture) {
-    console.log({ fixture })
     return {
         id: fixture.id.toString(),
         utcDate: fixture.date,
