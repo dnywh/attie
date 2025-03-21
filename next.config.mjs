@@ -21,6 +21,11 @@ const nextConfig = {
                 hostname: 'a1.espncdn.com', // NBA logos
                 port: '',
             },
+            {
+                protocol: 'https',
+                hostname: 'a.espncdn.com', // NRL logos
+                port: '',
+            },
         ],
     },
 };

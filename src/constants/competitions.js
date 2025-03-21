@@ -3,6 +3,7 @@ export const SPORTS = {
     BASEBALL: 'baseball',
     BASKETBALL: 'basketball',
     FOOTBALL: 'football',
+    RUBGY_LEAGUE: 'rugbyLeague',
 };
 
 export const COMPETITION_TYPES = {
@@ -16,7 +17,19 @@ export const TIERS = {
 };
 
 export const COMPETITIONS = {
-    'premier-league': {
+    'nrl': {
+        sport: SPORTS.RUBGY_LEAGUE,
+        code: 'nrl',
+        name: 'NRL',
+        type: COMPETITION_TYPES.LEAGUE,
+        tier: TIERS.FREE,
+        defaultForSport: true,
+        api: {
+            provider: 'espn',
+            endpoint: 'fooBar',
+        },
+    },
+    'epl': {
         sport: SPORTS.FOOTBALL,
         code: 'PL',
         name: 'Premier League',

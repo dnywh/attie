@@ -75,7 +75,7 @@ export default function FixturesClient({ initialParams }) {
   // Handle icon component for selected sport
   const getSportIcon = (sport) => {
     const SportIcon = SPORT_CONFIG[sport]?.icon;
-    return SportIcon ? <SportIcon /> : null;
+    return SportIcon ? <SportIcon /> : <RadioDotIcon />;
   };
 
   const selectedSportIcon = getSportIcon(selectedSport);
@@ -147,7 +147,7 @@ export default function FixturesClient({ initialParams }) {
       <Main>
         <ControlBar>
           <FancyDropdown
-            icon={<RadioDotIcon />} // Fallback icon on SSR. TODO: Make a proper sunburst logospin
+            icon={<RadioDotIcon />} // Fallback icon on SSR. TODO: Make a proper sunburst logospinner and/or placeholder sport icon
             label="Loading..."
             fillSpace={true}
           />

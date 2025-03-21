@@ -142,19 +142,24 @@ export function useFixtures(initialParams) {
                 }),
             );
 
+            console.log({ response })
+
             if (!response.ok) {
                 throw new Error(`API error: ${response.status}`);
             }
 
             const data = await response.json();
 
+            console.log({ data })
+
+            // Handle different API response structures
+            // E.g. ESPN uses data.events, football-data and ballislife use data.matches
+            const fixtureArray = data.matches || data.events || [];
+
             // Use the adapter pattern to standardize the data
-            const matches = data.matches.map(match =>
+            const matches = fixtureArray.map(match =>
                 adaptFixture(match, selectedSport)
             );
-
-            // Handle pagination metadata consistently
-            // handlePaginationMeta(data.meta); TODO: Re-enable pagination later
 
             fixturesCache.set(cacheKey, matches);
             return matches;
@@ -165,10 +170,15 @@ export function useFixtures(initialParams) {
     }, [dateWindow, showFutureFixtures, selectedSport, currentPage]);
 
     // Helper to get API configuration for each sport/competition
+    // TODO: Shouldn't this be on the competitions.js file?
     const getApiConfig = (sport, competitionCode) => {
         const configs = {
             football: {
                 baseUrl: `/api/football/${competitionCode}`,
+                paginationType: 'page',
+            },
+            rugbyLeague: {
+                baseUrl: `/api/rugby-league/${competitionCode}`,
                 paginationType: 'page',
             },
             basketball: {
