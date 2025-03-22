@@ -158,7 +158,7 @@ export function useFixtures(initialParams) {
 
             // Use the adapter pattern to standardize the data
             const matches = fixtureArray.map(match =>
-                adaptFixture(match, selectedSport)
+                adaptFixture(match, competitionCode, selectedSport)
             );
 
             fixturesCache.set(cacheKey, matches);
@@ -183,6 +183,10 @@ export function useFixtures(initialParams) {
             },
             'rugby-league': {
                 baseUrl: `/api/rugby-league/${competitionCode}`,
+                paginationType: 'page',
+            },
+            'rugby-union': {
+                baseUrl: `/api/rugby-union/${competitionCode}`,
                 paginationType: 'page',
             },
             'basketball': {

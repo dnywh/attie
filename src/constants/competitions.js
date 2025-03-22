@@ -182,7 +182,23 @@ export const COMPETITIONS = {
             provider: 'balldontlie',
             endpoint: 'nfl/v1/games',
         }
-    }
+    },
+    'super-rugby': {
+        sport: 'rugby-union',
+        name: 'Super Rugby',
+        code: 'super-rugby', // Looked up in const competitionCode = COMPETITIONS[competition].code; TODO, replace with key
+        type: COMPETITION_TYPES.LEAGUE,
+        tier: TIERS.FREE,
+        defaultForSport: true,
+    },
+    'united-rugby-championship': {
+        sport: 'rugby-union',
+        name: 'United Rugby Championship',
+        code: 'united-rugby-championship',
+        type: COMPETITION_TYPES.LEAGUE,
+        tier: TIERS.FREE,
+        defaultForSport: true,
+    },
 };
 
 // Helper functions

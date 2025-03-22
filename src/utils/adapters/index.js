@@ -1,3 +1,4 @@
+import { adaptESPNFixture } from '@/utils/adapters/espnAdapter';
 import { adaptAFLFixture } from '@/utils/adapters/aflAdapter';
 import { adaptNRLFixture } from '@/utils/adapters/nrlAdapter';
 import { adaptNFLFixture } from '@/utils/adapters/nflAdapter';
@@ -6,7 +7,7 @@ import { adaptBasketballFixture } from '@/utils/adapters/basketballAdapter';
 import { adaptFootballFixture } from '@/utils/adapters/footballAdapter';
 
 // Create a common fixture interface that all sports will conform to
-export const adaptFixture = (rawFixture, sport) => {
+export const adaptFixture = (rawFixture, competitionCode, sport) => {
     // TODO switch competition, not sport (since adaptation is almost always competition-based)
     switch (sport) {
         case 'aussie-rules':
@@ -21,6 +22,8 @@ export const adaptFixture = (rawFixture, sport) => {
             return adaptNFLFixture(rawFixture);
         case 'rugby-league':
             return adaptNRLFixture(rawFixture);
+        case 'rugby-union':
+            return adaptESPNFixture(rawFixture, competitionCode);
         default:
             throw new Error(`Sport ${sport} not supported`);
     }

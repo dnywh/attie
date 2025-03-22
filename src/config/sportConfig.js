@@ -29,4 +29,8 @@ export const SPORTS = {
         name: 'Rugby League',
         icon: AmericanFootballIcon,
     },
+    'rugby-union': {
+        name: 'Rugby Union',
+        icon: AmericanFootballIcon,
+    },
 };
