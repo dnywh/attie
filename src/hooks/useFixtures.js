@@ -1,7 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { COMPETITIONS } from "@/constants/competitions";
 import { DEFAULT_WINDOWS } from '@/utils/config/windows';
-import { fixturesCache, CACHE_CONFIG } from '@/utils/cache';
 import { sortFixtures } from '@/utils/dates';
 import { adaptFixture } from '@/utils/adapters';
 import { DEFAULTS } from "@/constants/defaults";
@@ -100,7 +99,6 @@ export function useFixtures(initialParams) {
 
         setSelectedSport(newSport);
         setSelectedCompetitions([defaultCompetition]);
-        fixturesCache.clear();
         setFixtures([]);
         setNextCursor(null);
         setCurrentPage(1);
@@ -109,7 +107,6 @@ export function useFixtures(initialParams) {
 
     // Replace direct setSelectedSport usage with handleSportChange
     useEffect(() => {
-        console.log("[Sport Change] Clearing fixtures and cache");
         loadInitialFixtures();
     }, [selectedSport]);
 
@@ -118,22 +115,6 @@ export function useFixtures(initialParams) {
         if (!competition) {
             throw new Error(`Competition ${competitionKey} not found`);
         }
-
-        const now = Date.now();
-        const cacheKey = `${competitionKey}-${customDateWindow?.start || dateWindow.start
-            }-${customDateWindow?.end || dateWindow.end}-${showFutureFixtures}`;
-
-        // Clear cache when switching directions
-        const cachedDirection = fixturesCache.get(CACHE_CONFIG.DIRECTION_KEY);
-        if (showFutureFixtures !== cachedDirection) {
-            console.log("[Fetch] Direction changed, clearing cache");
-            fixturesCache.clear();
-            fixturesCache.set(CACHE_CONFIG.DIRECTION_KEY, showFutureFixtures);
-        }
-
-        // Check cache first
-        const cached = fixturesCache.get(cacheKey);
-        if (cached) return cached;
 
         // Calculate date range
         const currentDate = new Date();
@@ -197,13 +178,12 @@ export function useFixtures(initialParams) {
                 return adaptFixture(match, competitionKey, selectedSport);
             });
 
-            fixturesCache.set(cacheKey, matches);
             return matches;
         } catch (error) {
             console.error(`[Fetch] Error:`, error);
             throw error;
         }
-    }, [dateWindow, showFutureFixtures, currentPage]);
+    }, [dateWindow, showFutureFixtures, currentPage, selectedSport]);
 
     const loadInitialFixtures = useCallback(async () => {
         setLoading(true);
@@ -254,6 +234,7 @@ export function useFixtures(initialParams) {
         try {
             if (selectedCompetitions.includes(competitionKey)) {
                 // Remove competition
+                console.log(`[Competition Change] Removing ${competitionKey}`);
                 setSelectedCompetitions((prev) =>
                     prev.filter((l) => l !== competitionKey)
                 );
@@ -262,6 +243,7 @@ export function useFixtures(initialParams) {
                 );
             } else {
                 // Add competition
+                console.log(`[Competition Change] Adding ${competitionKey}`);
                 setSelectedCompetitions((prev) => [...prev, competitionKey]);
 
                 // Get new matches
