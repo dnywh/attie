@@ -11,19 +11,21 @@ const blink = keyframes({
   },
 });
 
-const LiveStatus = styled(RegularStatus)({
-  color: "red",
+const LiveStatus = styled(RegularStatus)(({ theme }) => ({
+  color: theme.colors.text.live,
   display: "flex",
-  gap: "0.1rem",
   alignItems: "center",
+  gap: "0.35rem",
   "&::before": {
-    content: "'•'",
-    fontSize: "2rem",
-    // lineHeight: "100%",
+    content: "''",
+    width: "0.5rem",
+    height: "0.5rem",
+    backgroundColor: theme.colors.text.live,
+    borderRadius: "50%",
     display: "inline-block",
     animation: `${blink} 1s infinite alternate`,
   },
-});
+}));
 
 function FixtureStatus({ fixture }) {
   // https://docs.football-data.org/general/v4/match.html#_status_workflow_explained

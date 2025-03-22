@@ -54,6 +54,7 @@ export default withPigment(nextConfig, {
             text: {
                 primary: "#000000",
                 tertiary: "rgb(128, 128, 128)", // TBD team names
+                live: "red",
             },
             shadow: "rgba(0,0,0,0.1)"
         }
