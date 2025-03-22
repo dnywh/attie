@@ -1,6 +1,6 @@
 import { COMPETITIONS } from '@/constants/competitions';
-import { adaptESPNFixture } from '@/utils/adapters/ESPNAdapter';
-import { adaptFootballDataFixture } from '@/utils/adapters/footballDataAdapter'; // renamed from adaptFDFixture
+import { adaptESPNFixture } from '@/utils/adapters/espnAdapter';
+import { adaptFootballDataFixture } from '@/utils/adapters/footballDataAdapter';
 import { adaptNBAFixture } from '@/utils/adapters/nbaAdapter';
 import { adaptMLBFixture } from '@/utils/adapters/mlbAdapter';
 import { adaptNFLFixture } from '@/utils/adapters/nflAdapter';
