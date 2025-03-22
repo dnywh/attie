@@ -62,8 +62,8 @@ export const COMPETITIONS = {
         tier: TIERS.FREE,
         api: {
             adapter: 'espn',
-            sport: 'football', // TODO
-            league: '3', // TODO
+            sport: 'soccer',
+            league: 'UEFA.EUROPA',
         },
     },
     'la-liga': {
@@ -128,7 +128,7 @@ export const COMPETITIONS = {
     },
     'eredivisie': {
         sport: 'football',
-        name: 'Eredivise',
+        name: 'Eredivisie',
         type: COMPETITION_TYPES.LEAGUE,
         tier: TIERS.FREE,
         api: {
@@ -156,6 +156,42 @@ export const COMPETITIONS = {
             adapter: 'balldontlie-nba',
         },
     },
+    'wnba': {
+        sport: 'basketball',
+        name: 'WNBA',
+        type: COMPETITION_TYPES.LEAGUE,
+        tier: TIERS.FREE,
+        api: {
+            adapter: 'espn',
+            sport: 'basketball',
+            league: 'wnba',
+        },
+    },
+    'college-basketball-men': {
+        sport: 'basketball',
+        name: 'NCAAM College Basketball',
+        type: COMPETITION_TYPES.LEAGUE,
+        tier: TIERS.FREE,
+        api: {
+            adapter: 'espn',
+            sport: 'basketball',
+            league: 'mens-college-basketball',
+            groups: 100, // Required for college basketball, 100 or 50
+        },
+    },
+    'college-basketball-women': {
+        sport: 'basketball',
+        name: 'NCAAW College Basketball',
+        type: COMPETITION_TYPES.LEAGUE,
+        tier: TIERS.FREE,
+        api: {
+            adapter: 'espn',
+            sport: 'basketball',
+            league: 'womens-college-basketball',
+            groups: 100, // Required for college basketball, 100 or 50
+        },
+    },
+
     'mlb': {
         sport: 'baseball',
         name: 'MLB',
@@ -166,6 +202,17 @@ export const COMPETITIONS = {
             adapter: 'balldontlie-mlb',
         },
     },
+    'college-baseball': {
+        sport: 'baseball',
+        name: 'NCAA College Baseball',
+        type: COMPETITION_TYPES.LEAGUE,
+        tier: TIERS.FREE,
+        api: {
+            adapter: 'espn',
+            sport: 'baseball',
+            league: 'college-baseball',
+        },
+    },
     'nfl': {
         sport: 'american-football',
         name: 'NFL',
@@ -174,6 +221,17 @@ export const COMPETITIONS = {
         defaultForSport: true,
         api: {
             adapter: 'balldontlie-nfl',
+        },
+    },
+    'college-football': {
+        sport: 'american-football',
+        name: 'NCAA College Football',
+        type: COMPETITION_TYPES.LEAGUE,
+        tier: TIERS.FREE,
+        api: {
+            adapter: 'espn',
+            sport: 'football',
+            league: 'college-football',
         },
     },
     'super-rugby': {

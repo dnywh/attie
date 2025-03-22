@@ -37,6 +37,8 @@ const buildApiUrl = (competition, params) => {
         // espn expects a sport and league in their format
         queryParams.set('sport', competition.api.sport);
         queryParams.set('league', competition.api.league);
+        competition.api.groups && queryParams.set('groups', competition.api.groups);
+        competition.api.limit && queryParams.set('limit', competition.api.limit);
     }
 
     // else {

@@ -24,7 +24,7 @@ export const adaptFootballDataFixture = (rawFixture, competition) => {
         id: rawFixture.id,
         utcDate: rawFixture.utcDate,
         localDate: rawFixture.localDate,
-        status: rawFixture.status,
+        status: STATUS_MAP[rawFixture.status] || rawFixture.status,
         competition: {
             // id: competition.api.code,
             name: competition.name,

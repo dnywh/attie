@@ -1,6 +1,7 @@
 const STATUS_MAP = {
     'STATUS_FINAL': 'FINISHED',
     'STATUS_SCHEDULED': 'SCHEDULED',
+    'STATUS_IN_PROGRESS': 'IN_PLAY'
 };
 
 export const adaptESPNFixture = (rawFixture, competition) => {

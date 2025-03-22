@@ -5,6 +5,9 @@ const API_BASE_URL = 'https://site.api.espn.com/apis/site/v2/sports';
 // https://site.api.espn.com/apis/site/v2/sports/rugby/242041/scoreboard // Super Rugby
 // https://site.api.espn.com/apis/site/v2/sports/australian-football/afl/scoreboard // AFL
 // https://site.api.espn.com/apis/site/v2/sports/rugby-league/3/scoreboard // NRL
+// https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard
+// https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard
+// http://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/scoreboard
 
 export async function GET(request) {
     const { searchParams } = new URL(request.url);
@@ -16,6 +19,8 @@ export async function GET(request) {
     // Specific to ESPN
     const sport = searchParams.get('sport');
     const league = searchParams.get('league');
+    const groups = searchParams.get('groups'); // Required for college basketball, both mens and womens
+    const limit = searchParams.get('limit'); // Optional
 
     if (!dateFrom || !dateTo) {
         return NextResponse.json(
@@ -27,10 +32,10 @@ export async function GET(request) {
     console.log(`[ESPN API] Getting ${direction} games for ${sport}, ${league}`);
     console.log(`[ESPN API] Date range: ${dateFrom} to ${dateTo}`);
 
+    const apiUrl = `${API_BASE_URL}/${sport}/${league}/scoreboard?dates=${dateFrom}-${dateTo}${groups ? `&groups=${groups}` : ''}&limit=${limit ? limit : 500}`
+
     try {
-        const response = await fetch(
-            `${API_BASE_URL}/${sport}/${league}/scoreboard?dates=${dateFrom}-${dateTo}`
-        );
+        const response = await fetch(apiUrl);
 
         // Handle different response scenarios
         if (!response.ok) {
