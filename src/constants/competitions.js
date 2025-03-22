@@ -1,5 +1,3 @@
-import { SPORTS } from "@/config/sportConfig";
-
 export const COMPETITION_TYPES = {
     LEAGUE: 'league',
     CUP: 'cup',
@@ -20,8 +18,7 @@ export const COMPETITIONS = {
         tier: TIERS.FREE,
         defaultForSport: true,
         api: {
-            provider: 'espn',
-            endpoint: 'fooBar',
+            adapter: 'espn-alpha',
         },
     },
     'nrl': {
@@ -32,8 +29,7 @@ export const COMPETITIONS = {
         tier: TIERS.FREE,
         defaultForSport: true,
         api: {
-            provider: 'espn',
-            endpoint: 'fooBar',
+            adapter: 'espn-alpha',
         },
     },
     'premier-league': {
@@ -44,8 +40,7 @@ export const COMPETITIONS = {
         tier: TIERS.FREE,
         defaultForSport: true,
         api: {
-            provider: 'football-data',
-            endpoint: '/v4/competitions/PL/matches',
+            adapter: 'football-data',
         },
     },
     'champions-league': {
@@ -55,8 +50,7 @@ export const COMPETITIONS = {
         type: COMPETITION_TYPES.CUP,
         tier: TIERS.FREE,
         api: {
-            provider: 'football-data',
-            endpoint: '/v4/competitions/CL/matches',
+            adapter: 'football-data',
         },
     },
     'la-liga': {
@@ -66,8 +60,7 @@ export const COMPETITIONS = {
         type: COMPETITION_TYPES.LEAGUE,
         tier: TIERS.FREE,
         api: {
-            provider: 'football-data',
-            endpoint: '/v4/competitions/CL/matches',
+            adapter: 'football-data',
         },
     },
     'championship': {
@@ -77,8 +70,7 @@ export const COMPETITIONS = {
         type: COMPETITION_TYPES.LEAGUE,
         tier: TIERS.FREE,
         api: {
-            provider: 'football-data',
-            endpoint: '/v4/competitions/CL/matches',
+            adapter: 'football-data',
         },
     },
     'serie-a': {
@@ -88,8 +80,7 @@ export const COMPETITIONS = {
         type: COMPETITION_TYPES.LEAGUE,
         tier: TIERS.FREE,
         api: {
-            provider: 'football-data',
-            endpoint: '/v4/competitions/CL/matches',
+            adapter: 'football-data',
         },
     },
     'bundesliga': {
@@ -99,8 +90,7 @@ export const COMPETITIONS = {
         type: COMPETITION_TYPES.LEAGUE,
         tier: TIERS.FREE,
         api: {
-            provider: 'football-data',
-            endpoint: '/v4/competitions/CL/matches',
+            adapter: 'football-data',
         },
     },
     'ligue-1': {
@@ -110,8 +100,7 @@ export const COMPETITIONS = {
         type: COMPETITION_TYPES.LEAGUE,
         tier: TIERS.FREE,
         api: {
-            provider: 'football-data',
-            endpoint: '/v4/competitions/CL/matches',
+            adapter: 'football-data',
         },
     },
     'liga-portugal': {
@@ -121,8 +110,7 @@ export const COMPETITIONS = {
         type: COMPETITION_TYPES.LEAGUE,
         tier: TIERS.FREE,
         api: {
-            provider: 'football-data',
-            endpoint: '/v4/competitions/CL/matches',
+            adapter: 'football-data',
         },
     },
     'eredivisie': {
@@ -132,8 +120,7 @@ export const COMPETITIONS = {
         type: COMPETITION_TYPES.LEAGUE,
         tier: TIERS.FREE,
         api: {
-            provider: 'football-data',
-            endpoint: '/v4/competitions/CL/matches',
+            adapter: 'football-data',
         },
     },
     'brasileirao': {
@@ -143,8 +130,7 @@ export const COMPETITIONS = {
         type: COMPETITION_TYPES.LEAGUE,
         tier: TIERS.FREE,
         api: {
-            provider: 'football-data',
-            endpoint: '/v4/competitions/CL/matches',
+            adapter: 'football-data',
         },
     },
     'nba': {
@@ -155,9 +141,8 @@ export const COMPETITIONS = {
         tier: TIERS.FREE,
         defaultForSport: true,
         api: {
-            provider: 'balldontlie',
-            endpoint: '/v1/games',
-        }
+            adapter: 'balldontlie-nba',
+        },
     },
     'mlb': {
         sport: 'baseball',
@@ -167,9 +152,8 @@ export const COMPETITIONS = {
         tier: TIERS.FREE,
         defaultForSport: true,
         api: {
-            provider: 'balldontlie',
-            endpoint: 'mlb/v1/games',
-        }
+            adapter: 'balldontlie-mlb',
+        },
     },
     'nfl': {
         sport: 'american-football',
@@ -179,9 +163,8 @@ export const COMPETITIONS = {
         tier: TIERS.FREE,
         defaultForSport: true,
         api: {
-            provider: 'balldontlie',
-            endpoint: 'nfl/v1/games',
-        }
+            adapter: 'balldontlie-nfl',
+        },
     },
     'super-rugby': {
         sport: 'rugby-union',
@@ -190,6 +173,9 @@ export const COMPETITIONS = {
         type: COMPETITION_TYPES.LEAGUE,
         tier: TIERS.FREE,
         defaultForSport: true,
+        api: {
+            adapter: 'espn-alpha',
+        },
     },
     'united-rugby-championship': {
         sport: 'rugby-union',
@@ -197,6 +183,9 @@ export const COMPETITIONS = {
         code: 'united-rugby-championship',
         type: COMPETITION_TYPES.LEAGUE,
         tier: TIERS.FREE,
+        api: {
+            adapter: 'espn-alpha',
+        },
     },
 };
 

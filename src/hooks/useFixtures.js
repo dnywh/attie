@@ -153,7 +153,7 @@ export function useFixtures(initialParams) {
             console.log({ data })
 
             // Handle different API response structures
-            // E.g. ESPN uses data.events, football-data and ballislife use data.matches
+            // E.g. ESPN's API uses `data.events`, other APIs like football-data and ballislife use `data.matches`
             const fixtureArray = data.matches || data.events || [];
 
             // Use the adapter pattern to standardize the data

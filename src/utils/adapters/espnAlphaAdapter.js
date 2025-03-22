@@ -4,7 +4,7 @@ const STATUS_MAP = {
     'STATUS_SCHEDULED': 'SCHEDULED',
 };
 
-export function adaptESPNFixture(fixture, competitionCode) {
+export function adaptESPNAlphaFixture(fixture, competitionCode) {
     return {
         id: fixture.id.toString(),
         utcDate: fixture.date,

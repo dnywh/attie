@@ -9,7 +9,7 @@ const STATUS_MAP = {
     // 'In Progress': 'IN_PLAY',
 };
 
-export function adaptBasketballFixture(fixture) {
+export function adaptNBAFixture(fixture) {
     return {
         id: fixture.id.toString(),
         utcDate: fixture.datetime,

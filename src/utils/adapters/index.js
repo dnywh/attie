@@ -1,30 +1,34 @@
-import { adaptESPNFixture } from '@/utils/adapters/espnAdapter';
+import { COMPETITIONS } from '@/constants/competitions';
+import { adaptESPNAlphaFixture } from '@/utils/adapters/espnAlphaAdapter';
+import { adaptFootballDataFixture } from '@/utils/adapters/footballDataAdapter'; // renamed from adaptFDFixture
+import { adaptNBAFixture } from '@/utils/adapters/nbaAdapter';
+import { adaptMLBFixture } from '@/utils/adapters/mlbAdapter';
 import { adaptNFLFixture } from '@/utils/adapters/nflAdapter';
-import { adaptBaseballFixture } from '@/utils/adapters/baseballAdapter';
-import { adaptBasketballFixture } from '@/utils/adapters/basketballAdapter';
-import { adaptFootballFixture } from '@/utils/adapters/footballAdapter';
 
-// Create a common fixture interface that all sports will conform to
-export const adaptFixture = (rawFixture, competitionCode, sport) => {
-    // TODO switch competition, not sport (since adaptation is almost always competition-based)
-    switch (sport) {
-        case 'aussie-rules':
-            return adaptESPNFixture(rawFixture, competitionCode);
-        case 'football':
-            return adaptFootballFixture(rawFixture);
-        case 'basketball':
-            return adaptBasketballFixture(rawFixture);
-        case 'baseball':
-            return adaptBaseballFixture(rawFixture);
-        case 'american-football': // TODO for all others: case 'nfl', i.e. competition, since the adaptation is competition-based, not sport-based
-            return adaptNFLFixture(rawFixture);
-        case 'rugby-league':
-            return adaptESPNFixture(rawFixture, competitionCode);
-        case 'rugby-union':
-            return adaptESPNFixture(rawFixture, competitionCode);
-        default:
-            throw new Error(`Sport ${sport} not supported`);
+const ADAPTERS = {
+    'espn-alpha': adaptESPNAlphaFixture, // Specific to head-to-head formats like football, rugby, basketball
+    'football-data': adaptFootballDataFixture,
+    'balldontlie-nba': adaptNBAFixture,
+    'balldontlie-mlb': adaptMLBFixture,
+    'balldontlie-nfl': adaptNFLFixture,
+};
+
+export const adaptFixture = (rawFixture, competitionCode) => {
+    const competition = Object.entries(COMPETITIONS)
+        .find(([_, comp]) => comp.code === competitionCode)?.[1];
+
+    if (!competition) {
+        throw new Error(`Competition with code ${competitionCode} not found`);
     }
+
+    const adapter = ADAPTERS[competition.api.adapter];
+
+    if (!adapter) {
+        throw new Error(`Adapter ${competition.api.adapter} not found`);
+    }
+
+    console.log(`Using ${competition.api.adapter} adapter for ${competitionCode}`);
+    return adapter(rawFixture, competitionCode);
 };
 
 // Each sport adapter should return this common structure

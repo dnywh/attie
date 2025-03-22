@@ -3,7 +3,7 @@ const STATUS_MAP = {
     // Anything that I don't have mapped will just come through raw, as indicated below
 };
 
-export function adaptBaseballFixture(fixture) {
+export function adaptMLBFixture(fixture) {
     return {
         id: fixture.id.toString(),
         utcDate: fixture.date,
