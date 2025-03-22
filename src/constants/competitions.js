@@ -197,7 +197,6 @@ export const COMPETITIONS = {
         code: 'united-rugby-championship',
         type: COMPETITION_TYPES.LEAGUE,
         tier: TIERS.FREE,
-        defaultForSport: true,
     },
 };
 

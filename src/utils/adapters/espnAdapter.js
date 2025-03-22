@@ -14,8 +14,8 @@ export function adaptESPNFixture(fixture, competitionCode) {
             type: 'LEAGUE' // Why is this necessary?
         },
         homeTeam: {
-            name: fixture.competitions[0].competitors[0].team.name, // St Kilda
-            shortName: fixture.competitions[0].competitors[0].team.shortDisplayName, // St Kilda
+            name: fixture.competitions[0].competitors[0].team.name,
+            shortName: fixture.competitions[0].competitors[0].team.shortDisplayName,
             crest: fixture.competitions[0].competitors[0].team.logo
         },
         awayTeam: {

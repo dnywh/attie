@@ -1,6 +1,4 @@
 import { adaptESPNFixture } from '@/utils/adapters/espnAdapter';
-import { adaptAFLFixture } from '@/utils/adapters/aflAdapter';
-import { adaptNRLFixture } from '@/utils/adapters/nrlAdapter';
 import { adaptNFLFixture } from '@/utils/adapters/nflAdapter';
 import { adaptBaseballFixture } from '@/utils/adapters/baseballAdapter';
 import { adaptBasketballFixture } from '@/utils/adapters/basketballAdapter';
@@ -11,7 +9,7 @@ export const adaptFixture = (rawFixture, competitionCode, sport) => {
     // TODO switch competition, not sport (since adaptation is almost always competition-based)
     switch (sport) {
         case 'aussie-rules':
-            return adaptAFLFixture(rawFixture);
+            return adaptESPNFixture(rawFixture, competitionCode);
         case 'football':
             return adaptFootballFixture(rawFixture);
         case 'basketball':
@@ -21,7 +19,7 @@ export const adaptFixture = (rawFixture, competitionCode, sport) => {
         case 'american-football': // TODO for all others: case 'nfl', i.e. competition, since the adaptation is competition-based, not sport-based
             return adaptNFLFixture(rawFixture);
         case 'rugby-league':
-            return adaptNRLFixture(rawFixture);
+            return adaptESPNFixture(rawFixture, competitionCode);
         case 'rugby-union':
             return adaptESPNFixture(rawFixture, competitionCode);
         default:
