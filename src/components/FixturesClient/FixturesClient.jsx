@@ -163,6 +163,7 @@ export default function FixturesClient({ initialParams }) {
     );
   }
 
+  console.log("LENGTH", selectedCompetitions.length);
   // Then, on client, re-render with dynamic content once available
   return (
     <Main>
@@ -321,6 +322,9 @@ export default function FixturesClient({ initialParams }) {
                         fixture={fixture}
                         showAllScores={showAllScores}
                         useSoundEffects={useSoundEffects}
+                        showCompetition={
+                          selectedCompetitions.length > 1 ? true : false
+                        }
                       />
                     ))}
                   </DateFixturesList>
@@ -332,7 +336,11 @@ export default function FixturesClient({ initialParams }) {
                   >
                     <p>
                       Attie is lovingly crafted by one-man-band,{" "}
-                      <Link href="https://www.dannywhite.net/" target="_blank">
+                      {/* TODO: Use (i.e. automate) same link params as in Interstitial component footer */}
+                      <Link
+                        href="https://www.dannywhite.net/?ref=attie&utm_medium=sponsorship"
+                        target="_blank"
+                      >
                         Danny White
                       </Link>
                       . Got an idea that needs making? Get Danny involved.

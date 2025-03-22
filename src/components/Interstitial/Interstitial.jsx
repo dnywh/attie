@@ -69,7 +69,10 @@ function Interstitial({
         <h2>{intro}</h2>
         <Inner>{children}</Inner>
         {linkUrl && (
-          <Link href={linkUrl} target="_blank">
+          <Link
+            href={`${linkUrl}?ref=attie&utm_medium=sponsorship`}
+            target="_blank"
+          >
             {linkText ? linkText : "Learn more"}
           </Link>
         )}

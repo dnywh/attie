@@ -26,6 +26,7 @@ export async function generateMetadata({ params }) {
     // Get local sport name so it flows more nicely
     const localSportName = SPORTS[selectedCompetition.sport].localName ? SPORTS[selectedCompetition.sport].localName : SPORTS[selectedCompetition.sport].name
 
+    // TODO: This doesn't change if the user changes sports/competitions, is that okay?
     return {
         title: `Attie: ${selectedCompetition.name} results without the scores`,
         description: `See who played ${localSportName.toLowerCase()} overnight without spoiling the results. Attie shows recent ${selectedCompetition.name} games with scores hidden by default.`,

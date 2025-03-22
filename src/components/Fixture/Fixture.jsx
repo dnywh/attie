@@ -78,7 +78,7 @@ const OpponentsList = styled("ul")(({ theme }) => ({
   boxShadow: "0.5px 1.5px 0 0 white",
 }));
 
-function Fixture({ fixture, showAllScores, useSoundEffects }) {
+function Fixture({ fixture, showAllScores, useSoundEffects, showCompetition }) {
   const formattedDate = new Date(fixture.utcDate).toLocaleDateString(
     "default",
     {
@@ -116,15 +116,17 @@ function Fixture({ fixture, showAllScores, useSoundEffects }) {
         />
       </OpponentsList>
 
-      <CompetitionName>
-        {fixture.competition.name}{" "}
-        {fixture.competition.type === "CUP" && fixture.group
-          ? `· ${fixture.group}`
-          : null}{" "}
-        {fixture.competition.type === "CUP" && fixture.stage
-          ? `· ${fixture.stage}`
-          : null}
-      </CompetitionName>
+      {showCompetition && (
+        <CompetitionName>
+          {fixture.competition.name}{" "}
+          {fixture.competition.type === "CUP" && fixture.group
+            ? `· ${fixture.group}`
+            : null}{" "}
+          {fixture.competition.type === "CUP" && fixture.stage
+            ? `· ${fixture.stage}`
+            : null}
+        </CompetitionName>
+      )}
     </FixtureRow>
   );
 }

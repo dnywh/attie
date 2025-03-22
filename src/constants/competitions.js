@@ -169,19 +169,19 @@ export const COMPETITIONS = {
     },
     'college-basketball-men': {
         sport: 'basketball',
-        name: 'NCAAM College Basketball',
+        name: 'NCAAM college basketball',
         type: COMPETITION_TYPES.LEAGUE,
         tier: TIERS.FREE,
         api: {
             adapter: 'espn',
             sport: 'basketball',
             league: 'mens-college-basketball',
-            groups: 100, // Required for college basketball, 100 or 50
+            groups: 100, // Required for college basketball, 100 for all, or 80 for each D1 conference/divisions
         },
     },
     'college-basketball-women': {
         sport: 'basketball',
-        name: 'NCAAW College Basketball',
+        name: 'NCAAW college basketball',
         type: COMPETITION_TYPES.LEAGUE,
         tier: TIERS.FREE,
         api: {
@@ -204,7 +204,7 @@ export const COMPETITIONS = {
     },
     'college-baseball': {
         sport: 'baseball',
-        name: 'NCAA College Baseball',
+        name: 'NCAA college baseball',
         type: COMPETITION_TYPES.LEAGUE,
         tier: TIERS.FREE,
         api: {
@@ -225,7 +225,7 @@ export const COMPETITIONS = {
     },
     'college-football': {
         sport: 'american-football',
-        name: 'NCAA College Football',
+        name: 'NCAA college football',
         type: COMPETITION_TYPES.LEAGUE,
         tier: TIERS.FREE,
         api: {
