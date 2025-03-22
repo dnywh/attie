@@ -9,30 +9,30 @@ const STATUS_MAP = {
     // 'In Progress': 'IN_PLAY',
 };
 
-export function adaptNBAFixture(fixture) {
+export const adaptNBAFixture = (rawFixture, competition) => {
     return {
-        id: fixture.id.toString(),
-        utcDate: fixture.datetime,
-        localDate: fixture.date,
-        status: STATUS_MAP[fixture.status] || fixture.status,
+        id: rawFixture.id.toString(),
+        utcDate: rawFixture.datetime,
+        localDate: rawFixture.date,
+        status: STATUS_MAP[rawFixture.status] || rawFixture.status,
         competition: {
-            name: 'NBA',
-            type: 'LEAGUE'
+            name: competition.name,
+            type: competition.type,
         },
         homeTeam: {
-            name: fixture.home_team.full_name, // Philadelphia 76ers
-            shortName: fixture.home_team.name, // 76ers
-            crest: `https://interstate21.com/nba-logos/${fixture.home_team.abbreviation}.png`, // PHI
+            name: rawFixture.home_team.full_name, // Philadelphia 76ers
+            shortName: rawFixture.home_team.name, // 76ers
+            crest: `https://interstate21.com/nba-logos/${rawFixture.home_team.abbreviation}.png`, // PHI
         },
         awayTeam: {
-            name: fixture.visitor_team.full_name,
-            shortName: fixture.visitor_team.name,
-            crest: `https://interstate21.com/nba-logos/${fixture.visitor_team.abbreviation}.png`,
+            name: rawFixture.visitor_team.full_name,
+            shortName: rawFixture.visitor_team.name,
+            crest: `https://interstate21.com/nba-logos/${rawFixture.visitor_team.abbreviation}.png`,
         },
         score: {
             fullTime: {
-                home: fixture.home_team_score,
-                away: fixture.visitor_team_score
+                home: rawFixture.home_team_score,
+                away: rawFixture.visitor_team_score
             }
         }
     };

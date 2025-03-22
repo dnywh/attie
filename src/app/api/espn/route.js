@@ -1,23 +1,21 @@
 import { NextResponse } from 'next/server';
-import { APP_CONFIG } from '@/constants/config';
 
-const API_BASE_URL = 'https://api.football-data.org/v4';
+const API_BASE_URL = 'https://site.api.espn.com/apis/site/v2/sports';
+// https://site.api.espn.com/apis/site/v2/sports/rugby/270557/scoreboard // United Rugby CHampionship
+// https://site.api.espn.com/apis/site/v2/sports/rugby/242041/scoreboard // Super Rugby
+// https://site.api.espn.com/apis/site/v2/sports/australian-football/afl/scoreboard // AFL
+// https://site.api.espn.com/apis/site/v2/sports/rugby-league/3/scoreboard // NRL
 
-/**
- * Formats a date as YYYY-MM-DD for the API
- */
-function formatDateForApi(date) {
-    return date.toISOString().split('T')[0];
-}
-
-export async function GET(request, { params }) {
-    const { competition: competitionCode } = await params;
+export async function GET(request) {
     const { searchParams } = new URL(request.url);
 
     // Get required parameters
-    const dateFrom = searchParams.get('dateFrom');
-    const dateTo = searchParams.get('dateTo');
+    const dateFrom = searchParams.get('dateFrom').replace(/-/g, "");
+    const dateTo = searchParams.get('dateTo').replace(/-/g, "");
     const direction = searchParams.get('direction');
+    // Specific to ESPN
+    const sport = searchParams.get('sport');
+    const league = searchParams.get('league');
 
     if (!dateFrom || !dateTo) {
         return NextResponse.json(
@@ -26,24 +24,18 @@ export async function GET(request, { params }) {
         );
     }
 
-    console.log(`[API] Getting ${direction} games for ${competitionCode}`);
-    console.log(`[API] Date range: ${dateFrom} to ${dateTo}`);
+    console.log(`[ESPN API] Getting ${direction} games for ${sport}, ${league}`);
+    console.log(`[ESPN API] Date range: ${dateFrom} to ${dateTo}`);
 
     try {
         const response = await fetch(
-            `${API_BASE_URL}/competitions/${competitionCode}/matches?dateFrom=${dateFrom}&dateTo=${dateTo}`,
-            {
-                headers: {
-                    "X-Auth-Token": process.env.FOOTBALL_DATA_API_KEY,
-                    "User-Agent": APP_CONFIG.USER_AGENT,
-                },
-            }
+            `${API_BASE_URL}/${sport}/${league}/scoreboard?dates=${dateFrom}-${dateTo}`
         );
 
         // Handle different response scenarios
         if (!response.ok) {
             if (response.status === 429) {
-                console.log(`[API] Rate limit exceeded for ${competitionCode}`);
+                console.log(`[ESPN API] Rate limit exceeded`);
                 return NextResponse.json(
                     { error: 'Rate limit exceeded', isRateLimit: true },
                     { status: 429 }
@@ -51,11 +43,11 @@ export async function GET(request, { params }) {
             }
 
             if (response.status === 204) {
-                console.log(`[API] No content returned for ${competitionCode}`);
+                console.log(`[ESPN API] No content returned for ${sport}, ${league}`);
                 return NextResponse.json({ matches: [], message: 'No matches found' });
             }
 
-            console.log(`[API] Error ${response.status} for ${competitionCode}`);
+            console.log(`[ESPN API] Error ${response.status}`);
             return NextResponse.json(
                 { error: `API error: ${response.status}`, message: 'API request failed' },
                 { status: response.status }
@@ -63,11 +55,11 @@ export async function GET(request, { params }) {
         }
 
         const data = await response.json();
-        const matchCount = data.matches?.length || 0;
-        console.log(`[API] Found ${matchCount} matches for ${competitionCode}`);
+        const matchCount = data.events?.length || 0;
+        console.log(`[ESPN API] Found ${matchCount} matches for ${sport}, ${league}`);
 
         return NextResponse.json({
-            ...data,
+            events: data.events || [],
             meta: {
                 matchCount,
                 dateFrom,
@@ -76,7 +68,7 @@ export async function GET(request, { params }) {
             }
         });
     } catch (error) {
-        console.error('[API] Fetch error:', error);
+        console.error('[ESPN API] Fetch error:', error);
         return NextResponse.json(
             { error: 'Failed to fetch fixtures', message: error.message },
             { status: 500 }

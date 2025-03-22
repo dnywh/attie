@@ -5,9 +5,20 @@ import { fixturesCache, CACHE_CONFIG } from '@/utils/cache';
 import { sortFixtures } from '@/utils/dates';
 import { adaptFixture } from '@/utils/adapters';
 import { DEFAULTS } from "@/constants/defaults";
+import { ADAPTER_BASE_PATHS } from '@/utils/adapters';
 
-const buildApiUrl = (apiConfig, params) => {
-    const { baseUrl } = apiConfig;
+const buildApiUrl = (competition, params) => {
+    const adapterType = competition.api.adapter;
+    if (!adapterType) {
+        throw new Error(`No adapter specified for competition ${competition.name}`);
+    }
+
+    // Get the base path for this adapter type
+    const basePath = ADAPTER_BASE_PATHS[adapterType];
+    if (!basePath) {
+        throw new Error(`No base path found for adapter ${adapterType}`);
+    }
+
     const queryParams = new URLSearchParams();
 
     // Add common params
@@ -15,12 +26,30 @@ const buildApiUrl = (apiConfig, params) => {
     if (params.dateTo) queryParams.set('dateTo', params.dateTo);
     if (params.direction) queryParams.set('direction', params.direction);
 
-    // Add pagination params based on sport
+    // Add various identifiers based on adapter type
+    if (adapterType === 'football-data') {
+        // football-data expects a competition code in their format
+        if (!competition.api.code) {
+            throw new Error(`Football-data adapter requires a competition code for ${competition.name}`);
+        }
+        queryParams.set('competition', competition.api.code);
+    } else if (adapterType === 'espn') {
+        // espn expects a sport and league in their format
+        queryParams.set('sport', competition.api.sport);
+        queryParams.set('league', competition.api.league);
+    }
+
+    // else {
+    //     // For other adapters, use the competition key as identifier
+    //     queryParams.set('competition', competition.name.toLowerCase());
+    // }
+
+    // Add pagination params
     if (params.cursor) queryParams.set('cursor', params.cursor);
     if (params.page) queryParams.set('page', params.page);
 
-    const url = `${baseUrl}${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-    console.log('[API URL]', url);
+    const url = `${basePath}${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    console.log(`[API URL][${adapterType}] ${url}`);
     return url;
 };
 
@@ -82,13 +111,14 @@ export function useFixtures(initialParams) {
         loadInitialFixtures();
     }, [selectedSport]);
 
-    const fetchFixturesForCompetition = useCallback(async (
-        competitionCode,
-        customDateWindow,
-        cursor = null
-    ) => {
+    const fetchFixturesForCompetition = useCallback(async (competitionKey, customDateWindow, cursor = null) => {
+        const competition = COMPETITIONS[competitionKey];
+        if (!competition) {
+            throw new Error(`Competition ${competitionKey} not found`);
+        }
+
         const now = Date.now();
-        const cacheKey = `${competitionCode}-${customDateWindow?.start || dateWindow.start
+        const cacheKey = `${competitionKey}-${customDateWindow?.start || dateWindow.start
             }-${customDateWindow?.end || dateWindow.end}-${showFutureFixtures}`;
 
         // Clear cache when switching directions
@@ -126,20 +156,19 @@ export function useFixtures(initialParams) {
         console.log(
             `[Fetch] Getting ${showFutureFixtures ? "future" : "past"} fixtures`,
             `\n Sport: ${selectedSport}`,
-            `\n  Competition: ${competitionCode}`,
+            `\n  Competition: ${competitionKey}`,
             `\n  Date range: ${dateFrom} to ${dateTo}`
         );
 
         try {
-            const apiConfig = getApiConfig(selectedSport, competitionCode);
             const response = await fetch(
-                buildApiUrl(apiConfig, {
+                buildApiUrl(competition, {
                     dateFrom,
                     dateTo,
                     direction: showFutureFixtures ? "future" : "past",
                     cursor,
                     page: currentPage
-                }),
+                })
             );
 
             console.log({ response })
@@ -150,16 +179,21 @@ export function useFixtures(initialParams) {
 
             const data = await response.json();
 
-            console.log({ data })
+            console.log('Raw API response:', data);
 
-            // Handle different API response structures
-            // E.g. ESPN's API uses `data.events`, other APIs like football-data and ballislife use `data.matches`
+            // Handle different API response structures (events for ESPN, matches for others)
             const fixtureArray = data.matches || data.events || [];
 
+            if (!Array.isArray(fixtureArray)) {
+                console.error('Expected array of fixtures, got:', fixtureArray);
+                return [];
+            }
+
             // Use the adapter pattern to standardize the data
-            const matches = fixtureArray.map(match =>
-                adaptFixture(match, competitionCode, selectedSport)
-            );
+            const matches = fixtureArray.map(match => {
+                console.log('Processing match:', match);
+                return adaptFixture(match, competitionKey, selectedSport);
+            });
 
             fixturesCache.set(cacheKey, matches);
             return matches;
@@ -167,44 +201,7 @@ export function useFixtures(initialParams) {
             console.error(`[Fetch] Error:`, error);
             throw error;
         }
-    }, [dateWindow, showFutureFixtures, selectedSport, currentPage]);
-
-    // Helper to get API configuration for each sport/competition
-    // TODO: Shouldn't this be on the competitions.js file?
-    const getApiConfig = (sport, competitionCode) => {
-        const configs = {
-            'aussie-rules': {
-                baseUrl: `/api/aussie-rules/${competitionCode}`,
-                paginationType: 'page',
-            },
-            'football': {
-                baseUrl: `/api/football/${competitionCode}`,
-                paginationType: 'page',
-            },
-            'rugby-league': {
-                baseUrl: `/api/rugby-league/${competitionCode}`,
-                paginationType: 'page',
-            },
-            'rugby-union': {
-                baseUrl: `/api/rugby-union/${competitionCode}`,
-                paginationType: 'page',
-            },
-            'basketball': {
-                baseUrl: `/api/basketball/${competitionCode}`,
-                paginationType: 'cursor',
-            },
-            'baseball': {
-                baseUrl: `/api/baseball/${competitionCode}`,
-                paginationType: 'cursor',
-            },
-            'american-football': {
-                baseUrl: `/api/american-football/${competitionCode}`,
-                paginationType: 'cursor',
-            },
-        };
-
-        return configs[sport] || configs.football; // TODO, instead of falling back to football, show clear error message that the sport lookup didn't work
-    };
+    }, [dateWindow, showFutureFixtures, currentPage]);
 
     const loadInitialFixtures = useCallback(async () => {
         setLoading(true);
@@ -219,19 +216,15 @@ export function useFixtures(initialParams) {
 
             setDateWindow(initialWindow);
 
-            const initialCodes = selectedCompetitions.map(
-                (l) => COMPETITIONS[l].code
-            );
-
             console.log(
                 `[Initial Load] Getting ${showFutureFixtures ? "future" : "past"} fixtures`,
-                `\n  Competitions: ${initialCodes.join(", ")}`,
+                `\n  Competitions: ${selectedCompetitions.join(", ")}`,
                 `\n  Window: start=${initialWindow.start}, end=${initialWindow.end}`
             );
 
             const matches = await Promise.all(
-                initialCodes.map((competitionCode) =>
-                    fetchFixturesForCompetition(competitionCode, initialWindow)
+                selectedCompetitions.map((competitionKey) =>
+                    fetchFixturesForCompetition(competitionKey, initialWindow)
                 )
             );
 
@@ -254,25 +247,23 @@ export function useFixtures(initialParams) {
         }
     }, [fetchFixturesForCompetition, selectedCompetitions, showFutureFixtures]);
 
-    const handleCompetitionChange = useCallback(async (competition) => {
-        const competitionCode = COMPETITIONS[competition].code;
-
+    const handleCompetitionChange = useCallback(async (competitionKey) => {
         setLoading(true);
         try {
-            if (selectedCompetitions.includes(competition)) {
+            if (selectedCompetitions.includes(competitionKey)) {
                 // Remove competition
                 setSelectedCompetitions((prev) =>
-                    prev.filter((l) => l !== competition)
+                    prev.filter((l) => l !== competitionKey)
                 );
                 setFixtures((prev) =>
-                    prev.filter((fixture) => fixture.competitionCode !== competitionCode)
+                    prev.filter((fixture) => fixture.competition.id !== competitionKey)
                 );
             } else {
                 // Add competition
-                setSelectedCompetitions((prev) => [...prev, competition]);
+                setSelectedCompetitions((prev) => [...prev, competitionKey]);
 
                 // Get new matches
-                const newMatches = await fetchFixturesForCompetition(competitionCode);
+                const newMatches = await fetchFixturesForCompetition(competitionKey);
 
                 // Merge with existing fixtures, ensuring uniqueness by ID
                 setFixtures((prevFixtures) => {
@@ -295,51 +286,6 @@ export function useFixtures(initialParams) {
             setLoading(false);
         }
     }, [fetchFixturesForCompetition, selectedCompetitions, showFutureFixtures]);
-
-    // const handleLoadMore = useCallback(async () => {
-    //     if (selectedSport === 'basketball' && !nextCursor) {
-    //         console.log('[Load More] No more pages available');
-    //         setHasReachedEnd(true);
-    //         return;
-    //     }
-
-    //     setLoadingMore(true);
-    //     setHasRateLimitError(false);
-
-    //     try {
-    //         if (selectedSport === 'basketball') {
-    //             const matches = await Promise.all(
-    //                 selectedCompetitions.map((competition) =>
-    //                     fetchFixturesForCompetition(
-    //                         COMPETITIONS[competition].code,
-    //                         null,
-    //                         nextCursor
-    //                     )
-    //                 )
-    //             );
-
-    //             const newFixtures = matches.flat();
-
-    //             setFixtures((prevFixtures) => {
-    //                 const combined = [...prevFixtures, ...newFixtures];
-    //                 const unique = Array.from(
-    //                     new Map(combined.map((f) => [f.id, f])).values()
-    //                 );
-    //                 return sortFixtures(unique, showFutureFixtures);
-    //             });
-    //         } else {
-    //             // ... existing football load more logic ...
-    //         }
-    //     } catch (error) {
-    //         console.error("[Load More] Error:", error);
-    //         if (error.message !== "RATE_LIMIT_EXCEEDED") {
-    //             alert("Failed to load more fixtures. Please try again.");
-    //         }
-    //     } finally {
-    //         setLoadingMore(false);
-    //     }
-    // }, [fetchFixturesForCompetition, selectedSport, nextCursor, selectedCompetitions, showFutureFixtures]);
-    // const handleLoadMore = console.log("Load more coming soon")
 
     return {
         // State

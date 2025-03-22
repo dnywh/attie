@@ -1,24 +1,35 @@
 import { COMPETITIONS } from '@/constants/competitions';
-import { adaptESPNAlphaFixture } from '@/utils/adapters/espnAlphaAdapter';
+import { adaptESPNFixture } from '@/utils/adapters/ESPNAdapter';
 import { adaptFootballDataFixture } from '@/utils/adapters/footballDataAdapter'; // renamed from adaptFDFixture
 import { adaptNBAFixture } from '@/utils/adapters/nbaAdapter';
 import { adaptMLBFixture } from '@/utils/adapters/mlbAdapter';
 import { adaptNFLFixture } from '@/utils/adapters/nflAdapter';
 
 const ADAPTERS = {
-    'espn-alpha': adaptESPNAlphaFixture, // Specific to head-to-head formats like football, rugby, basketball
+    'espn': adaptESPNFixture,
     'football-data': adaptFootballDataFixture,
     'balldontlie-nba': adaptNBAFixture,
     'balldontlie-mlb': adaptMLBFixture,
     'balldontlie-nfl': adaptNFLFixture,
 };
 
-export const adaptFixture = (rawFixture, competitionCode) => {
-    const competition = Object.entries(COMPETITIONS)
-        .find(([_, comp]) => comp.code === competitionCode)?.[1];
+export const ADAPTER_BASE_PATHS = {
+    'espn': '/api/espn',
+    'football-data': '/api/football-data',
+    'balldontlie-nba': '/api/nba',
+    'balldontlie-mlb': '/api/mlb',
+    'balldontlie-nfl': '/api/nfl',
+};
+
+export const adaptFixture = (rawFixture, competitionKey) => {
+    console.log('Adapting fixture for competition:', competitionKey);
+
+    // Look up competition by its key
+    const competition = COMPETITIONS[competitionKey];
+    console.log('Found competition:', competition);
 
     if (!competition) {
-        throw new Error(`Competition with code ${competitionCode} not found`);
+        throw new Error(`Competition ${competitionKey} not found`);
     }
 
     const adapter = ADAPTERS[competition.api.adapter];
@@ -27,8 +38,11 @@ export const adaptFixture = (rawFixture, competitionCode) => {
         throw new Error(`Adapter ${competition.api.adapter} not found`);
     }
 
-    console.log(`Using ${competition.api.adapter} adapter for ${competitionCode}`);
-    return adapter(rawFixture, competitionCode);
+    // Make sure we're passing the right things to the adapter
+    console.log('Raw fixture:', rawFixture);
+    console.log('Competition being passed to adapter:', competition);
+
+    return adapter(rawFixture, competition);
 };
 
 // Each sport adapter should return this common structure

@@ -1,20 +1,24 @@
 import { NextResponse } from 'next/server';
+import { APP_CONFIG } from '@/constants/config';
 
-const API_BASE_URL = 'https://site.api.espn.com/apis/site/v2/sports/australian-football/afl/scoreboard';
+const API_BASE_URL = 'https://api.football-data.org/v4';
+
 /**
  * Formats a date as YYYY-MM-DD for the API
  */
-function formatDateForApi(date) {
-    return date.toISOString().split('T')[0];
-}
+// function formatDateForApi(date) {
+//     return date.toISOString().split('T')[0];
+// }
 
 export async function GET(request, { params }) {
     const { searchParams } = new URL(request.url);
 
     // Get required parameters
-    const dateFrom = searchParams.get('dateFrom').replace(/-/g, "");
-    const dateTo = searchParams.get('dateTo').replace(/-/g, "");
+    const dateFrom = searchParams.get('dateFrom');
+    const dateTo = searchParams.get('dateTo');
     const direction = searchParams.get('direction');
+    // Custom to football-data
+    const competitionCode = searchParams.get('competition');
 
     if (!dateFrom || !dateTo) {
         return NextResponse.json(
@@ -23,21 +27,24 @@ export async function GET(request, { params }) {
         );
     }
 
-    console.log(`[AFL API] Getting ${direction} games for AFL`);
-    console.log(`[AFL API] Date range: ${dateFrom} to ${dateTo}`);
+    console.log(`[API] Getting ${direction} games for ${competitionCode}`);
+    console.log(`[API] Date range: ${dateFrom} to ${dateTo}`);
 
-    const fullUrl = `${API_BASE_URL}?dates=${dateFrom}-${dateTo}`
-    // console.log(fullRu)
-    console.log({ fullUrl })
     try {
         const response = await fetch(
-            fullUrl,
+            `${API_BASE_URL}/competitions/${competitionCode}/matches?dateFrom=${dateFrom}&dateTo=${dateTo}`,
+            {
+                headers: {
+                    "X-Auth-Token": process.env.FOOTBALL_DATA_API_KEY,
+                    "User-Agent": APP_CONFIG.USER_AGENT,
+                },
+            }
         );
 
         // Handle different response scenarios
         if (!response.ok) {
             if (response.status === 429) {
-                console.log(`[AFL API] Rate limit exceeded for AFL`);
+                console.log(`[API] Rate limit exceeded for ${competitionCode}`);
                 return NextResponse.json(
                     { error: 'Rate limit exceeded', isRateLimit: true },
                     { status: 429 }
@@ -45,11 +52,11 @@ export async function GET(request, { params }) {
             }
 
             if (response.status === 204) {
-                console.log(`[AFL API] No content returned for AFL`);
+                console.log(`[API] No content returned for ${competitionCode}`);
                 return NextResponse.json({ matches: [], message: 'No matches found' });
             }
 
-            console.log(`[AFL API] Error ${response.status} for AFL`);
+            console.log(`[API] Error ${response.status} for ${competitionCode}`);
             return NextResponse.json(
                 { error: `API error: ${response.status}`, message: 'API request failed' },
                 { status: response.status }
@@ -57,8 +64,8 @@ export async function GET(request, { params }) {
         }
 
         const data = await response.json();
-        const matchCount = data.events?.length || 0;
-        console.log(`[AFL API] Found ${matchCount} matches for AFL`);
+        const matchCount = data.matches?.length || 0;
+        console.log(`[API] Found ${matchCount} matches for ${competitionCode}`);
 
         return NextResponse.json({
             ...data,
@@ -70,7 +77,7 @@ export async function GET(request, { params }) {
             }
         });
     } catch (error) {
-        console.error('[AFL API] Fetch error:', error);
+        console.error('[API] Fetch error:', error);
         return NextResponse.json(
             { error: 'Failed to fetch fixtures', message: error.message },
             { status: 500 }

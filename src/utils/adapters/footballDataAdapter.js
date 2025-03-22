@@ -19,31 +19,32 @@ const STATUS_MAP = {
 // group
 // GROUP_A | GROUP_B | GROUP_C | GROUP_D | GROUP_E | GROUP_F | GROUP_G | GROUP_H | GROUP_I | GROUP_J | GROUP_K | GROUP_L
 
-export function adaptFootballDataFixture(fixture) {
+export const adaptFootballDataFixture = (rawFixture, competition) => {
     return {
-        id: fixture.id.toString(),
-        utcDate: fixture.utcDate,
-        localDate: new Date(fixture.utcDate).toLocaleDateString(),
-        status: STATUS_MAP[fixture.status] || fixture.status,
+        id: rawFixture.id,
+        utcDate: rawFixture.utcDate,
+        localDate: rawFixture.localDate,
+        status: rawFixture.status,
         competition: {
-            name: fixture.competition.name,
-            type: fixture.competition.type
+            // id: competition.api.code,
+            name: competition.name,
+            type: competition.type
         },
         homeTeam: {
-            name: fixture.homeTeam.name,
-            shortName: fixture.homeTeam.shortName || fixture.homeTeam.tla,
-            crest: fixture.homeTeam.crest,
+            name: rawFixture.homeTeam.name,
+            shortName: rawFixture.homeTeam.shortName || rawFixture.homeTeam.tla,
+            crest: rawFixture.homeTeam.crest,
         },
         awayTeam: {
-            name: fixture.awayTeam.name,
-            shortName: fixture.awayTeam.shortName || fixture.awayTeam.tla,
-            crest: fixture.awayTeam.crest,
+            name: rawFixture.awayTeam.name,
+            shortName: rawFixture.awayTeam.shortName || rawFixture.awayTeam.tla,
+            crest: rawFixture.awayTeam.crest,
         },
         score: {
             fullTime: {
-                home: fixture.score.fullTime.home,
-                away: fixture.score.fullTime.away
+                home: rawFixture.score.fullTime.home,
+                away: rawFixture.score.fullTime.away
             }
         }
     };
-} 
+}; 
