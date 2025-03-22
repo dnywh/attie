@@ -35,7 +35,7 @@ export async function GET(request) {
         });
 
 
-        console.log(Response.json({ matches: response.data }));
+        // console.log(Response.json({ matches: response.data }));
 
         return Response.json({
             matches: response.data,

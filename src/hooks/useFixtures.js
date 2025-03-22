@@ -39,7 +39,6 @@ const buildApiUrl = (competition, params) => {
         competition.api.groups && queryParams.set('groups', competition.api.groups);
         competition.api.limit && queryParams.set('limit', competition.api.limit);
     }
-
     // else {
     //     // For other adapters, use the competition key as identifier
     //     queryParams.set('competition', competition.name.toLowerCase());
@@ -50,7 +49,6 @@ const buildApiUrl = (competition, params) => {
     if (params.page) queryParams.set('page', params.page);
 
     const url = `${basePath}${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-    console.log(`[API URL][${adapterType}] ${url}`);
     return url;
 };
 
@@ -83,10 +81,8 @@ export function useFixtures(initialParams) {
     // Add new state for cursor
     const [nextCursor, setNextCursor] = useState(null);
 
-    // Modified sport change handler
+    // Sport change handler
     const handleSportChange = useCallback((newSport) => {
-        console.log(`[Sport Change] Switching to ${newSport}`);
-
         // Get default competition for the new sport
         const defaultCompetition = Object.keys(COMPETITIONS).find(
             (key) => COMPETITIONS[key].sport === newSport && COMPETITIONS[key].defaultForSport
@@ -105,10 +101,13 @@ export function useFixtures(initialParams) {
         setHasReachedEnd(false);
     }, []);
 
-    // Replace direct setSelectedSport usage with handleSportChange
+    // Load initial fixtures
     useEffect(() => {
-        loadInitialFixtures();
-    }, [selectedSport]);
+        // Only load fixtures if we have selected competitions
+        if (selectedCompetitions.length > 0) {
+            loadInitialFixtures();
+        }
+    }, [selectedSport, selectedCompetitions, showFutureFixtures]);
 
     const fetchFixturesForCompetition = useCallback(async (competitionKey, customDateWindow, cursor = null) => {
         const competition = COMPETITIONS[competitionKey];
@@ -136,13 +135,6 @@ export function useFixtures(initialParams) {
         const dateFrom = startDate.toISOString().split("T")[0];
         const dateTo = endDate.toISOString().split("T")[0];
 
-        console.log(
-            `[Fetch] Getting ${showFutureFixtures ? "future" : "past"} fixtures`,
-            `\n Sport: ${selectedSport}`,
-            `\n  Competition: ${competitionKey}`,
-            `\n  Date range: ${dateFrom} to ${dateTo}`
-        );
-
         try {
             const response = await fetch(
                 buildApiUrl(competition, {
@@ -154,19 +146,16 @@ export function useFixtures(initialParams) {
                 })
             );
 
-            console.log({ response })
-
             if (!response.ok) {
                 throw new Error(`API error: ${response.status}`);
             }
 
             const data = await response.json();
 
-            console.log('Raw API response:', data);
-
             // Handle different API response structures (events for ESPN, matches for others)
             const fixtureArray = data.matches || data.events || [];
 
+            // Handle error if array is not in above fixtures format
             if (!Array.isArray(fixtureArray)) {
                 console.error('Expected array of fixtures, got:', fixtureArray);
                 return [];
@@ -174,7 +163,6 @@ export function useFixtures(initialParams) {
 
             // Use the adapter pattern to standardize the data
             const matches = fixtureArray.map(match => {
-                console.log('Processing match:', match);
                 return adaptFixture(match, competitionKey, selectedSport);
             });
 
@@ -198,12 +186,6 @@ export function useFixtures(initialParams) {
 
             setDateWindow(initialWindow);
 
-            console.log(
-                `[Initial Load] Getting ${showFutureFixtures ? "future" : "past"} fixtures`,
-                `\n  Competitions: ${selectedCompetitions.join(", ")}`,
-                `\n  Window: start=${initialWindow.start}, end=${initialWindow.end}`
-            );
-
             const matches = await Promise.all(
                 selectedCompetitions.map((competitionKey) =>
                     fetchFixturesForCompetition(competitionKey, initialWindow)
@@ -211,8 +193,8 @@ export function useFixtures(initialParams) {
             );
 
             const allMatches = matches.flat();
-            console.log(`[Initial Load] Found ${allMatches.length} total fixtures`);
 
+            // Handle case where no fixtures are found in range
             if (allMatches.length === 0) {
                 console.log("[Initial Load] No fixtures found");
                 setHasReachedEnd(true);
@@ -233,17 +215,18 @@ export function useFixtures(initialParams) {
         setLoading(true);
         try {
             if (selectedCompetitions.includes(competitionKey)) {
-                // Remove competition
-                console.log(`[Competition Change] Removing ${competitionKey}`);
-                setSelectedCompetitions((prev) =>
-                    prev.filter((l) => l !== competitionKey)
-                );
-                setFixtures((prev) =>
-                    prev.filter((fixture) => fixture.competition.id !== competitionKey)
+                // Update both states in a single batch to avoid race conditions
+                const newSelectedCompetitions = selectedCompetitions.filter(l => l !== competitionKey);
+                setSelectedCompetitions(newSelectedCompetitions);
+
+                // Only keep fixtures for the remaining competitions
+                setFixtures(prevFixtures =>
+                    prevFixtures.filter(fixture =>
+                        newSelectedCompetitions.includes(fixture.competition.id)
+                    )
                 );
             } else {
                 // Add competition
-                console.log(`[Competition Change] Adding ${competitionKey}`);
                 setSelectedCompetitions((prev) => [...prev, competitionKey]);
 
                 // Get new matches
@@ -254,12 +237,6 @@ export function useFixtures(initialParams) {
                     const combined = [...prevFixtures, ...newMatches];
                     const unique = Array.from(
                         new Map(combined.map((fixture) => [fixture.id, fixture])).values()
-                    );
-                    console.log(
-                        `[Competition Change] Merging fixtures:`,
-                        `\n  Previous count: ${prevFixtures.length}`,
-                        `\n  New matches: ${newMatches.length}`,
-                        `\n  Combined unique: ${unique.length}`
                     );
                     return sortFixtures(unique, showFutureFixtures);
                 });

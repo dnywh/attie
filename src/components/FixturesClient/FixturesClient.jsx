@@ -62,11 +62,6 @@ export default function FixturesClient({ initialParams }) {
     loadInitialFixtures,
   } = useFixtures(initialParams);
 
-  // Initial load
-  useEffect(() => {
-    loadInitialFixtures();
-  }, [showFutureFixtures]);
-
   // Filter competitions based on selected sport
   const availableCompetitions = Object.entries(
     getCompetitionsForSport(selectedSport)
@@ -96,7 +91,6 @@ export default function FixturesClient({ initialParams }) {
 
     // Compare against provided defaults or global defaults
     const compareDefaults = initialParams || DEFAULTS;
-    console.log("compareDefaults:", compareDefaults);
 
     // Track if we've deviated from the initialParams
     let hasDeviatedFromInitialParams = false;
@@ -163,7 +157,6 @@ export default function FixturesClient({ initialParams }) {
     );
   }
 
-  console.log("LENGTH", selectedCompetitions.length);
   // Then, on client, re-render with dynamic content once available
   return (
     <Main>

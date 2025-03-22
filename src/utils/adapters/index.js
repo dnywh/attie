@@ -22,11 +22,8 @@ export const ADAPTER_BASE_PATHS = {
 };
 
 export const adaptFixture = (rawFixture, competitionKey) => {
-    console.log('Adapting fixture for competition:', competitionKey);
-
     // Look up competition by its key
     const competition = COMPETITIONS[competitionKey];
-    console.log('Found competition:', competition);
 
     if (!competition) {
         throw new Error(`Competition ${competitionKey} not found`);
@@ -37,10 +34,6 @@ export const adaptFixture = (rawFixture, competitionKey) => {
     if (!adapter) {
         throw new Error(`Adapter ${competition.api.adapter} not found`);
     }
-
-    // Make sure we're passing the right things to the adapter
-    console.log('Raw fixture:', rawFixture);
-    console.log('Competition being passed to adapter:', competition);
 
     return adapter(rawFixture, competition);
 };

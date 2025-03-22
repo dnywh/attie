@@ -27,8 +27,8 @@ export async function GET(request, { params }) {
         );
     }
 
-    console.log(`[API] Getting ${direction} games for ${competitionCode}`);
-    console.log(`[API] Date range: ${dateFrom} to ${dateTo}`);
+    console.log(`[Football-Data API] Getting ${direction} games for ${competitionCode}`);
+    console.log(`[Football-Data API] Date range: ${dateFrom} to ${dateTo}`);
 
     try {
         const response = await fetch(
@@ -44,7 +44,7 @@ export async function GET(request, { params }) {
         // Handle different response scenarios
         if (!response.ok) {
             if (response.status === 429) {
-                console.log(`[API] Rate limit exceeded for ${competitionCode}`);
+                console.log(`[Football-Data API] Rate limit exceeded for ${competitionCode}`);
                 return NextResponse.json(
                     { error: 'Rate limit exceeded', isRateLimit: true },
                     { status: 429 }
@@ -52,11 +52,11 @@ export async function GET(request, { params }) {
             }
 
             if (response.status === 204) {
-                console.log(`[API] No content returned for ${competitionCode}`);
+                console.log(`[Football-Data API] No content returned for ${competitionCode}`);
                 return NextResponse.json({ matches: [], message: 'No matches found' });
             }
 
-            console.log(`[API] Error ${response.status} for ${competitionCode}`);
+            console.log(`[Football-Data API] Error ${response.status} for ${competitionCode}`);
             return NextResponse.json(
                 { error: `API error: ${response.status}`, message: 'API request failed' },
                 { status: response.status }
@@ -65,7 +65,7 @@ export async function GET(request, { params }) {
 
         const data = await response.json();
         const matchCount = data.matches?.length || 0;
-        console.log(`[API] Found ${matchCount} matches for ${competitionCode}`);
+        console.log(`[Football-Data API] Found ${matchCount} matches for ${competitionCode}`);
 
         return NextResponse.json({
             ...data,
@@ -77,7 +77,7 @@ export async function GET(request, { params }) {
             }
         });
     } catch (error) {
-        console.error('[API] Fetch error:', error);
+        console.error('[Football-Data API] Fetch error:', error);
         return NextResponse.json(
             { error: 'Failed to fetch fixtures', message: error.message },
             { status: 500 }
