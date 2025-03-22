@@ -32,7 +32,8 @@ export async function GET(request) {
     console.log(`[ESPN API] Getting ${direction} games for ${sport}, ${league}`);
     console.log(`[ESPN API] Date range: ${dateFrom} to ${dateTo}`);
 
-    const apiUrl = `${API_BASE_URL}/${sport}/${league}/scoreboard?dates=${dateFrom}-${dateTo}${groups ? `&groups=${groups}` : ''}&limit=${limit ? limit : 500}`
+    const apiUrl = `${API_BASE_URL}/${sport}/${league}/scoreboard?dates=${dateFrom}-${dateTo}${groups ? `&groups=${groups}` : ''}&limit=${limit ? limit : 100}`
+    console.log(`[ESPN API] URL: ${apiUrl}`)
 
     try {
         const response = await fetch(apiUrl);

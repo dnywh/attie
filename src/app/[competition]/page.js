@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import FixturesClient from "@/components/FixturesClient";
 import { COMPETITIONS } from '@/constants/competitions';
+import { SPORTS } from "@/config/sportConfig"
 
 export async function generateStaticParams() {
     // Convert object keys to array of param objects
@@ -22,9 +23,12 @@ export async function generateMetadata({ params }) {
         description: 'Don’t spoil the game. Get the results without the scores.'
     };
 
+    // Get local sport name so it flows more nicely
+    const localSportName = SPORTS[selectedCompetition.sport].localName ? SPORTS[selectedCompetition.sport].localName : SPORTS[selectedCompetition.sport].name
+
     return {
         title: `Attie: ${selectedCompetition.name} results without the scores`,
-        description: `See who played ${selectedCompetition.sport} overnight without spoiling the results. Attie shows recent ${selectedCompetition.name} games with scores hidden by default.`,
+        description: `See who played ${localSportName.toLowerCase()} overnight without spoiling the results. Attie shows recent ${selectedCompetition.name} games with scores hidden by default.`,
         // Optional: Add OpenGraph metadata for better social sharing
         //   openGraph: {
         //     title: `Watch ${selectedCompetition.name} without spoilers`,

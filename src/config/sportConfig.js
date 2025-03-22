@@ -23,6 +23,7 @@ export const SPORTS = {
     },
     'american-football': {
         name: 'American Football',
+        localName: 'Football', // Because "American Football" looks weird to American audiences
         icon: AmericanFootballIcon,
     },
     'rugby-league': {
