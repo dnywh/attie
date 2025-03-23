@@ -372,7 +372,7 @@ export default function FixturesClient({ initialParams }) {
               {!selectedCompetitions.length
                 ? "Select a competition from above"
                 : `No fixtures found across the ${
-                    showFutureFixtures ? `next few weeks` : `last few weeks`
+                    showFutureFixtures ? `next few months` : `last few months`
                   }`}
             </SelectionExplainerText>
           </EmptyState>

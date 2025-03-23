@@ -194,19 +194,21 @@ export function useFixtures(initialParams) {
         setLoadingMore(true);
 
         try {
-            // Calculate new date window
             const increment = DEFAULT_WINDOWS.INCREMENT.DAYS;
             const newWindow = { ...currentWindow };
 
             if (showFutureFixtures) {
+                // Move the window forward by increment
+                newWindow.start = newWindow.end;
                 newWindow.end += increment;
             } else {
+                // Move the window backward by increment
+                newWindow.end = newWindow.start;
                 newWindow.start += increment;
             }
 
             console.log("[Load More] New date window:", newWindow);
 
-            // Fetch new fixtures for all selected competitions using the new window directly
             const newMatches = await Promise.all(
                 selectedCompetitions.map((competitionKey) =>
                     fetchFixturesForCompetition(competitionKey, newWindow)
@@ -217,7 +219,6 @@ export function useFixtures(initialParams) {
             console.log("[Load More] Found new matches:", allNewMatches.length);
 
             if (allNewMatches.length > 0) {
-                // Update both fixtures and date window state
                 setFixtures(prevFixtures => {
                     const combined = [...prevFixtures, ...allNewMatches];
                     const unique = Array.from(
@@ -226,9 +227,8 @@ export function useFixtures(initialParams) {
                     return sortFixtures(unique, showFutureFixtures);
                 });
                 setDateWindow(newWindow);
-                loadAttemptsRef.current = 0; // Reset attempts on success
+                loadAttemptsRef.current = 0;
             } else {
-                // If no new fixtures found, try again with the updated window
                 await handleLoadMore(newWindow);
             }
         } catch (error) {
