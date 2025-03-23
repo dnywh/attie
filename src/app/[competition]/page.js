@@ -15,7 +15,10 @@ export async function generateStaticParams() {
 // 2. Meaning they are easily shareable
 // 3. And most importantly, provide SEO-friendly pages for distinct searches (e.g. "NFL results without the scores")
 export async function generateMetadata({ params }) {
-    const selectedCompetition = await COMPETITIONS[params.competition];
+    const { competition } = await params;
+    const selectedCompetition = COMPETITIONS[competition];
+
+
 
     // TODO: can I just run `if (!selectedCompetition) return` and have it fall back to the metadata from the main layout? If not, share that content somewhere higher, like in constants
     if (!selectedCompetition) return {
@@ -39,20 +42,22 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function CompetitionPage({ params }) {
-    const selectedCompetition = await params.competition;
+    const { competition } = await params;
+    console.log('Selected competition:', competition);
+
     // The dynamic generation of pages meanings that going to a non-existant slug will crash this React app once it tries to find its corresponding competition details
     // We therefore should check if the passed path matches a competition before continuing
     // Check if the page slug exists as a competition in COMPETITIONS
-    if (!COMPETITIONS[selectedCompetition]) {
-        console.log(`Invalid competition requested: ${selectedCompetition}`);
+    if (!COMPETITIONS[competition]) {
+        console.log(`Invalid competition requested: ${competition}`);
         redirect('/');
     }
 
     // If we get here, the competition exists
     // Map competition URLs to actual sport and competition params
     const selectedCompetitionParams = {
-        competitions: [selectedCompetition],// Just the key, nested in in an array since initialParams expects that format
-        sport: COMPETITIONS[selectedCompetition].sport,
+        competitions: [competition],// Just the key, nested in in an array since initialParams expects that format
+        sport: COMPETITIONS[competition].sport,
         direction: false // Backwards by default
     }
 
