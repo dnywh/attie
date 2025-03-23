@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import useSound from "use-sound";
+import { useScoreSound } from "@/contexts/SoundContext";
 import { styled } from "@pigment-css/react";
 
 const Block = styled("div")(({ theme }) => ({
@@ -47,7 +47,7 @@ const Block = styled("div")(({ theme }) => ({
 
 function Score({ score, showAllScores = false, useSoundEffects }) {
   const [hasBeenRevealed, setHasBeenRevealed] = useState(false);
-  const [play] = useSound("/sounds/scratch.mp3");
+  const play = useScoreSound();
 
   // Reset local state when showAllScores changes to false
   useEffect(() => {

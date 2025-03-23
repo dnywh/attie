@@ -3,6 +3,7 @@ import '@fontsource-variable/jost/wght-italic.css';
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { globalCss, styled } from "@pigment-css/react";
+import { SoundProvider } from "@/contexts/SoundContext";
 import '@pigment-css/react/styles.css';
 
 import FixturesHeader from '@/components/FixturesHeader';
@@ -99,8 +100,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <Body>
-        <FixturesHeader />
-        {children}
+        <SoundProvider>
+          <FixturesHeader />
+          {children}
+        </SoundProvider>
         <Analytics />
         <SpeedInsights />
       </Body>
