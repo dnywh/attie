@@ -1,5 +1,6 @@
 import { BalldontlieAPI } from "@balldontlie/sdk";
 import { APP_CONFIG } from '@/constants/config';
+import { generateDateRange } from '@/utils/dates';
 
 const api = new BalldontlieAPI({
     apiKey: process.env.BALL_DONT_LIE_API_KEY,
@@ -10,22 +11,25 @@ const api = new BalldontlieAPI({
 
 export async function GET(request) {
     const { searchParams } = new URL(request.url);
-    const dateA = searchParams.get('dateFrom');
-    const dateB = searchParams.get('dateTo');
+    const dateFrom = searchParams.get('dateFrom');
+    const dateTo = searchParams.get('dateTo');
     const cursor = searchParams.get('cursor');
     const direction = searchParams.get('direction');
 
     console.log(`[MLB API] Getting ${direction} games:`, {
-        dateA,
-        dateB,
+        dateFrom,
+        dateTo,
         cursor: cursor || 'No cursor (first page)'
     });
 
     try {
+        // Doesn't support date range, so make an array instead based on dateFrom and dateTo
+        const datesArray = generateDateRange(dateFrom, dateTo);
+        console.log('[MLB API] Generated dates array:', datesArray);
+
         const response = await api.mlb.getGames({
-            // Doesn't support date range, so use an array instead. E.g: ?dates[]=2024-01-01&dates[]=2024-01-02
-            dates: ["2024-09-01", "2024-09-10", "2024-09-11"], // dates: [dateA, dateB] etc
-            per_page: 25, // 25–100
+            dates: datesArray,
+            per_page: 25,
             ...(cursor && { cursor })
         });
 
@@ -33,8 +37,6 @@ export async function GET(request) {
             next_cursor: response.meta.next_cursor,
             per_page: response.meta.per_page
         });
-
-        console.log(Response.json({ matches: response.data }));
 
         return Response.json({
             matches: response.data,

@@ -74,4 +74,21 @@ export const groupFixturesByDate = (fixtures) => {
         });
         return groups;
     }, {});
-}; 
+};
+
+// Some APIs (balldontlie MLB and NFL namely) do not support date range, only passing single dates in an array
+// But my adaptors just pass a dateFrom and dateTo
+// This function makes so make an array based on dateFrom and dateTo
+export function generateDateRange(startDate, endDate) {
+    const dates = [];
+    const currentDate = new Date(startDate);
+    const lastDate = new Date(endDate);
+
+    // Include the start date
+    while (currentDate <= lastDate) {
+        dates.push(currentDate.toISOString().split('T')[0]);
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return dates;
+} 

@@ -1,5 +1,6 @@
 import { BalldontlieAPI } from "@balldontlie/sdk";
 import { APP_CONFIG } from '@/constants/config';
+import { generateDateRange } from '@/utils/dates';
 
 const api = new BalldontlieAPI({
     apiKey: process.env.BALL_DONT_LIE_API_KEY,
@@ -10,22 +11,24 @@ const api = new BalldontlieAPI({
 
 export async function GET(request) {
     const { searchParams } = new URL(request.url);
-    const dateA = searchParams.get('dateFrom');
-    const dateB = searchParams.get('dateTo');
+    const dateFrom = searchParams.get('dateFrom');
+    const dateTo = searchParams.get('dateTo');
     const cursor = searchParams.get('cursor');
     const direction = searchParams.get('direction');
 
     console.log(`[NFL API] Getting ${direction} games:`, {
-        dateA,
-        dateB,
+        dateFrom,
+        dateTo,
         cursor: cursor || 'No cursor (first page)'
     });
 
     try {
+        const datesArray = generateDateRange(dateFrom, dateTo);
+        console.log('[NFL API] Generated dates array:', datesArray);
+
         const response = await api.nfl.getGames({
-            // Doesn't support date range, so use an array instead. E.g: ?dates[]=2024-01-01&dates[]=2024-01-02
-            dates: ["2023-12-31", "2024-01-01"], // dates: [dateA, dateB] etc
-            per_page: 25, // 25–100
+            dates: datesArray,
+            per_page: 25,
             ...(cursor && { cursor })
         });
 
