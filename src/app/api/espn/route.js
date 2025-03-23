@@ -30,7 +30,6 @@ export async function GET(request) {
     }
 
     console.log(`[ESPN API] Getting ${direction} games for ${sport}, ${league}`);
-    console.log(`[ESPN API] Date range: ${dateFrom} to ${dateTo}`);
 
     const apiUrl = `${API_BASE_URL}/${sport}/${league}/scoreboard?dates=${dateFrom}-${dateTo}${groups ? `&groups=${groups}` : ''}&limit=${limit ? limit : 100}`
     console.log(`[ESPN API] URL: ${apiUrl}`)
@@ -49,7 +48,7 @@ export async function GET(request) {
             }
 
             if (response.status === 204) {
-                console.log(`[ESPN API] No content returned for ${sport}, ${league}`);
+                console.log(`[ESPN API] No content returned for sport: ${sport}, competition: ${league}`);
                 return NextResponse.json({ matches: [], message: 'No matches found' });
             }
 

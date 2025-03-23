@@ -38,27 +38,4 @@ export const adaptFixture = (rawFixture, competitionKey) => {
     return adapter(rawFixture, competition);
 };
 
-// Each sport adapter should return this common structure
-// const commonFixtureShape = {
-//     id: String,
-//     utcDate: String,
-//     localDate: String,
-//     status: String,
-//     homeTeam: {
-//         id: String,
-//         name: String,
-//         score: Number,
-//     },
-//     awayTeam: {
-//         id: String,
-//         name: String,
-//         score: Number,
-//     },
-//     competition: {
-//         id: String,
-//         name: String,
-//         code: String,
-//     },
-//     // Optional sport-specific data
-//     sportSpecific: Object,
-// }; 
+

@@ -28,21 +28,21 @@ const LiveStatus = styled(RegularStatus)(({ theme }) => ({
 }));
 
 function FixtureStatus({ fixture }) {
-  // https://docs.football-data.org/general/v4/match.html#_status_workflow_explained
-  // const status = "IN_PLAY";
-  const status = fixture.status;
-  // const formattedStatus = status;
+  // Unpack status
+  const { status } = fixture;
+  const statusType = typeof status === "string" ? status : status.type;
+  // Handle both string status and status objects (for competitions with live fixture details, like "2nd Qtr")
+  const statusDetail = typeof status === "object" ? status.detail : null;
 
-  if (status === "IN_PLAY" || status === "PAUSED") {
+  if (statusType === "LIVE") {
     return (
       <LiveStatus>
         Live
-        {fixture.minute && ` ${fixture.minute}’`}
-        {fixture.injuryTime && `+ ${fixture.injuryTime}’`}
+        {statusDetail && `: ${statusDetail}`}
       </LiveStatus>
     );
   } else {
-    return <RegularStatus>{status}</RegularStatus>;
+    return <RegularStatus>{statusType}</RegularStatus>;
   }
 }
 

@@ -34,9 +34,6 @@ export async function GET(request) {
             per_page: response.meta.per_page
         });
 
-
-        // console.log(Response.json({ matches: response.data }));
-
         return Response.json({
             matches: response.data,
             meta: {

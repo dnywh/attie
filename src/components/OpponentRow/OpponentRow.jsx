@@ -2,6 +2,7 @@ import TeamLogo from "@/components/TeamLogo";
 import Score from "@/components/Score";
 import { styled } from "@pigment-css/react";
 import { teamText, ellipsizedText } from "@/styles/commonStyles";
+import { FIXTURE_STATUS } from "@/constants/fixtureStatus";
 
 const StyledOpponentRow = styled("li")({
   display: "flex",
@@ -48,13 +49,22 @@ function OpponentRow({
   isHomeTeam,
   useSoundEffects,
 }) {
-  const isKnown = !!team.shortName || !!team.name;
   // Prepare for 'null' cases like a not-yet-determined opponent in upcoming knockout stage
   const teamName = team.shortName
     ? team.shortName
     : team.name
     ? team.name
     : "TBD";
+  const isKnown = teamName !== "TBD";
+
+  // Determine if score component should be rendered or not
+  // Handled explicitly here instead of passing showFutureFixtures down
+  // because future fixtures can technically be shown when showFutureFixtures === false,
+  // as it's not future/past but rather today back or tomorrow forward used to determine split logic
+  const shouldShowScoreComponent = [
+    FIXTURE_STATUS.LIVE,
+    FIXTURE_STATUS.FINISHED,
+  ].includes(status.type);
 
   return (
     <StyledOpponentRow>
@@ -65,7 +75,7 @@ function OpponentRow({
         isHomeTeam={isHomeTeam}
       />
       <OpponentName isKnown={isKnown}>{teamName}</OpponentName>
-      {!["SCHEDULED", "TIMED", "CANCELLED", "POSTPONED"].includes(status) && (
+      {shouldShowScoreComponent && (
         <Score
           score={score}
           showAllScores={showAllScores}

@@ -66,7 +66,6 @@ function FixturesHeader() {
         Atti<span>e</span>
       </h1>
       <p>The anti-score scores app</p>
-      {/* <p>Matches without the scores.</p> */}
     </Header>
   );
 }

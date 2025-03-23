@@ -370,7 +370,7 @@ export default function FixturesClient({ initialParams }) {
           <EmptyState>
             <SelectionExplainerText>
               {!selectedCompetitions.length
-                ? "Select at least one competition from above"
+                ? "Select a competition from above"
                 : "No fixtures found"}
             </SelectionExplainerText>
           </EmptyState>
