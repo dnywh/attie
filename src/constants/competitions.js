@@ -118,12 +118,12 @@ export const COMPETITIONS = {
     },
     'liga-portugal': {
         sport: 'football',
-        code: 'PPL',
         name: 'Primeira Liga',
         type: COMPETITION_TYPES.LEAGUE,
         tier: TIERS.FREE,
         api: {
             adapter: 'football-data',
+            code: 'PPL',
         },
     },
     'eredivisie': {

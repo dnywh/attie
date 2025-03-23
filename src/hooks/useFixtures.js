@@ -110,10 +110,11 @@ export function useFixtures(initialParams) {
         if (selectedCompetitions.length > 0) {
             loadInitialFixtures();
         }
-    }, [selectedSport, selectedCompetitions, showFutureFixtures]);
+    }, [selectedSport, showFutureFixtures]);
 
     const fetchFixturesForCompetition = useCallback(async (competitionKey, customDateWindow, cursor = null) => {
         const competition = COMPETITIONS[competitionKey];
+
         if (!competition) {
             throw new Error(`Competition ${competitionKey} not found`);
         }
@@ -263,7 +264,6 @@ export function useFixtures(initialParams) {
 
             const allMatches = matches.flat();
 
-            // Handle case where no fixtures are found in range
             if (allMatches.length === 0) {
                 console.log("[Initial Load] No fixtures found, attempting to load more");
                 await handleLoadMore();
@@ -282,13 +282,12 @@ export function useFixtures(initialParams) {
 
     const handleCompetitionChange = useCallback(async (competitionKey) => {
         setLoading(true);
+        console.log('[Competition Change] Current competitions:', { selectedCompetitions });
+
         try {
             if (selectedCompetitions.includes(competitionKey)) {
-                // Update both states in a single batch to avoid race conditions
                 const newSelectedCompetitions = selectedCompetitions.filter(l => l !== competitionKey);
                 setSelectedCompetitions(newSelectedCompetitions);
-
-                // Only keep fixtures for the remaining competitions
                 setFixtures(prevFixtures =>
                     prevFixtures.filter(fixture =>
                         newSelectedCompetitions.includes(fixture.competition.id)
@@ -296,16 +295,17 @@ export function useFixtures(initialParams) {
                 );
             } else {
                 // Add competition
-                setSelectedCompetitions((prev) => [...prev, competitionKey]);
+                setSelectedCompetitions(prev => [...prev, competitionKey]);
 
-                // Get new matches
-                const newMatches = await fetchFixturesForCompetition(competitionKey);
+                // Only fetch data for the new competition
+                const newMatches = await fetchFixturesForCompetition(competitionKey, dateWindow);
+                console.log('[Competition Change] New matches fetched:', newMatches.length);
 
                 // Merge with existing fixtures, ensuring uniqueness by ID
-                setFixtures((prevFixtures) => {
+                setFixtures(prevFixtures => {
                     const combined = [...prevFixtures, ...newMatches];
                     const unique = Array.from(
-                        new Map(combined.map((fixture) => [fixture.id, fixture])).values()
+                        new Map(combined.map(fixture => [fixture.id, fixture])).values()
                     );
                     return sortFixtures(unique, showFutureFixtures);
                 });
@@ -315,7 +315,7 @@ export function useFixtures(initialParams) {
         } finally {
             setLoading(false);
         }
-    }, [fetchFixturesForCompetition, selectedCompetitions, showFutureFixtures]);
+    }, [fetchFixturesForCompetition, selectedCompetitions, showFutureFixtures, dateWindow]);
 
     return {
         // State
