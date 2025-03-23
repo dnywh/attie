@@ -5,26 +5,26 @@ import AmericanFootballIcon from "@/components/AmericanFootballIcon";
 import RugbyLeagueIcon from "@/components/RugbyLeagueIcon";
 
 export const SPORTS = {
+    'american-football': {
+        name: 'American Football',
+        localName: 'Football', // Because "American Football" looks weird to American audiences
+        icon: AmericanFootballIcon,
+    },
     'aussie-rules': {
         name: "Aussie Rules",
         icon: AmericanFootballIcon,
-    },
-    'football': {
-        name: 'Football',
-        icon: FootballIcon,
-    },
-    'basketball': {
-        name: 'Basketball',
-        icon: BasketballIcon,
     },
     'baseball': {
         name: 'Baseball',
         icon: BaseballIcon,
     },
-    'american-football': {
-        name: 'American Football',
-        localName: 'Football', // Because "American Football" looks weird to American audiences
-        icon: AmericanFootballIcon,
+    'basketball': {
+        name: 'Basketball',
+        icon: BasketballIcon,
+    },
+    'football': {
+        name: 'Football',
+        icon: FootballIcon,
     },
     'rugby-league': {
         name: 'Rugby League',

@@ -8,7 +8,7 @@ export const WINDOW_CONFIG = {
         INCREMENT: {
             DAYS: 14, // Days to increment when loading more
         },
-        MAX_ATTEMPTS: 3, // Maximum attempts to find new fixtures when loading more
+        MAX_ATTEMPTS: 4, // Maximum attempts to find new fixtures when loading more
     },
     // Add other sports here with their own window configurations
 };

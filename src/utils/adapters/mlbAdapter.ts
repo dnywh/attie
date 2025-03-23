@@ -2,6 +2,7 @@ import { FIXTURE_STATUS } from "@/constants/fixtureStatus";
 import type { CommonFixture } from "./types";
 
 const STATUS_MAP: Record<string, string> = {
+  STATUS_SCHEDULED: FIXTURE_STATUS.SCHEDULED,
   STATUS_FINAL: FIXTURE_STATUS.FINISHED,
 };
 

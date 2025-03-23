@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { COMPETITIONS } from "@/constants/competitions";
 import { DEFAULT_WINDOWS } from '@/utils/config/windows';
 import { sortFixtures } from '@/utils/dates';
@@ -75,6 +75,9 @@ export function useFixtures(initialParams) {
             : DEFAULT_WINDOWS.INITIAL.PAST.end,
     }));
 
+    // Replace state with ref for load attempts
+    const loadAttemptsRef = useRef(0);
+
     // Add state for pagination
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -115,25 +118,38 @@ export function useFixtures(initialParams) {
             throw new Error(`Competition ${competitionKey} not found`);
         }
 
-        // Calculate date range
+        // Calculate date range based on the provided window
         const currentDate = new Date();
         const startDate = new Date(currentDate);
         const endDate = new Date(currentDate);
-        const windowStart = customDateWindow?.start || dateWindow.start;
-        const windowEnd = customDateWindow?.end || dateWindow.end;
+
+        // Always use the custom window if provided, otherwise fallback to state
+        const windowStart = customDateWindow.start;
+        const windowEnd = customDateWindow.end;
 
         if (showFutureFixtures) {
+            // For future fixtures, start from current date and go forward
             startDate.setHours(currentDate.getHours(), currentDate.getMinutes(), 0, 0);
             endDate.setDate(currentDate.getDate() + windowEnd);
             endDate.setHours(23, 59, 59, 999);
         } else {
+            // For past fixtures, go backwards from current date
             startDate.setDate(currentDate.getDate() - windowStart);
             startDate.setHours(0, 0, 0, 0);
+            endDate.setDate(currentDate.getDate() - windowEnd);
             endDate.setHours(23, 59, 59, 999);
         }
 
         const dateFrom = startDate.toISOString().split("T")[0];
         const dateTo = endDate.toISOString().split("T")[0];
+
+        console.log(`[Fetch] Date range for ${competitionKey}:`, {
+            windowStart,
+            windowEnd,
+            dateFrom,
+            dateTo,
+            showFutureFixtures
+        });
 
         try {
             const response = await fetch(
@@ -151,33 +167,86 @@ export function useFixtures(initialParams) {
             }
 
             const data = await response.json();
-
-            // Handle different API response structures (events for ESPN, matches for others)
             const fixtureArray = data.matches || data.events || [];
 
-            // Handle error if array is not in above fixtures format
             if (!Array.isArray(fixtureArray)) {
                 console.error('Expected array of fixtures, got:', fixtureArray);
                 return [];
             }
 
-            // Use the adapter pattern to standardize the data
-            const matches = fixtureArray.map(match => {
-                return adaptFixture(match, competitionKey, selectedSport);
-            });
-
-            return matches;
+            return fixtureArray.map(match => adaptFixture(match, competitionKey, selectedSport));
         } catch (error) {
             console.error(`[Fetch] Error:`, error);
             throw error;
         }
-    }, [dateWindow, showFutureFixtures, currentPage, selectedSport]);
+    }, [showFutureFixtures, currentPage, selectedSport]);
+
+    const handleLoadMore = useCallback(async (currentWindow = dateWindow) => {
+        if (loadAttemptsRef.current >= DEFAULT_WINDOWS.MAX_ATTEMPTS) {
+            console.log("[Load More] Max attempts reached");
+            setHasReachedEnd(true);
+            return;
+        }
+
+        loadAttemptsRef.current += 1;
+        console.log("[Load More] Starting load more with attempts:", loadAttemptsRef.current);
+
+        setLoadingMore(true);
+
+        try {
+            // Calculate new date window
+            const increment = DEFAULT_WINDOWS.INCREMENT.DAYS;
+            const newWindow = { ...currentWindow };
+
+            if (showFutureFixtures) {
+                newWindow.end += increment;
+            } else {
+                newWindow.start += increment;
+            }
+
+            console.log("[Load More] New date window:", newWindow);
+
+            // Fetch new fixtures for all selected competitions using the new window directly
+            const newMatches = await Promise.all(
+                selectedCompetitions.map((competitionKey) =>
+                    fetchFixturesForCompetition(competitionKey, newWindow)
+                )
+            );
+
+            const allNewMatches = newMatches.flat();
+            console.log("[Load More] Found new matches:", allNewMatches.length);
+
+            if (allNewMatches.length > 0) {
+                // Update both fixtures and date window state
+                setFixtures(prevFixtures => {
+                    const combined = [...prevFixtures, ...allNewMatches];
+                    const unique = Array.from(
+                        new Map(combined.map((fixture) => [fixture.id, fixture])).values()
+                    );
+                    return sortFixtures(unique, showFutureFixtures);
+                });
+                setDateWindow(newWindow);
+                loadAttemptsRef.current = 0; // Reset attempts on success
+            } else {
+                // If no new fixtures found, try again with the updated window
+                await handleLoadMore(newWindow);
+            }
+        } catch (error) {
+            console.error("[Load More] Error:", error);
+            if (error.message === "RATE_LIMIT_EXCEEDED") {
+                setHasRateLimitError(true);
+            }
+        } finally {
+            setLoadingMore(false);
+        }
+    }, [dateWindow, showFutureFixtures, selectedCompetitions, fetchFixturesForCompetition]);
 
     const loadInitialFixtures = useCallback(async () => {
         setLoading(true);
         setFixtures([]);
         setHasReachedEnd(false);
         setHasRateLimitError(false);
+        loadAttemptsRef.current = 0;
 
         try {
             const initialWindow = showFutureFixtures
@@ -196,11 +265,11 @@ export function useFixtures(initialParams) {
 
             // Handle case where no fixtures are found in range
             if (allMatches.length === 0) {
-                console.log("[Initial Load] No fixtures found");
-                setHasReachedEnd(true);
+                console.log("[Initial Load] No fixtures found, attempting to load more");
+                await handleLoadMore();
+            } else {
+                setFixtures(sortFixtures(allMatches, showFutureFixtures));
             }
-
-            setFixtures(sortFixtures(allMatches, showFutureFixtures));
         } catch (error) {
             console.error("[Initial Load] Error:", error);
             if (error.message === "RATE_LIMIT_EXCEEDED") {
@@ -209,7 +278,7 @@ export function useFixtures(initialParams) {
         } finally {
             setLoading(false);
         }
-    }, [fetchFixturesForCompetition, selectedCompetitions, showFutureFixtures]);
+    }, [fetchFixturesForCompetition, selectedCompetitions, showFutureFixtures, handleLoadMore]);
 
     const handleCompetitionChange = useCallback(async (competitionKey) => {
         setLoading(true);
@@ -264,7 +333,7 @@ export function useFixtures(initialParams) {
         setSelectedSport: handleSportChange,
         setSelectedCompetitions,
         handleCompetitionChange,
-        // handleLoadMore,
+        handleLoadMore,
         loadInitialFixtures,
     };
 } 

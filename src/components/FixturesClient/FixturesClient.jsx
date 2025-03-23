@@ -58,7 +58,7 @@ export default function FixturesClient({ initialParams }) {
     setSelectedCompetitions,
     setShowFutureFixtures,
     handleCompetitionChange,
-    // handleLoadMore,
+    handleLoadMore,
     loadInitialFixtures,
   } = useFixtures(initialParams);
 
@@ -343,12 +343,12 @@ export default function FixturesClient({ initialParams }) {
               </Fragment>
             ))}
 
-            {/* {(() => {
+            {(() => {
               console.log(
                 `[Render] hasReachedEnd: ${hasReachedEnd}, fixtures length: ${fixtures.length}`
               );
               return !hasReachedEnd ? (
-                <Button onClick={handleLoadMore} disabled={loadingMore}>
+                <Button onClick={() => handleLoadMore()} disabled={loadingMore}>
                   {loadingMore ? (
                     <LoadingText>Loading</LoadingText>
                   ) : (
@@ -364,7 +364,7 @@ export default function FixturesClient({ initialParams }) {
                   </SelectionExplainerText>
                 </EmptyState>
               );
-            })()} */}
+            })()}
           </AllFixturesList>
         ) : (
           <EmptyState>
