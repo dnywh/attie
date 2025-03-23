@@ -25,7 +25,6 @@ export async function GET(request) {
     try {
         // Doesn't support date range, so make an array instead based on dateFrom and dateTo
         const datesArray = generateDateRange(dateFrom, dateTo);
-        console.log('[MLB API] Generated dates array:', datesArray);
 
         const response = await api.mlb.getGames({
             dates: datesArray,

@@ -24,7 +24,6 @@ export async function GET(request) {
 
     try {
         const datesArray = generateDateRange(dateFrom, dateTo);
-        console.log('[NFL API] Generated dates array:', datesArray);
 
         const response = await api.nfl.getGames({
             dates: datesArray,
