@@ -29,7 +29,7 @@ export async function GET(request) {
         );
     }
 
-    console.log(`[ESPN API] Getting ${direction} games for ${sport}, ${league}`);
+    console.log(`[ESPN API] Getting ${direction} games for sport: ${sport}, competition: ${league}`);
 
     const apiUrl = `${API_BASE_URL}/${sport}/${league}/scoreboard?dates=${dateFrom}-${dateTo}${groups ? `&groups=${groups}` : ''}&limit=${limit ? limit : 100}`
     console.log(`[ESPN API] URL: ${apiUrl}`)
@@ -61,7 +61,7 @@ export async function GET(request) {
 
         const data = await response.json();
         const matchCount = data.events?.length || 0;
-        console.log(`[ESPN API] Found ${matchCount} matches for ${sport}, ${league}`);
+        console.log(`[ESPN API] Found ${matchCount} matches for sport: ${sport}, competition: ${league}`);
 
         return NextResponse.json({
             events: data.events || [],
