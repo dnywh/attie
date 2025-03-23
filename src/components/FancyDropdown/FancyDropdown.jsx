@@ -79,14 +79,17 @@ const StyledButton = styled("button")(({ theme }) => ({
   borderRadius: "2px",
   boxShadow: `0.5px 1.5px 0 0 ${theme.colors.background.foremost}`,
 
-  transition: `transform 150ms ${theme.curves.spring.heavy}`,
+  transition: `transform 150ms ${theme.curves.spring.light}`,
   // transformOrigin: "bottom center",
 
   "&:hover": {
     transform: "translateY(-1.5px) scale(1.005)",
   },
   "&:active": {
-    transform: "translateY(0) scale(0.965)",
+    "&:(pointer: coarse)": {
+      // Only apply to touch screens and similar
+      transform: "translateY(0) scale(0.965)",
+    },
   },
 
   position: "relative", // For SVG
@@ -158,7 +161,7 @@ const StyledDialogPanel = styled(DialogPanel)(({ theme }) => ({
 
     "&[data-closed]": {
       transform:
-        "translateX(-48%) translateY(calc(-50% + 1.75rem)) rotate(-2.25deg)",
+        "translateX(-48%) translateY(calc(-50% + 2.5rem)) rotate(-2.25deg)",
     },
   },
 }));
