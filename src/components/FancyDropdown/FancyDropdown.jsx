@@ -79,7 +79,7 @@ const StyledButton = styled("button")(({ theme }) => ({
   borderRadius: "2px",
   boxShadow: `0.5px 1.5px 0 0 ${theme.colors.background.foremost}`,
 
-  transition: `transform ${theme.curves.springy}`,
+  transition: `transform 150ms ${theme.curves.spring.heavy}`,
   // transformOrigin: "bottom center",
 
   "&:hover": {
@@ -131,25 +131,35 @@ const StyledDialog = styled(Dialog)({
   zIndex: "50",
 });
 
-const DialogInner = styled("div")(({ theme }) => ({
+const StyledDialogPanel = styled(DialogPanel)(({ theme }) => ({
   position: "fixed",
   bottom: "0.5rem",
   left: "50%",
-  transform: "translateX(-50%)",
+  // Specify all transform properties in initial state
+  transform: "translateX(-50%) translateY(0) rotate(0deg)",
   backgroundColor: theme.colors.background.interstitial,
   padding: "0 0 1.75rem",
   width: "calc(100% - 1rem)",
   maxWidth: "30rem",
   borderRadius: "0.25rem",
-
   maxHeight: "calc(100dvh - 5rem)",
   overflowY: "scroll",
+  transition: `opacity 50ms ease, transform 150ms ${theme.curves.spring.light}`,
+
+  "&[data-closed]": {
+    opacity: 0,
+    transform: "translateX(-50%) translateY(15%) rotate(0deg)",
+  },
 
   "@media (min-height: 768px)": {
-    transform: "translateX(-50%) translateY(50%)",
     top: "50%",
     bottom: "unset",
-    transform: "translate(-50%, -50%)",
+    transform: "translateX(-50%) translateY(-50%) rotate(0deg)",
+
+    "&[data-closed]": {
+      transform:
+        "translateX(-48%) translateY(calc(-50% + 1.75rem)) rotate(-2.25deg)",
+    },
   },
 }));
 
@@ -168,7 +178,12 @@ const StyledDialogBackdropOne = styled(DialogBackdrop)(({ theme }) => ({
   right: "0",
   bottom: "0",
   backgroundColor: "#FA6565",
-  opacity: "95%",
+  opacity: 0.95,
+  transition: "opacity 150ms ease",
+
+  "&[data-closed]": {
+    opacity: 0,
+  },
 }));
 
 const StyledDialogBackdropTwo = styled(DialogBackdrop)({
@@ -177,7 +192,14 @@ const StyledDialogBackdropTwo = styled(DialogBackdrop)({
   left: "0",
   right: "0",
   bottom: "0",
-  backdropFilter: "grayscale(96%) sepia(30%)",
+  backdropFilter: "grayscale(96%) sepia(30%) opacity(1)",
+  // transition: "backdrop-filter 150ms ease",
+  transition: "opacity 150ms ease",
+
+  "&[data-closed]": {
+    // backdropFilter: "grayscale(96%) sepia(30%) opacity(0)",
+    opacity: 0,
+  },
 });
 
 function FancyDropdown({
@@ -186,7 +208,6 @@ function FancyDropdown({
   fillSpace = false,
   count,
   children,
-  ...props
 }) {
   const [isOpen, setIsOpen] = useState(false);
   function open() {
@@ -208,17 +229,15 @@ function FancyDropdown({
       </StyledButton>
 
       <StyledDialog open={isOpen} onClose={() => setIsOpen(false)}>
-        <StyledDialogBackdropOne />
-        <StyledDialogBackdropTwo />
-        <DialogInner>
-          <DialogPanel transition>
-            <DialogHeader>
-              <Button onClick={close}>Close</Button>
-              {/* <DialogTitle>Sport and competitions</DialogTitle> */}
-            </DialogHeader>
-            <DialogContent>{children}</DialogContent>
-          </DialogPanel>
-        </DialogInner>
+        <StyledDialogBackdropOne transition />
+        <StyledDialogBackdropTwo transition />
+        <StyledDialogPanel transition>
+          <DialogHeader>
+            <Button onClick={close}>Close</Button>
+            {/* <DialogTitle>Sport and competitions</DialogTitle> */}
+          </DialogHeader>
+          <DialogContent>{children}</DialogContent>
+        </StyledDialogPanel>
       </StyledDialog>
     </>
   );

@@ -11,7 +11,7 @@ const Block = styled("div")(({ theme }) => ({
   height: "2rem",
   color: "black",
   borderRadius: "50%",
-  transition: `transform ${theme.curves.springy}`,
+  transition: `transform 180ms ${theme.curves.spring.heavy}`,
   "&:hover": {
     transform: "scale(1.1)",
   },

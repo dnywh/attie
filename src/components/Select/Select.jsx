@@ -47,7 +47,7 @@ const Wrapper = styled("div")(({ theme }) => ({
   color: theme.colors.text.primary,
   ...bleedingWhiteCard({ theme }),
 
-  transition: `transform ${theme.curves.springy}`,
+  transition: `transform 180ms ${theme.curves.spring.heavy}`,
 
   "&:hover": {
     transform: "scale(1.005)",

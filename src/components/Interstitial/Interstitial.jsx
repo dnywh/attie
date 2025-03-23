@@ -32,7 +32,7 @@ const Visible = styled("div")(({ theme }) => ({
   "& > a": {
     fontStyle: "italic",
     fontWeight: "600",
-    transition: `transform ${theme.curves.springy}`,
+    transition: `transform 180ms ${theme.curves.spring.heavy}`,
     "&:hover": {
       transform: "scale(1.05)",
     },
@@ -49,7 +49,7 @@ const Inner = styled("div")(({ theme }) => ({
     "& > a": {
       fontStyle: "italic",
       fontWeight: "600",
-      transition: `opacity ${theme.curves.smooth}, transform ${theme.curves.springy}`,
+      transition: `opacity 200ms ${theme.curves.ease.basic}, transform 180ms ${theme.curves.spring.heavy}`,
       "&:hover": {
         opacity: "0.5",
       },
@@ -70,7 +70,7 @@ function Interstitial({
         <Inner>{children}</Inner>
         {linkUrl && (
           <Link
-            href={`${linkUrl}?ref=attie&utm_medium=sponsorship`}
+            href={`${linkUrl}?utm_source=attie&utm_medium=sponsorship`}
             target="_blank"
           >
             {linkText ? linkText : "Learn more"}

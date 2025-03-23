@@ -331,7 +331,7 @@ export default function FixturesClient({ initialParams }) {
                       Attie is lovingly crafted by one-man-band,{" "}
                       {/* TODO: Use (i.e. automate) same link params as in Interstitial component footer */}
                       <Link
-                        href="https://www.dannywhite.net/?ref=attie&utm_medium=sponsorship"
+                        href="https://www.dannywhite.net/?utm_source=attie&utm_medium=sponsorship"
                         target="_blank"
                       >
                         Danny White
