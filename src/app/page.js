@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import FixturesClient from "@/components/FixturesClient";
 
 export default function Home() {
@@ -5,6 +6,9 @@ export default function Home() {
     // FixturesHeader in shared layout
     // If passing custom props to header, uncomment and set props:
     // <FixturesHeader />
-    <FixturesClient />
+    <Suspense>
+      {/* Fallback (i.e. loading) is handled inside FixturesClient */}
+      <FixturesClient />
+    </Suspense>
   );
 }

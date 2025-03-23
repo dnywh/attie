@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { Suspense } from 'react';
 import FixturesClient from "@/components/FixturesClient";
 import { COMPETITIONS } from '@/constants/competitions';
 import { SPORTS } from "@/config/sportConfig"
@@ -64,5 +65,10 @@ export default async function CompetitionPage({ params }) {
     // FixturesHeader in shared layout
     // If passing custom props to header, uncomment and set props:
     // <FixturesHeader />
-    return <FixturesClient initialParams={selectedCompetitionParams} />
+    return (
+        <Suspense>
+            {/* Fallback (i.e. loading) is handled inside FixturesClient */}
+            <FixturesClient initialParams={selectedCompetitionParams} />
+        </Suspense>
+    );
 } 
