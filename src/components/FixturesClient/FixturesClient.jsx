@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, Fragment } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Legend } from "@headlessui/react";
 import Select from "@/components/Select";
 import Fixture from "@/components/Fixture";
@@ -39,12 +40,23 @@ export default function FixturesClient({ initialParams }) {
   const [isClient, setIsClient] = useState(false);
   const [showAllScores, setShowAllScores] = useState(false);
   const [useSoundEffects, setUseSoundEffects] = useState(true);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    setIsClient(true); // Avoid hydration issues as described below
+    setIsClient(true);
   }, []);
 
-  // Pass initialParams to useFixtures
+  // Get URL params, but prioritize initialParams if they exist
+  const urlParams = {
+    sport: searchParams?.get("sport"),
+    competitions: searchParams?.get("competitions")?.split(","),
+    direction: searchParams?.get("direction") === "forwards",
+  };
+
+  // Use initialParams if provided (for dynamic routes), otherwise use URL params
+  const params = initialParams || urlParams;
+
+  // Pass params to useFixtures
   const {
     fixtures,
     loading,
@@ -60,7 +72,7 @@ export default function FixturesClient({ initialParams }) {
     handleCompetitionChange,
     handleLoadMore,
     loadInitialFixtures,
-  } = useFixtures(initialParams);
+  } = useFixtures(params);
 
   // Filter competitions based on selected sport
   const availableCompetitions = Object.entries(
@@ -88,44 +100,50 @@ export default function FixturesClient({ initialParams }) {
     if (!isClient) return; // Don't update URL during SSR
 
     const params = new URLSearchParams();
+    const isCompetitionPage = window.location.pathname !== "/";
 
-    // Compare against provided defaults or global defaults
-    const compareDefaults = initialParams || DEFAULTS;
-
-    // Track if we've deviated from the initialParams
-    let hasDeviatedFromInitialParams = false;
-
-    if (selectedSport !== (compareDefaults.sport || DEFAULTS.SPORT)) {
-      params.set("sport", selectedSport);
-      hasDeviatedFromInitialParams = true;
-    }
-
+    // If we're on a competition page and trying to change to a different competition,
+    // redirect to the home page with the new params
     if (
-      !arraysEqual(
-        selectedCompetitions,
-        compareDefaults.competitions || DEFAULTS.COMPETITIONS
-      )
+      isCompetitionPage &&
+      !arraysEqual(selectedCompetitions, initialParams.competitions)
     ) {
+      if (selectedSport !== initialParams.sport) {
+        params.set("sport", selectedSport);
+      }
       params.set("competitions", selectedCompetitions.join(","));
-      hasDeviatedFromInitialParams = true;
+      if (showFutureFixtures !== DEFAULTS.DIRECTION) {
+        params.set("direction", showFutureFixtures ? "forwards" : "backwards");
+      }
+      window.history.replaceState(
+        {},
+        "",
+        params.toString() ? `/?${params}` : "/"
+      );
+      return;
     }
 
-    if (
-      showFutureFixtures !== (compareDefaults.direction ?? DEFAULTS.DIRECTION)
-    ) {
+    // For other changes, only add params that differ from defaults
+    // But only compare against DEFAULTS if we're on the home page
+    const compareAgainst = isCompetitionPage ? initialParams : DEFAULTS;
+
+    if (selectedSport !== compareAgainst.sport) {
+      params.set("sport", selectedSport);
+    }
+    if (!arraysEqual(selectedCompetitions, compareAgainst.competitions)) {
+      params.set("competitions", selectedCompetitions.join(","));
+    }
+    if (showFutureFixtures !== compareAgainst.direction) {
       params.set("direction", showFutureFixtures ? "forwards" : "backwards");
-      hasDeviatedFromInitialParams = true;
     }
 
-    // If we've deviated from the initialParams, use root path
-    // Otherwise, keep the current path (which might include the initialParams)
-    const basePath = hasDeviatedFromInitialParams
-      ? "/"
-      : window.location.pathname;
-
-    const newUrl = params.toString() ? `${basePath}?${params}` : basePath;
-
-    window.history.replaceState({}, "", newUrl);
+    // Use the current path if we're on a competition page, otherwise use root
+    const basePath = isCompetitionPage ? window.location.pathname : "/";
+    window.history.replaceState(
+      {},
+      "",
+      params.toString() ? `${basePath}?${params}` : basePath
+    );
   }, [
     selectedSport,
     selectedCompetitions,

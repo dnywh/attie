@@ -43,8 +43,6 @@ export async function generateMetadata({ params }) {
 
 export default async function CompetitionPage({ params }) {
     const { competition } = await params;
-    console.log('Selected competition:', competition);
-
     // The dynamic generation of pages meanings that going to a non-existant slug will crash this React app once it tries to find its corresponding competition details
     // We therefore should check if the passed path matches a competition before continuing
     // Check if the page slug exists as a competition in COMPETITIONS

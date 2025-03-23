@@ -162,7 +162,7 @@ const StyledDialogPanel = styled(DialogPanel)(({ theme }) => ({
 
     "&[data-closed]": {
       transform:
-        "translateX(-48%) translateY(calc(-50% + 2.5rem)) rotate(-5deg)",
+        "translateX(-50%) translateY(calc(-50% + 2.5rem)) rotate(-3.5deg)",
     },
   },
 }));
