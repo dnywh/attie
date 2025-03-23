@@ -130,33 +130,40 @@ export function useFixtures(initialParams) {
 
         if (showFutureFixtures) {
             // For future fixtures, start from current date and go forward
-            startDate.setHours(currentDate.getHours(), currentDate.getMinutes(), 0, 0);
+            startDate.setHours(0, 0, 0, 0); // Start from beginning of current day
             endDate.setDate(currentDate.getDate() + windowEnd);
             endDate.setHours(23, 59, 59, 999);
         } else {
             // For past fixtures, go backwards from current date
             startDate.setDate(currentDate.getDate() - windowStart);
             startDate.setHours(0, 0, 0, 0);
-            endDate.setDate(currentDate.getDate() - windowEnd);
-            endDate.setHours(23, 59, 59, 999);
+            endDate.setHours(23, 59, 59, 999); // Include full current day
         }
 
         const dateFrom = startDate.toISOString().split("T")[0];
         const dateTo = endDate.toISOString().split("T")[0];
+
+        // For ESPN adapter, add one day to the end date since their API is exclusive of the end date
+        const adjustedDateTo = competition.api.adapter === 'espn'
+            ? new Date(endDate.getTime() + 24 * 60 * 60 * 1000).toISOString().split("T")[0]
+            : dateTo;
 
         console.log(`[Fetch] Date range for ${competitionKey}:`, {
             windowStart,
             windowEnd,
             dateFrom,
             dateTo,
-            showFutureFixtures
+            adjustedDateTo,
+            showFutureFixtures,
+            startDate: startDate.toISOString(),
+            endDate: endDate.toISOString()
         });
 
         try {
             const response = await fetch(
                 buildApiUrl(competition, {
                     dateFrom,
-                    dateTo,
+                    dateTo: adjustedDateTo,
                     direction: showFutureFixtures ? "future" : "past",
                     cursor,
                     page: currentPage

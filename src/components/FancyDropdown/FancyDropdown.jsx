@@ -86,7 +86,7 @@ const StyledButton = styled("button")(({ theme }) => ({
     transform: "translateY(-1.5px) scale(1.005)",
   },
   "&:active": {
-    "&:(pointer: coarse)": {
+    "@media (pointer: coarse)": {
       // Only apply to touch screens and similar
       transform: "translateY(0) scale(0.965)",
     },
@@ -157,11 +157,12 @@ const StyledDialogPanel = styled(DialogPanel)(({ theme }) => ({
   "@media (min-height: 768px)": {
     top: "50%",
     bottom: "unset",
+    transition: `opacity 50ms ease, transform 100ms ${theme.curves.spring.light}`,
     transform: "translateX(-50%) translateY(-50%) rotate(0deg)",
 
     "&[data-closed]": {
       transform:
-        "translateX(-48%) translateY(calc(-50% + 2.5rem)) rotate(-2.25deg)",
+        "translateX(-48%) translateY(calc(-50% + 2.5rem)) rotate(-5deg)",
     },
   },
 }));
