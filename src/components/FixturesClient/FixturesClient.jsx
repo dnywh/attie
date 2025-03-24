@@ -123,27 +123,37 @@ export default function FixturesClient({ initialParams }) {
       return;
     }
 
-    // For other changes, only add params that differ from defaults
-    // But only compare against DEFAULTS if we're on the home page
+    // For the homepage, only add params if they differ from defaults
+    // For competition pages, compare against initialParams
     const compareAgainst = isCompetitionPage ? initialParams : DEFAULTS;
+    const shouldUpdateUrl =
+      isCompetitionPage ||
+      selectedSport !== DEFAULTS.SPORT ||
+      !arraysEqual(selectedCompetitions, DEFAULTS.COMPETITIONS) ||
+      showFutureFixtures !== DEFAULTS.DIRECTION;
 
-    if (selectedSport !== compareAgainst.sport) {
-      params.set("sport", selectedSport);
-    }
-    if (!arraysEqual(selectedCompetitions, compareAgainst.competitions)) {
-      params.set("competitions", selectedCompetitions.join(","));
-    }
-    if (showFutureFixtures !== compareAgainst.direction) {
-      params.set("direction", showFutureFixtures ? "forwards" : "backwards");
-    }
+    if (shouldUpdateUrl) {
+      if (selectedSport !== compareAgainst.sport) {
+        params.set("sport", selectedSport);
+      }
+      if (!arraysEqual(selectedCompetitions, compareAgainst.competitions)) {
+        params.set("competitions", selectedCompetitions.join(","));
+      }
+      if (showFutureFixtures !== compareAgainst.direction) {
+        params.set("direction", showFutureFixtures ? "forwards" : "backwards");
+      }
 
-    // Use the current path if we're on a competition page, otherwise use root
-    const basePath = isCompetitionPage ? window.location.pathname : "/";
-    window.history.replaceState(
-      {},
-      "",
-      params.toString() ? `${basePath}?${params}` : basePath
-    );
+      // Use the current path if we're on a competition page, otherwise use root
+      const basePath = isCompetitionPage ? window.location.pathname : "/";
+      window.history.replaceState(
+        {},
+        "",
+        params.toString() ? `${basePath}?${params}` : basePath
+      );
+    } else if (!isCompetitionPage) {
+      // If we're on the homepage and everything matches defaults, ensure clean URL
+      window.history.replaceState({}, "", "/");
+    }
   }, [
     selectedSport,
     selectedCompetitions,
