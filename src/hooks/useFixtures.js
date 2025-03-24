@@ -295,11 +295,16 @@ export function useFixtures(initialParams) {
             if (selectedCompetitions.includes(competitionKey)) {
                 const newSelectedCompetitions = selectedCompetitions.filter(l => l !== competitionKey);
                 setSelectedCompetitions(newSelectedCompetitions);
-                setFixtures(prevFixtures =>
-                    prevFixtures.filter(fixture =>
-                        newSelectedCompetitions.includes(fixture.competition.id)
-                    )
-                );
+                setFixtures(prevFixtures => {
+                    const filtered = prevFixtures.filter(fixture => {
+                        // Get the competition key from the competition name
+                        const fixtureCompetitionKey = Object.entries(COMPETITIONS).find(
+                            ([_, comp]) => comp.name === fixture.competition.name
+                        )?.[0];
+                        return newSelectedCompetitions.includes(fixtureCompetitionKey);
+                    });
+                    return filtered;
+                });
             } else {
                 // Add competition
                 setSelectedCompetitions(prev => [...prev, competitionKey]);
