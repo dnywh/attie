@@ -8,7 +8,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     {
       url: siteConfig.url,
       lastModified: new Date(),
-      changeFrequency: "daily" as const,
+      changeFrequency: "always" as const,
       priority: 1,
     },
   ];
@@ -18,7 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     routes.push({
       url: `${siteConfig.url}/${competitionKey}` as MetadataRoute.Sitemap[number]["url"],
       lastModified: new Date(),
-      changeFrequency: "daily" as const,
+      changeFrequency: "always" as const,
       priority: 0.9,
     });
   });

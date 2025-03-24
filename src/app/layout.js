@@ -13,8 +13,7 @@ export const metadata = {
   title: `${siteConfig.name}: ${siteConfig.byline}`,
   description: siteConfig.description,
   keywords: [
-    "sports results without the scores",
-    "sport results without spoilers",
+    ...siteConfig.meta.keywords,
     ...Object.values(COMPETITIONS).map(comp => `${comp.name} results`),
   ],
   openGraph: {

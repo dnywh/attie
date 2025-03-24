@@ -24,15 +24,14 @@ export async function generateMetadata({ params }) {
     const selectedSport = SPORTS[selectedCompetition.sport].localName ? SPORTS[selectedCompetition.sport].localName : SPORTS[selectedCompetition.sport].name
 
     const pageTitle = `Attie: ${selectedCompetition.name} results without the scores`
-    const pageDescription = `See who played ${selectedSport.toLowerCase()} overnight without spoiling the results. Attie shows recent ${selectedCompetition.name} games with scores hidden by default.`
+    const pageDescription = `See who played ${selectedSport.toLowerCase()} recently without spoiling the results. Attie shows ${selectedCompetition.name} games with scores hidden by default.`
 
     // TODO: This doesn't change if the user changes sports/competitions, is that okay?
     return {
         title: pageTitle,
         description: pageDescription,
         keywords: [
-            "sports results without the scores",
-            "sport results without spoilers",
+            ...siteConfig.meta.keywords,
             `${selectedCompetition.name} results`,
             `${selectedSport} results`,
         ],
