@@ -8,11 +8,12 @@ const PHYSICAL_SIZE = CONTAINER_SIZE * 2;
 const ROTATION = 15;
 
 const Container = styled("div")(({ theme }) => ({
+  flexShrink: 1, // Prefer to keep the score dot sized and shrink this instead
   border: "1px solid black",
   borderRadius: "2px",
   overflow: "hidden",
   width: `${CONTAINER_SIZE}px`,
-  height: `${CONTAINER_SIZE}px`,
+  aspectRatio: "1 / 1", // Keeps it square, even when shrinking
   variants: [
     {
       props: { "data-orientation": "home" },

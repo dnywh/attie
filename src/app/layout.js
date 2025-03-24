@@ -1,20 +1,29 @@
-// Supports weights 100-900
-import '@fontsource-variable/jost/wght-italic.css';
+import '@fontsource-variable/jost/wght-italic.css'; // Supports weights 100-900
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
-import { globalCss, styled } from "@pigment-css/react";
+import { siteConfig } from "@/config/site";
 import { SoundProvider } from "@/contexts/SoundContext";
+import FixturesHeader from '@/components/FixturesHeader';
+import { COMPETITIONS } from '@/constants/competitions';
+import { globalCss, styled } from "@pigment-css/react";
 import '@pigment-css/react/styles.css';
 
-import FixturesHeader from '@/components/FixturesHeader';
-
 export const metadata = {
-  title: "Attie: the anti-score scores app",
-  description: "Don’t spoil the game. Get the results without the scores.",
+  title: `${siteConfig.name}: ${siteConfig.byline}`,
+  description: siteConfig.description,
+  keywords: [
+    ...Object.values(COMPETITIONS).map(comp => `${comp.name} results without the scores`),
+  ],
+  openGraph: {
+    title: `${siteConfig.name}: ${siteConfig.byline}`,
+    type: "website",
+    description: siteConfig.description,
+    siteName: siteConfig.name,
+    url: siteConfig.url,
+  },
 };
 
 globalCss`
-
 // https://www.joshwcomeau.com/css/custom-css-reset/
 
 /* 1. Use a more-intuitive box-sizing model */

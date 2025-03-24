@@ -1,3 +1,4 @@
+import { siteConfig } from "@/config/site";
 import { styled, keyframes } from "@pigment-css/react";
 
 const scrollFade = keyframes({
@@ -65,7 +66,7 @@ function FixturesHeader() {
       <h1>
         Atti<span>e</span>
       </h1>
-      <p>The anti-score scores app</p>
+      <p>{siteConfig.byline}</p>
     </Header>
   );
 }
