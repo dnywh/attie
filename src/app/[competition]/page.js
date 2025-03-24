@@ -42,6 +42,7 @@ export async function generateMetadata({ params }) {
             description: pageDescription,
             siteName: siteConfig.name,
             url: `${siteConfig.url}/${Object.keys(COMPETITIONS).find(key => COMPETITIONS[key] === selectedCompetition)}`,
+            // TODO: The `opengraph-image` does not get passed down automatically, presumedly because this counts as a separate route segment
         },
     };
 };
