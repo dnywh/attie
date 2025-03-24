@@ -4,6 +4,7 @@ import { useScoreSound } from "@/contexts/SoundContext";
 import { styled } from "@pigment-css/react";
 
 const Block = styled("div")(({ theme }) => ({
+  flexShrink: 0,
   display: "flex",
   justifyContent: "center",
   alignItems: "center",

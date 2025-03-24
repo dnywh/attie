@@ -157,7 +157,7 @@ const StyledDialogPanel = styled(DialogPanel)(({ theme }) => ({
   "@media (min-height: 768px)": {
     top: "50%",
     bottom: "unset",
-    transition: `opacity 50ms ease, transform 100ms ${theme.curves.spring.light}`,
+    transition: `opacity 50ms ease, transform 300ms cubic-bezier(0, 0.5, 0, 1)`,
     transform: "translateX(-50%) translateY(-50%) rotate(0deg)",
 
     "&[data-closed]": {

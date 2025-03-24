@@ -61,6 +61,7 @@ const FixtureTiming = styled("div")({
     },
     "&:last-of-type": {
       textAlign: "right",
+      flexShrink: 0,
     },
   },
 });
