@@ -9,10 +9,13 @@ import { globalCss, styled } from "@pigment-css/react";
 import '@pigment-css/react/styles.css';
 
 export const metadata = {
+  metadataBase: new URL(siteConfig.url),
   title: `${siteConfig.name}: ${siteConfig.byline}`,
   description: siteConfig.description,
   keywords: [
-    ...Object.values(COMPETITIONS).map(comp => `${comp.name} results without the scores`),
+    "sports results without the scores",
+    "sport results without spoilers",
+    ...Object.values(COMPETITIONS).map(comp => `${comp.name} results`),
   ],
   openGraph: {
     title: `${siteConfig.name}: ${siteConfig.byline}`,

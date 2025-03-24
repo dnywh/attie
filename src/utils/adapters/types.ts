@@ -1,4 +1,4 @@
-import { FIXTURE_STATUS, FixtureStatusType } from "./constants";
+import { FixtureStatusType } from "@/constants/fixtureStatus";
 
 export interface StatusObject {
   type: FixtureStatusType;

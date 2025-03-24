@@ -31,12 +31,10 @@ export async function generateMetadata({ params }) {
         title: pageTitle,
         description: pageDescription,
         keywords: [
+            "sports results without the scores",
+            "sport results without spoilers",
             `${selectedCompetition.name} results`,
             `${selectedSport} results`,
-            `${selectedCompetition.name} matches`,
-            `${selectedSport} matches`,
-            `${selectedCompetition.name} no scores`,
-            `${selectedSport} no scores`,
         ],
         openGraph: {
             title: pageTitle,
