@@ -40,12 +40,12 @@ export const adaptNBAFixture = (
     homeTeam: {
       name: rawFixture.home_team.full_name,
       shortName: rawFixture.home_team.name,
-      crest: `https://interstate21.com/nba-logos/${rawFixture.home_team.abbreviation}.png`,
+      crest: `https://a1.espncdn.com/combiner/i?img=/i/teamlogos/nba/500/scoreboard/${rawFixture.home_team.abbreviation}.png&h=112&w=112`,
     },
     awayTeam: {
       name: rawFixture.visitor_team.full_name,
       shortName: rawFixture.visitor_team.name,
-      crest: `https://interstate21.com/nba-logos/${rawFixture.visitor_team.abbreviation}.png`,
+      crest: `https://a1.espncdn.com/combiner/i?img=/i/teamlogos/nba/500/scoreboard/${rawFixture.visitor_team.abbreviation}.png&h=112&w=112`,
     },
     score: {
       fullTime: {

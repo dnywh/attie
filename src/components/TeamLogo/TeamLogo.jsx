@@ -68,9 +68,9 @@ function TeamLogo({ src, alt, isHomeTeam, isKnown: initialIsKnown = true }) {
           alt={alt}
           width={PHYSICAL_SIZE}
           height={PHYSICAL_SIZE}
-          priority
+          unoptimized
           onError={() => {
-            console.log(
+            console.warn(
               `Failed to load team logo, falling back to base TeamLogo styles.\nSource: ${src}`
             );
             setImageLoadFailed(true);

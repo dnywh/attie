@@ -5,6 +5,11 @@ import { withPigment, extendTheme } from '@pigment-css/nextjs-plugin';
 
 const nextConfig = {
     images: {
+        // Increase expiration (Max Age) of cache
+        // https://vercel.com/docs/image-optimization#remote-images-cache-key
+        // https://nextjs.org/docs/app/api-reference/components/image#caching-behavior
+        minimumCacheTTL: 2678400, // 31 days (has no effect if `Image` components have `unoptimized` set)
+        // Define where remote images can be pulled from
         remotePatterns: [
             {
                 protocol: 'https',
