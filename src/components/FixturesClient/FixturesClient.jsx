@@ -105,6 +105,15 @@ export default function FixturesClient({ initialParams }) {
     const params = new URLSearchParams();
     const isCompetitionPage = window.location.pathname !== "/";
 
+    // If we're on a competition page, assume the visitor wants this to be their new default for Attie (as well as the competition's sport)
+    if (isCompetitionPage) {
+      localStorage.setItem("attie.sport", selectedSport);
+      localStorage.setItem(
+        `attie.competitions.${selectedSport}`,
+        JSON.stringify(selectedCompetitions)
+      );
+    }
+
     // If we're on a competition page and trying to change to a different competition,
     // redirect to the home page with the new params
     if (

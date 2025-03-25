@@ -410,6 +410,7 @@ export function useFixtures(initialParams) {
                     return sortFixtures(unique, showFutureFixtures);
                 });
             }
+            // Save updated competitions to localStorage
             // if (typeof window !== 'undefined') {
             localStorage.setItem(`attie.competitions.${selectedSport}`, JSON.stringify(newSelectedCompetitions));
         } catch (error) {
