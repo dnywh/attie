@@ -15,11 +15,11 @@ export async function GET(request) {
     const cursor = searchParams.get('cursor');
     const direction = searchParams.get('direction');
 
-    console.log(`[NBA API] Getting ${direction} games:`, {
-        dateFrom,
-        dateTo,
-        cursor: cursor || 'No cursor (first page)'
-    });
+    // console.log(`[NBA API] Getting ${direction} games:`, {
+    //     dateFrom,
+    //     dateTo,
+    //     cursor: cursor || 'No cursor (first page)'
+    // });
 
     try {
         const response = await api.nba.getGames({

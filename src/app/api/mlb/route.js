@@ -16,11 +16,11 @@ export async function GET(request) {
     const cursor = searchParams.get('cursor');
     const direction = searchParams.get('direction');
 
-    console.log(`[MLB API] Getting ${direction} games:`, {
-        dateFrom,
-        dateTo,
-        cursor: cursor || 'No cursor (first page)'
-    });
+    // console.log(`[MLB API] Getting ${direction} games:`, {
+    //     dateFrom,
+    //     dateTo,
+    //     cursor: cursor || 'No cursor (first page)'
+    // });
 
     try {
         // Doesn't support date range, so make an array instead based on dateFrom and dateTo

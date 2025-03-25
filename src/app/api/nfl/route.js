@@ -16,11 +16,11 @@ export async function GET(request) {
     const cursor = searchParams.get('cursor');
     const direction = searchParams.get('direction');
 
-    console.log(`[NFL API] Getting ${direction} games:`, {
-        dateFrom,
-        dateTo,
-        cursor: cursor || 'No cursor (first page)'
-    });
+    // console.log(`[NFL API] Getting ${direction} games:`, {
+    //     dateFrom,
+    //     dateTo,
+    //     cursor: cursor || 'No cursor (first page)'
+    // });
 
     try {
         const datesArray = generateDateRange(dateFrom, dateTo);

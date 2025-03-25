@@ -1,3 +1,4 @@
+// https://fontsource.org/docs/getting-started/variable
 import '@fontsource-variable/jost/wght-italic.css'; // Supports weights 100-900
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
