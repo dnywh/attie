@@ -62,7 +62,6 @@ export default async function CompetitionPage({ params }) {
     const selectedCompetitionParams = {
         competitions: [competition],// Just the key, nested in in an array since initialParams expects that format
         sport: COMPETITIONS[competition].sport,
-        direction: false // Backwards by default
     }
 
     // Return client accordingly

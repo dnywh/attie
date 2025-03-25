@@ -60,11 +60,12 @@ export default function FixturesClient({ initialParams }) {
   const urlParams = {
     sport: searchParams?.get("sport"),
     competitions: searchParams?.get("competitions")?.split(","),
-    direction: searchParams?.get("direction") === "forwards",
+    direction: searchParams?.get("direction"),
   };
 
   // Use initialParams if provided (for dynamic routes), otherwise use URL params
   const params = initialParams || urlParams;
+  console.log({ params });
 
   // Pass relevant params to useFixtures
   const {
@@ -145,6 +146,7 @@ export default function FixturesClient({ initialParams }) {
     // For the homepage, only add params if they differ from defaults
     // For competition pages, compare against initialParams
     const compareAgainst = isCompetitionPage ? initialParams : DEFAULTS;
+
     const shouldUpdateUrl =
       isCompetitionPage ||
       selectedSport !== DEFAULTS.SPORT ||
@@ -188,6 +190,17 @@ export default function FixturesClient({ initialParams }) {
     if (typeof window !== "undefined") {
       localStorage.setItem("attie.sound", JSON.stringify(newValue));
       console.log("Sound effects changed to:", newValue);
+    }
+  };
+
+  const handleDirectionChange = (newValue) => {
+    setShowFutureFixtures(newValue);
+    if (typeof window !== "undefined") {
+      localStorage.setItem(
+        "attie.show-future-fixtures",
+        JSON.stringify(newValue)
+      );
+      console.log("Show future fixtures changed to:", newValue);
     }
   };
 
@@ -323,7 +336,7 @@ export default function FixturesClient({ initialParams }) {
             <HeadingBanner as={Legend}>Fixture direction</HeadingBanner>
             <RadioGroup
               value={showFutureFixtures}
-              onChange={setShowFutureFixtures}
+              onChange={handleDirectionChange}
               aria-label="Fixture direction"
             >
               <FieldRadioRow value={false}>Backwards</FieldRadioRow>

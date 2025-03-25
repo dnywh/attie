@@ -14,20 +14,17 @@ const getStoredPreferences = () => {
             sport: DEFAULTS.SPORT,
             competitions: DEFAULTS.COMPETITIONS,
             direction: DEFAULTS.DIRECTION,
-            sound: DEFAULTS.SOUND,
         };
     }
     // Continue if on client
     const storedSport = localStorage.getItem("attie.sport");
     const storedCompetitions = localStorage.getItem(`attie.competitions.${storedSport}`);
-    const storedDirection = localStorage.getItem("attie.direction")
-    const storedSound = localStorage.getItem("attie.sound")
+    const storedDirection = localStorage.getItem("attie.show-future-fixtures")
 
     return {
         sport: storedSport || DEFAULTS.SPORT,
         competitions: storedCompetitions ? JSON.parse(storedCompetitions) : DEFAULTS.COMPETITIONS,
-        direction: storedDirection || DEFAULTS.DIRECTION,
-        sound: storedSound || DEFAULTS.SOUND
+        direction: storedDirection !== null ? JSON.parse(storedDirection) : DEFAULTS.DIRECTION,
     };
 };
 
@@ -42,12 +39,9 @@ const initializeStorage = () => {
         localStorage.setItem("attie.sport", DEFAULTS.SPORT);
         localStorage.setItem(`attie.competitions.${DEFAULTS.SPORT}`, JSON.stringify(DEFAULTS.COMPETITIONS));
     }
-    // Set other preferences
-    if (!localStorage.getItem("attie.direction")) {
-        localStorage.setItem("attie.direction", DEFAULTS.DIRECTION);
-    }
-    if (!localStorage.getItem("attie.sound")) {
-        localStorage.setItem("attie.sound", DEFAULTS.SOUND);
+    // Set other fixture-related preferences
+    if (!localStorage.getItem("attie.show-future-fixtures")) {
+        localStorage.setItem("attie.show-future-fixtures", DEFAULTS.DIRECTION);
     }
 };
 
@@ -107,13 +101,14 @@ export function useFixtures(initialParams) {
     //     sport: DEFAULTS.SPORT,
     //     competitions: DEFAULTS.COMPETITIONS,
     //     direction: DEFAULTS.DIRECTION
-    // }
-    const [useSoundEffects, setUseSoundEffects] = useState(getStoredPreferences().sound);
+    // };
 
     // Use provided params (i.e. searchParams or initialParams set by a [competition] page), or fallback to defaults
     const [showFutureFixtures, setShowFutureFixtures] = useState(
         initialParams?.direction ?? getStoredPreferences().direction
     );
+    console.log({ initialParams }, { showFutureFixtures })
+
     const [selectedSport, setSelectedSport] = useState(
         initialParams?.sport ?? getStoredPreferences().sport
     );

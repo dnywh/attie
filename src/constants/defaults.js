@@ -1,6 +1,6 @@
 export const DEFAULTS = {
     SPORT: "basketball", // SPORT: "football",
     COMPETITIONS: ["nba"], // ["premier-league"]
-    DIRECTION: true, // false = backwards
+    DIRECTION: false, // false = backwards
     SOUND: false,
 }; 
