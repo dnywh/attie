@@ -25,7 +25,7 @@ import { SPORTS } from "@/config/sportConfig";
 
 import { dashedBorder } from "@/styles/commonStyles";
 import { formatDateForDisplay, groupFixturesByDate } from "@/utils/dates";
-import { useFixtures } from "@/hooks/useFixtures";
+import { useFixtures, getStoredPreferences } from "@/hooks/useFixtures";
 
 import ScoresHiddenIcon from "@/components/ScoresHiddenIcon";
 import ScoresRevealedIcon from "@/components/ScoresRevealedIcon";
@@ -114,6 +114,7 @@ export default function FixturesClient({ initialParams }) {
     const isCompetitionPage = window.location.pathname !== "/";
 
     // If we're on a competition page, assume the visitor wants this to be their new default for Attie (as well as the competition's sport)
+    // So update localStorage accordingly
     if (isCompetitionPage) {
       localStorage.setItem("attie.sport", selectedSport);
       localStorage.setItem(
@@ -149,9 +150,9 @@ export default function FixturesClient({ initialParams }) {
 
     const shouldUpdateUrl =
       isCompetitionPage ||
-      selectedSport !== DEFAULTS.SPORT ||
-      !arraysEqual(selectedCompetitions, DEFAULTS.COMPETITIONS) ||
-      showFutureFixtures !== DEFAULTS.DIRECTION;
+      selectedSport !== getStoredPreferences().sport ||
+      !arraysEqual(selectedCompetitions, getStoredPreferences().competitions) ||
+      showFutureFixtures !== getStoredPreferences().direction;
 
     if (shouldUpdateUrl) {
       if (selectedSport !== compareAgainst.sport) {
@@ -193,6 +194,7 @@ export default function FixturesClient({ initialParams }) {
     }
   };
 
+  // Handle direction change
   const handleDirectionChange = (newValue) => {
     setShowFutureFixtures(newValue);
     if (typeof window !== "undefined") {

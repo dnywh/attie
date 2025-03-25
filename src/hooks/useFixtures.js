@@ -7,7 +7,7 @@ import { DEFAULTS } from "@/constants/defaults";
 import { ADAPTER_BASE_PATHS } from '@/utils/adapters';
 
 // Helper function to safely get stored preferences (client-side only)
-const getStoredPreferences = () => {
+export const getStoredPreferences = () => {
     // Just use standard defaults if this is run on server
     if (typeof window === 'undefined') {
         return {
