@@ -25,8 +25,11 @@ export const COMPETITIONS = {
         name: 'Premier League',
         defaultForSport: true,
         api: {
-            adapter: 'football-data',
-            code: 'PL',
+            // adapter: 'football-data',
+            // code: 'PL',
+            adapter: 'espn',
+            sport: 'soccer',
+            league: 'eng.1'
         },
     },
     'fa-cup': {

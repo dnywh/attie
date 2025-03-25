@@ -16,15 +16,28 @@ export const getStoredPreferences = () => {
             direction: DEFAULTS.DIRECTION,
         };
     }
-    // Continue if on client
-    const storedSport = localStorage.getItem("attie.sport");
+
+    // Get current sport (from storage or default)
+    const storedSport = localStorage.getItem("attie.sport") || DEFAULTS.SPORT;
+
+    // Get competitions for this sport
     const storedCompetitions = localStorage.getItem(`attie.competitions.${storedSport}`);
-    const storedDirection = localStorage.getItem("attie.direction")
+    let competitions;
+
+    if (!storedCompetitions || storedCompetitions === '[]') {
+        // If no stored competitions, get default for current sport
+        const defaultCompetition = Object.keys(COMPETITIONS).find(
+            key => COMPETITIONS[key].sport === storedSport && COMPETITIONS[key].defaultForSport
+        );
+        competitions = defaultCompetition ? [defaultCompetition] : DEFAULTS.COMPETITIONS;
+    } else {
+        competitions = JSON.parse(storedCompetitions);
+    }
 
     return {
-        sport: storedSport || DEFAULTS.SPORT,
-        competitions: storedCompetitions ? JSON.parse(storedCompetitions) : DEFAULTS.COMPETITIONS,
-        direction: storedDirection || DEFAULTS.DIRECTION,
+        sport: storedSport,
+        competitions,
+        direction: localStorage.getItem("attie.direction") || DEFAULTS.DIRECTION,
     };
 };
 
@@ -103,16 +116,16 @@ export function useFixtures(initialParams) {
     const [selectedSport, setSelectedSport] = useState(
         initialParams?.sport ?? getStoredPreferences().sport
     );
+
     const [selectedCompetitions, setSelectedCompetitions] = useState(() => {
-        if (initialParams?.competitions === undefined || initialParams?.competitions === '') {
+        if (!initialParams?.competitions) {
             return getStoredPreferences().competitions;
         }
-        // Handle string format from URL params (comma-separated)
-        if (typeof initialParams.competitions === 'string') {
-            return initialParams.competitions.split(',').filter(Boolean);
-        }
-        // Handle array format (when passed directly as prop)
-        return initialParams.competitions;
+        const comps = typeof initialParams.competitions === 'string'
+            ? initialParams.competitions.split(',').filter(Boolean)
+            : initialParams.competitions;
+
+        return comps.length > 0 ? comps : getStoredPreferences().competitions;
     });
     const [fixtures, setFixtures] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -150,7 +163,7 @@ export function useFixtures(initialParams) {
         } else {
             // Otherwise, use the default competition for this sport
             const defaultCompetitionForSport = Object.keys(COMPETITIONS).find(
-                (key) => COMPETITIONS[key].sport === newSport && COMPETITIONS[key].defaultForSport
+                key => COMPETITIONS[key].sport === newSport && COMPETITIONS[key].defaultForSport
             );
 
             if (!defaultCompetitionForSport) {
@@ -192,11 +205,21 @@ export function useFixtures(initialParams) {
         const competition = COMPETITIONS[competitionKey];
 
         if (!competition) {
-            console.warn(`Competition "${competitionKey}" not found, falling back to defaults`);
+            console.warn(`Competition "${competitionKey}" not found, falling back to default for ${selectedSport}`);
+
+            const defaultCompetitionForSport = Object.keys(COMPETITIONS).find(
+                key => COMPETITIONS[key].sport === selectedSport && COMPETITIONS[key].defaultForSport
+            );
+            console.log('[Competition Not Found] Falling back to default:', { defaultCompetitionForSport });
+
+            if (!defaultCompetitionForSport) {
+                console.error(`No default competition found for sport: ${selectedSport}`);
+                return [];
+            }
+
             // Reset to defaults and skip this fetch
-            const defaultCompetition = DEFAULTS.COMPETITIONS[0];
-            setSelectedCompetitions([defaultCompetition]);
-            localStorage.setItem(`attie.competitions.${selectedSport}`, JSON.stringify([defaultCompetition]));
+            setSelectedCompetitions([defaultCompetitionForSport]);
+            localStorage.setItem(`attie.competitions.${selectedSport}`, JSON.stringify([defaultCompetitionForSport]));
             return [];
         }
 
