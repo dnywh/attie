@@ -99,14 +99,21 @@ export function useFixtures(initialParams) {
     const [selectedDirection, setSelectedDirection] = useState(
         initialParams?.direction ?? getStoredPreferences().direction
     );
-    console.log(initialParams.direction, { selectedDirection })
 
     const [selectedSport, setSelectedSport] = useState(
         initialParams?.sport ?? getStoredPreferences().sport
     );
-    const [selectedCompetitions, setSelectedCompetitions] = useState(
-        initialParams?.competitions ?? getStoredPreferences().competitions
-    );
+    const [selectedCompetitions, setSelectedCompetitions] = useState(() => {
+        if (initialParams?.competitions === undefined || initialParams?.competitions === '') {
+            return getStoredPreferences().competitions;
+        }
+        // Handle string format from URL params (comma-separated)
+        if (typeof initialParams.competitions === 'string') {
+            return initialParams.competitions.split(',').filter(Boolean);
+        }
+        // Handle array format (when passed directly as prop)
+        return initialParams.competitions;
+    });
     const [fixtures, setFixtures] = useState([]);
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
@@ -130,7 +137,6 @@ export function useFixtures(initialParams) {
 
     // Sport change handler
     const handleSportChange = useCallback((newSport) => {
-        console.log(newSport, selectedSport)
         // Prevent unecessary updates if sport is the same
         // if (newSport === selectedSport) return;
 
@@ -186,7 +192,12 @@ export function useFixtures(initialParams) {
         const competition = COMPETITIONS[competitionKey];
 
         if (!competition) {
-            throw new Error(`Competition ${competitionKey} not found`);
+            console.warn(`Competition "${competitionKey}" not found, falling back to defaults`);
+            // Reset to defaults and skip this fetch
+            const defaultCompetition = DEFAULTS.COMPETITIONS[0];
+            setSelectedCompetitions([defaultCompetition]);
+            localStorage.setItem(`attie.competitions.${selectedSport}`, JSON.stringify([defaultCompetition]));
+            return [];
         }
 
         // Calculate date range based on the provided window
@@ -315,6 +326,13 @@ export function useFixtures(initialParams) {
         setHasReachedEnd(false);
         setHasRateLimitError(false);
         loadAttemptsRef.current = 0;
+
+        // Validate sport
+        if (!Object.values(COMPETITIONS).some(comp => comp.sport === selectedSport)) {
+            console.warn(`Sport "${selectedSport}" not found, falling back to defaults`);
+            handleSportChange(DEFAULTS.SPORT);
+            return;
+        }
 
         try {
             const initialWindow = selectedDirection === "forwards"
