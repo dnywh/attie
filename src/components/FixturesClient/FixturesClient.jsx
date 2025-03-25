@@ -39,6 +39,17 @@ import { DEFAULTS } from "@/constants/defaults";
 export default function FixturesClient({ initialParams }) {
   const [isClient, setIsClient] = useState(false);
   const [showAllScores, setShowAllScores] = useState(false);
+  const [useSoundEffects, setUseSoundEffects] = useState(() => {
+    // Check if window exists (we're on the client)
+    if (typeof window !== "undefined") {
+      const storedSoundPref = localStorage.getItem("attie.sound");
+      return storedSoundPref !== null
+        ? JSON.parse(storedSoundPref)
+        : DEFAULTS.SOUND;
+    }
+    // Default to the default value when on the server
+    return DEFAULTS.SOUND;
+  });
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -55,10 +66,8 @@ export default function FixturesClient({ initialParams }) {
   // Use initialParams if provided (for dynamic routes), otherwise use URL params
   const params = initialParams || urlParams;
 
-  // Pass params to useFixtures
+  // Pass relevant params to useFixtures
   const {
-    useSoundEffects,
-    setUseSoundEffects,
     fixtures,
     loading,
     loadingMore,
@@ -74,8 +83,6 @@ export default function FixturesClient({ initialParams }) {
     handleLoadMore,
     loadInitialFixtures,
   } = useFixtures(params);
-
-  // console.log({ useSoundEffects });
 
   // Filter competitions based on selected sport
   const availableCompetitions = Object.entries(
@@ -173,6 +180,16 @@ export default function FixturesClient({ initialParams }) {
     isClient,
     initialParams,
   ]);
+
+  // Handle sound preference changes
+  const handleSoundEffectsChange = (newValue) => {
+    setUseSoundEffects(newValue);
+    // Only attempt to use localStorage on the client
+    if (typeof window !== "undefined") {
+      localStorage.setItem("attie.sound", JSON.stringify(newValue));
+      console.log("Sound effects changed to:", newValue);
+    }
+  };
 
   // Prevent hydration mismatch by not rendering dynamic content on server
   // I.e. render same static loading content by default on both server and client
@@ -278,7 +295,7 @@ export default function FixturesClient({ initialParams }) {
               <HeadingBanner as={Legend}>Sound effects</HeadingBanner>
               <RadioGroup
                 value={useSoundEffects}
-                onChange={setUseSoundEffects}
+                onChange={handleSoundEffectsChange}
                 aria-label="Sound effects"
                 disabled={showAllScores}
               >
