@@ -25,7 +25,7 @@ import { SPORTS } from "@/config/sportConfig";
 
 import { dashedBorder } from "@/styles/commonStyles";
 import { formatDateForDisplay, groupFixturesByDate } from "@/utils/dates";
-import { useFixtures, getStoredPreferences } from "@/hooks/useFixtures";
+import { useFixtures } from "@/hooks/useFixtures";
 
 import ScoresHiddenIcon from "@/components/ScoresHiddenIcon";
 import ScoresRevealedIcon from "@/components/ScoresRevealedIcon";
@@ -65,7 +65,6 @@ export default function FixturesClient({ initialParams }) {
 
   // Use initialParams if provided (for dynamic routes), otherwise use URL params
   const params = initialParams || urlParams;
-  console.log({ params });
 
   // Pass relevant params to useFixtures
   const {
@@ -74,15 +73,13 @@ export default function FixturesClient({ initialParams }) {
     loadingMore,
     hasReachedEnd,
     hasRateLimitError,
-    showFutureFixtures,
+    selectedDirection,
     selectedSport,
     setSelectedSport,
     selectedCompetitions,
-    setSelectedCompetitions,
-    setShowFutureFixtures,
+    setSelectedDirection,
     handleCompetitionChange,
     handleLoadMore,
-    loadInitialFixtures,
   } = useFixtures(params);
 
   // Filter competitions based on selected sport
@@ -114,7 +111,6 @@ export default function FixturesClient({ initialParams }) {
     const isCompetitionPage = window.location.pathname !== "/";
 
     // If we're on a competition page, assume the visitor wants this to be their new default for Attie (as well as the competition's sport)
-    // So update localStorage accordingly
     if (isCompetitionPage) {
       localStorage.setItem("attie.sport", selectedSport);
       localStorage.setItem(
@@ -123,7 +119,7 @@ export default function FixturesClient({ initialParams }) {
       );
     }
 
-    // If we're on a competition page and trying to change to a different competition,
+    // If we're on a competition page and trying to change a param (another competition, sport, or just the direction),
     // redirect to the home page with the new params
     if (
       isCompetitionPage &&
@@ -133,8 +129,9 @@ export default function FixturesClient({ initialParams }) {
         params.set("sport", selectedSport);
       }
       params.set("competitions", selectedCompetitions.join(","));
-      if (showFutureFixtures !== DEFAULTS.DIRECTION) {
-        params.set("direction", showFutureFixtures ? "forwards" : "backwards");
+
+      if (selectedDirection !== DEFAULTS.DIRECTION) {
+        params.set("direction", selectedDirection);
       }
       window.history.replaceState(
         {},
@@ -146,13 +143,19 @@ export default function FixturesClient({ initialParams }) {
 
     // For the homepage, only add params if they differ from defaults
     // For competition pages, compare against initialParams
-    const compareAgainst = isCompetitionPage ? initialParams : DEFAULTS;
+    const compareAgainst = isCompetitionPage
+      ? initialParams
+      : {
+          sport: DEFAULTS.SPORT,
+          competitions: DEFAULTS.COMPETITIONS,
+          direction: DEFAULTS.DIRECTION,
+        };
 
     const shouldUpdateUrl =
       isCompetitionPage ||
-      selectedSport !== getStoredPreferences().sport ||
-      !arraysEqual(selectedCompetitions, getStoredPreferences().competitions) ||
-      showFutureFixtures !== getStoredPreferences().direction;
+      selectedSport !== DEFAULTS.SPORT ||
+      !arraysEqual(selectedCompetitions, DEFAULTS.COMPETITIONS) ||
+      selectedDirection !== DEFAULTS.DIRECTION;
 
     if (shouldUpdateUrl) {
       if (selectedSport !== compareAgainst.sport) {
@@ -161,8 +164,8 @@ export default function FixturesClient({ initialParams }) {
       if (!arraysEqual(selectedCompetitions, compareAgainst.competitions)) {
         params.set("competitions", selectedCompetitions.join(","));
       }
-      if (showFutureFixtures !== compareAgainst.direction) {
-        params.set("direction", showFutureFixtures ? "forwards" : "backwards");
+      if (selectedDirection !== compareAgainst.direction) {
+        params.set("direction", selectedDirection);
       }
 
       // Use the current path if we're on a competition page, otherwise use root
@@ -179,7 +182,7 @@ export default function FixturesClient({ initialParams }) {
   }, [
     selectedSport,
     selectedCompetitions,
-    showFutureFixtures,
+    selectedDirection,
     isClient,
     initialParams,
   ]);
@@ -194,15 +197,13 @@ export default function FixturesClient({ initialParams }) {
     }
   };
 
-  // Handle direction change
   const handleDirectionChange = (newValue) => {
-    setShowFutureFixtures(newValue);
+    const newDirection = newValue ? "forwards" : "backwards";
+    setSelectedDirection(newDirection);
+    // Only attempt to use localStorage on the client
     if (typeof window !== "undefined") {
-      localStorage.setItem(
-        "attie.show-future-fixtures",
-        JSON.stringify(newValue)
-      );
-      console.log("Show future fixtures changed to:", newValue);
+      localStorage.setItem("attie.direction", newDirection);
+      console.log("Direction changed to:", newDirection);
     }
   };
 
@@ -290,7 +291,7 @@ export default function FixturesClient({ initialParams }) {
           </>
         </FancyDropdown>
 
-        {!showFutureFixtures && (
+        {selectedDirection === "backwards" && (
           <FancyDropdown
             icon={showAllScores ? <ScoresRevealedIcon /> : <ScoresHiddenIcon />}
           >
@@ -327,7 +328,7 @@ export default function FixturesClient({ initialParams }) {
         )}
         <FancyDropdown
           icon={
-            showFutureFixtures ? (
+            selectedDirection === "forwards" ? (
               <FixturesForwardIcon />
             ) : (
               <FixturesBackwardIcon />
@@ -337,7 +338,7 @@ export default function FixturesClient({ initialParams }) {
           <Fieldset>
             <HeadingBanner as={Legend}>Fixture direction</HeadingBanner>
             <RadioGroup
-              value={showFutureFixtures}
+              value={selectedDirection === "forwards"}
               onChange={handleDirectionChange}
               aria-label="Fixture direction"
             >
@@ -346,7 +347,7 @@ export default function FixturesClient({ initialParams }) {
             </RadioGroup>
           </Fieldset>
           <SelectionExplainerText>
-            {showFutureFixtures
+            {selectedDirection === "forwards"
               ? "Shows upcoming fixtures, from today into the future."
               : "Shows in-progress or finished fixtures, from today back."}
           </SelectionExplainerText>
@@ -358,7 +359,8 @@ export default function FixturesClient({ initialParams }) {
           <EmptyState>
             <SelectionExplainerText>
               <LoadingText>
-                Loading {showFutureFixtures && "upcoming"} fixtures
+                Loading {selectedDirection === "forwards" && "upcoming"}{" "}
+                fixtures
               </LoadingText>
             </SelectionExplainerText>
           </EmptyState>
@@ -369,7 +371,7 @@ export default function FixturesClient({ initialParams }) {
                 fixtures.filter((fixture) => {
                   const fixtureDate = new Date(fixture.utcDate);
                   const now = new Date();
-                  return showFutureFixtures
+                  return selectedDirection === "forwards"
                     ? fixtureDate >= now
                     : fixtureDate <= now;
                 })
@@ -444,7 +446,9 @@ export default function FixturesClient({ initialParams }) {
               {!selectedCompetitions.length
                 ? "Select a competition from above"
                 : `No fixtures found across the ${
-                    showFutureFixtures ? `next few months` : `last few months`
+                    selectedDirection === "forwards"
+                      ? `next few months`
+                      : `last few months`
                   }`}
             </SelectionExplainerText>
           </EmptyState>
