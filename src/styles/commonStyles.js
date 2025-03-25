@@ -53,6 +53,12 @@ export const teamText = ({
     textTransform: "uppercase",
 });
 
+// Helper function for creating a stippled background
+export const createStippledBackground = ({ fill }) =>
+    ({ theme }) => ({
+        background: `repeating-linear-gradient(to right, transparent, transparent 2px, ${fill} 2px, ${fill} 4px), repeating-linear-gradient(to bottom, transparent, transparent 2px,${fill} 2px,${fill} 4px), color-mix(in hsl, ${fill}, black 2.5%)`,
+    });
+
 export const dashedBorder = ({ theme }) => ({
     paddingTop: "1.5rem",
     // Dashed border generator

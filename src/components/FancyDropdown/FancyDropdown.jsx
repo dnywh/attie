@@ -13,12 +13,12 @@ import CountDot from "@/components/CountDot";
 import DropdownIcon from "@/components/DropdownIcon";
 import FootballIcon from "@/components/FootballIcon";
 import { styled, keyframes } from "@pigment-css/react";
-// import {
-//   createCardStyle,
-//   veryBasicCardStyle,
-//   smallCardStyle,
-// } from "@/styles/commonStyles";
-import { teamText, mediumText, ellipsizedText } from "@/styles/commonStyles";
+import {
+  veryBasicCardStyle,
+  createStippledBackground,
+  mediumText,
+  ellipsizedText,
+} from "@/styles/commonStyles";
 
 const scrollShadow = keyframes({
   from: {
@@ -40,7 +40,9 @@ const DialogHeader = styled("header")(({ theme }) => ({
   position: "sticky",
   top: "0",
   // Sticky styling
-  backgroundColor: theme.colors.background.interstitial,
+  ...createStippledBackground({ fill: theme.colors.background.interstitial })({
+    theme,
+  }),
   padding: "0 0.75rem",
   minHeight: "3rem", // 48px
 
@@ -70,11 +72,6 @@ const StyledButton = styled("button")(({ theme }) => ({
   // textWrap: "noWrap",
   overflow: "hidden",
   // whiteSpace: "nowrap",
-
-  // ...createCardStyle({ interactive: true })({ theme }),
-
-  // ...veryBasicCardStyle({ theme }),
-
   border: `1px solid ${theme.colors.text.primary}`,
   borderRadius: "2px",
   boxShadow: `0.5px 1.5px 0 0 ${theme.colors.background.foremost}`,
@@ -136,11 +133,14 @@ const StyledDialog = styled(Dialog)({
 
 const StyledDialogPanel = styled(DialogPanel)(({ theme }) => ({
   position: "fixed",
-  bottom: "0.5rem",
+  bottom: "calc(0.5rem + 4px)", // Account for big shadow on veryBasicCardStyle
   left: "50%",
   // Specify all transform properties in initial state
   transform: "translateX(-50%) translateY(0) rotate(0deg)",
-  backgroundColor: theme.colors.background.interstitial,
+  ...veryBasicCardStyle({ theme }),
+  ...createStippledBackground({ fill: theme.colors.background.interstitial })({
+    theme,
+  }),
   padding: "0 0 1.75rem",
   width: "calc(100% - 1rem)",
   maxWidth: "30rem",
@@ -154,7 +154,8 @@ const StyledDialogPanel = styled(DialogPanel)(({ theme }) => ({
     transform: "translateX(-50%) translateY(15%) rotate(0deg)",
   },
 
-  "@media (min-height: 768px)": {
+  // Center on larger viewport heights
+  "@media (min-height: 960px)": {
     top: "50%",
     bottom: "unset",
     transition: `opacity 50ms ease, transform 300ms cubic-bezier(0, 0.5, 0, 1)`,

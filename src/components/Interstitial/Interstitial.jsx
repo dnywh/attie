@@ -3,6 +3,7 @@ import { styled } from "@pigment-css/react";
 import {
   smallText,
   veryBasicCardStyle,
+  createStippledBackground,
   bleedingWhiteCard,
   dashedBorder,
 } from "@/styles/commonStyles";
@@ -16,8 +17,10 @@ const Visible = styled("div")(({ theme }) => ({
   flexDirection: "column",
   gap: "0.65rem",
   padding: "1rem",
-  backgroundColor: theme.colors.background.interstitial,
   ...veryBasicCardStyle({ theme }),
+  ...createStippledBackground({ fill: theme.colors.background.interstitial })({
+    theme,
+  }),
 
   "& > h2, & > a": {
     ...smallText,

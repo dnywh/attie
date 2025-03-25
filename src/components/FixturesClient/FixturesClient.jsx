@@ -23,7 +23,7 @@ import {
 } from "@/constants/competitions";
 import { SPORTS } from "@/config/sportConfig";
 
-import { dashedBorder } from "@/styles/commonStyles";
+import { dashedBorder, createStippledBackground } from "@/styles/commonStyles";
 import { formatDateForDisplay, groupFixturesByDate } from "@/utils/dates";
 import { useFixtures } from "@/hooks/useFixtures";
 
@@ -470,7 +470,9 @@ const ControlBar = styled("section")(({ theme }) => ({
   gap: "0.5rem",
   padding: "0.5rem",
   alignItems: "center",
-  backgroundColor: theme.colors.background.interstitial,
+  ...createStippledBackground({ fill: theme.colors.background.interstitial })({
+    theme,
+  }),
   overflowX: "hidden",
 
   border: `1px solid ${theme.colors.text.primary}`,
