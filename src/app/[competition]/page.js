@@ -4,6 +4,7 @@ import FixturesClient from "@/components/FixturesClient";
 import { COMPETITIONS } from '@/constants/competitions';
 import { siteConfig } from "@/config/site";
 import { SPORTS } from "@/config/sportConfig"
+import { DEFAULTS } from "@/constants/defaults";
 
 export async function generateStaticParams() {
     // Convert object keys to array of param objects
@@ -62,6 +63,7 @@ export default async function CompetitionPage({ params }) {
     const selectedCompetitionParams = {
         competitions: [competition],// Just the key, nested in in an array since initialParams expects that format
         sport: COMPETITIONS[competition].sport,
+        direction: DEFAULTS.DIRECTION,
     }
 
     // Return client accordingly

@@ -19,12 +19,12 @@ const getStoredPreferences = () => {
     // Continue if on client
     const storedSport = localStorage.getItem("attie.sport");
     const storedCompetitions = localStorage.getItem(`attie.competitions.${storedSport}`);
-    const storedDirection = localStorage.getItem("attie.show-future-fixtures")
+    const storedDirection = localStorage.getItem("attie.direction")
 
     return {
         sport: storedSport || DEFAULTS.SPORT,
         competitions: storedCompetitions ? JSON.parse(storedCompetitions) : DEFAULTS.COMPETITIONS,
-        direction: storedDirection !== null ? JSON.parse(storedDirection) : DEFAULTS.DIRECTION,
+        direction: storedDirection || DEFAULTS.DIRECTION,
     };
 };
 
@@ -40,8 +40,8 @@ const initializeStorage = () => {
         localStorage.setItem(`attie.competitions.${DEFAULTS.SPORT}`, JSON.stringify(DEFAULTS.COMPETITIONS));
     }
     // Set other fixture-related preferences
-    if (!localStorage.getItem("attie.show-future-fixtures")) {
-        localStorage.setItem("attie.show-future-fixtures", DEFAULTS.DIRECTION);
+    if (!localStorage.getItem("attie.direction")) {
+        localStorage.setItem("attie.direction", DEFAULTS.DIRECTION);
     }
 };
 
@@ -95,19 +95,11 @@ const buildApiUrl = (competition, params) => {
 };
 
 export function useFixtures(initialParams) {
-    // console.log(getStoredPreferences().sport)
-    // // Get stored preferences
-    // const storedPrefs = {
-    //     sport: DEFAULTS.SPORT,
-    //     competitions: DEFAULTS.COMPETITIONS,
-    //     direction: DEFAULTS.DIRECTION
-    // };
-
     // Use provided params (i.e. searchParams or initialParams set by a [competition] page), or fallback to defaults
-    const [showFutureFixtures, setShowFutureFixtures] = useState(
+    const [selectedDirection, setSelectedDirection] = useState(
         initialParams?.direction ?? getStoredPreferences().direction
     );
-    console.log({ initialParams }, { showFutureFixtures })
+    console.log(initialParams.direction, { selectedDirection })
 
     const [selectedSport, setSelectedSport] = useState(
         initialParams?.sport ?? getStoredPreferences().sport
@@ -122,7 +114,7 @@ export function useFixtures(initialParams) {
     const [hasRateLimitError, setHasRateLimitError] = useState(false);
     const [dateWindow, setDateWindow] = useState(() => ({
         start: DEFAULT_WINDOWS.INITIAL.PAST.start,
-        end: showFutureFixtures
+        end: selectedDirection === "forwards"
             ? DEFAULT_WINDOWS.INITIAL.FUTURE.end
             : DEFAULT_WINDOWS.INITIAL.PAST.end,
     }));
@@ -188,7 +180,7 @@ export function useFixtures(initialParams) {
         if (selectedCompetitions.length > 0) {
             loadInitialFixtures();
         }
-    }, [selectedSport, showFutureFixtures]);
+    }, [selectedSport, selectedDirection]);
 
     const fetchFixturesForCompetition = useCallback(async (competitionKey, customDateWindow, cursor = null) => {
         const competition = COMPETITIONS[competitionKey];
@@ -206,7 +198,7 @@ export function useFixtures(initialParams) {
         const windowStart = customDateWindow.start;
         const windowEnd = customDateWindow.end;
 
-        if (showFutureFixtures) {
+        if (selectedDirection === "forwards") {
             // For future fixtures, start from current date and go forward
             startDate.setHours(0, 0, 0, 0); // Start from beginning of current day
             endDate.setDate(currentDate.getDate() + windowEnd);
@@ -226,23 +218,13 @@ export function useFixtures(initialParams) {
             ? new Date(endDate.getTime() + 24 * 60 * 60 * 1000).toISOString().split("T")[0]
             : dateTo;
 
-        // console.log(`[Fetch] Date range for ${competitionKey}:`, {
-        //     windowStart,
-        //     windowEnd,
-        //     dateFrom,
-        //     dateTo,
-        //     adjustedDateTo,
-        //     showFutureFixtures,
-        //     startDate: startDate.toISOString(),
-        //     endDate: endDate.toISOString()
-        // });
 
         try {
             const response = await fetch(
                 buildApiUrl(competition, {
                     dateFrom,
                     dateTo: adjustedDateTo,
-                    direction: showFutureFixtures ? "future" : "past",
+                    direction: selectedDirection === "forwards" ? "future" : "past",
                     cursor,
                     page: currentPage
                 })
@@ -265,7 +247,7 @@ export function useFixtures(initialParams) {
             console.error(`[Fetch] Error:`, error);
             throw error;
         }
-    }, [showFutureFixtures, currentPage, selectedSport]);
+    }, [selectedDirection, currentPage, selectedSport]);
 
     const handleLoadMore = useCallback(async (currentWindow = dateWindow) => {
         if (loadAttemptsRef.current >= DEFAULT_WINDOWS.MAX_ATTEMPTS) {
@@ -283,7 +265,7 @@ export function useFixtures(initialParams) {
             const increment = DEFAULT_WINDOWS.INCREMENT.DAYS;
             const newWindow = { ...currentWindow };
 
-            if (showFutureFixtures) {
+            if (selectedDirection === "forwards") {
                 // Move the window forward by increment
                 newWindow.start = newWindow.end;
                 newWindow.end += increment;
@@ -310,7 +292,7 @@ export function useFixtures(initialParams) {
                     const unique = Array.from(
                         new Map(combined.map((fixture) => [fixture.id, fixture])).values()
                     );
-                    return sortFixtures(unique, showFutureFixtures);
+                    return sortFixtures(unique, selectedDirection);
                 });
                 setDateWindow(newWindow);
                 loadAttemptsRef.current = 0;
@@ -325,7 +307,7 @@ export function useFixtures(initialParams) {
         } finally {
             setLoadingMore(false);
         }
-    }, [dateWindow, showFutureFixtures, selectedCompetitions, fetchFixturesForCompetition]);
+    }, [dateWindow, selectedDirection, selectedCompetitions, fetchFixturesForCompetition]);
 
     const loadInitialFixtures = useCallback(async () => {
         setLoading(true);
@@ -335,7 +317,7 @@ export function useFixtures(initialParams) {
         loadAttemptsRef.current = 0;
 
         try {
-            const initialWindow = showFutureFixtures
+            const initialWindow = selectedDirection === "forwards"
                 ? DEFAULT_WINDOWS.INITIAL.FUTURE
                 : DEFAULT_WINDOWS.INITIAL.PAST;
 
@@ -353,7 +335,7 @@ export function useFixtures(initialParams) {
                 console.log("[Initial Load] No fixtures found, attempting to load more");
                 await handleLoadMore();
             } else {
-                setFixtures(sortFixtures(allMatches, showFutureFixtures));
+                setFixtures(sortFixtures(allMatches, selectedDirection));
             }
         } catch (error) {
             console.error("[Initial Load] Error:", error);
@@ -363,7 +345,7 @@ export function useFixtures(initialParams) {
         } finally {
             setLoading(false);
         }
-    }, [fetchFixturesForCompetition, selectedCompetitions, showFutureFixtures, handleLoadMore]);
+    }, [fetchFixturesForCompetition, selectedCompetitions, selectedDirection, handleLoadMore]);
 
     const handleCompetitionChange = useCallback(async (competitionKey) => {
         setLoading(true);
@@ -375,7 +357,6 @@ export function useFixtures(initialParams) {
             if (selectedCompetitions.includes(competitionKey)) {
                 newSelectedCompetitions = selectedCompetitions.filter(l => l !== competitionKey);
                 setSelectedCompetitions(newSelectedCompetitions);
-                // console.log({ newSelectedCompetitions })
 
                 setFixtures(prevFixtures => {
                     const filtered = prevFixtures.filter(fixture => {
@@ -402,7 +383,7 @@ export function useFixtures(initialParams) {
                     const unique = Array.from(
                         new Map(combined.map(fixture => [fixture.id, fixture])).values()
                     );
-                    return sortFixtures(unique, showFutureFixtures);
+                    return sortFixtures(unique, selectedDirection);
                 });
             }
             // Save updated competitions to localStorage
@@ -413,7 +394,7 @@ export function useFixtures(initialParams) {
         } finally {
             setLoading(false);
         }
-    }, [fetchFixturesForCompetition, selectedCompetitions, showFutureFixtures, dateWindow]);
+    }, [fetchFixturesForCompetition, selectedCompetitions, selectedDirection, dateWindow]);
 
     return {
         // State
@@ -422,16 +403,14 @@ export function useFixtures(initialParams) {
         loadingMore,
         hasReachedEnd,
         hasRateLimitError,
-        showFutureFixtures,
+        selectedDirection,
         selectedSport,
         selectedCompetitions,
 
         // Actions
-        setShowFutureFixtures,
+        setSelectedDirection,
         setSelectedSport: handleSportChange,
-        setSelectedCompetitions,
         handleCompetitionChange,
         handleLoadMore,
-        loadInitialFixtures,
     };
 } 

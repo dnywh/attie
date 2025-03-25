@@ -47,13 +47,13 @@ export const getOrdinalSuffix = (day) => {
 /**
  * Sort fixtures by date
  */
-export const sortFixtures = (fixtures, showFutureFixtures) => {
+export const sortFixtures = (fixtures, selectedDirection) => {
     return fixtures.sort((a, b) => {
         const dateA = new Date(a.utcDate);
         const dateB = new Date(b.utcDate);
-        // For past fixtures: most recent first (B-A)
-        // For future fixtures: soonest first (A-B)
-        return showFutureFixtures ? dateA - dateB : dateB - dateA;
+        // When fixtures direction backwards: most recent first (B-A)
+        // When fixtures direction forwards: soonest first (A-B)
+        return selectedDirection === "forwards" ? dateA - dateB : dateB - dateA;
     });
 };
 
