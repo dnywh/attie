@@ -6,6 +6,54 @@ import { adaptFixture } from '@/utils/adapters';
 import { DEFAULTS } from "@/constants/defaults";
 import { ADAPTER_BASE_PATHS } from '@/utils/adapters';
 
+// Helper function to safely get stored preferences (client-side only)
+const getStoredPreferences = () => {
+    // Just use standard defaults if this is run on server
+    if (typeof window === 'undefined') {
+        return {
+            sport: DEFAULTS.SPORT,
+            competitions: DEFAULTS.COMPETITIONS,
+            direction: DEFAULTS.DIRECTION,
+            sound: DEFAULTS.SOUND,
+        };
+    }
+    // Continue if on client
+    const storedSport = localStorage.getItem("attie.sport");
+    const storedCompetitions = localStorage.getItem(`attie.competitions.${storedSport}`);
+    const storedDirection = localStorage.getItem("attie.direction")
+    const storedSound = localStorage.getItem("attie.sound")
+
+    return {
+        sport: storedSport || DEFAULTS.SPORT,
+        competitions: storedCompetitions ? JSON.parse(storedCompetitions) : DEFAULTS.COMPETITIONS,
+        direction: storedDirection || DEFAULTS.DIRECTION,
+        sound: storedSound || DEFAULTS.SOUND
+    };
+};
+
+// Initialize localStorage with defaults if empty
+const initializeStorage = () => {
+    // Ignore if this is run on server
+    if (typeof window === 'undefined') return;
+
+    // Continue if on client
+    // Set sport and subsequent competitions
+    if (!localStorage.getItem("attie.sport")) {
+        localStorage.setItem("attie.sport", DEFAULTS.SPORT);
+        localStorage.setItem(`attie.competitions.${DEFAULTS.SPORT}`, JSON.stringify(DEFAULTS.COMPETITIONS));
+    }
+    // Set other preferences
+    if (!localStorage.getItem("attie.direction")) {
+        localStorage.setItem("attie.direction", DEFAULTS.DIRECTION);
+    }
+    if (!localStorage.getItem("attie.sound")) {
+        localStorage.setItem("attie.sound", DEFAULTS.SOUND);
+    }
+};
+
+
+
+
 const buildApiUrl = (competition, params) => {
     const adapterType = competition.api.adapter;
     if (!adapterType) {
@@ -53,15 +101,24 @@ const buildApiUrl = (competition, params) => {
 };
 
 export function useFixtures(initialParams) {
+    // console.log(getStoredPreferences().sport)
+    // // Get stored preferences
+    // const storedPrefs = {
+    //     sport: DEFAULTS.SPORT,
+    //     competitions: DEFAULTS.COMPETITIONS,
+    //     direction: DEFAULTS.DIRECTION
+    // }
+    const [useSoundEffects, setUseSoundEffects] = useState(getStoredPreferences().sound);
+
     // Use provided params (i.e. searchParams or initialParams set by a [competition] page), or fallback to defaults
     const [showFutureFixtures, setShowFutureFixtures] = useState(
-        initialParams?.direction ?? DEFAULTS.DIRECTION
+        initialParams?.direction ?? getStoredPreferences().direction
     );
     const [selectedSport, setSelectedSport] = useState(
-        initialParams?.sport ?? DEFAULTS.SPORT
+        initialParams?.sport ?? getStoredPreferences().sport
     );
     const [selectedCompetitions, setSelectedCompetitions] = useState(
-        initialParams?.competitions ?? DEFAULTS.COMPETITIONS
+        initialParams?.competitions ?? getStoredPreferences().competitions
     );
     const [fixtures, setFixtures] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -75,7 +132,7 @@ export function useFixtures(initialParams) {
             : DEFAULT_WINDOWS.INITIAL.PAST.end,
     }));
 
-    // Replace state with ref for load attempts
+    // Ref for load attempts
     const loadAttemptsRef = useRef(0);
 
     // Add state for pagination
@@ -86,22 +143,48 @@ export function useFixtures(initialParams) {
 
     // Sport change handler
     const handleSportChange = useCallback((newSport) => {
-        // Get default competition for the new sport
-        const defaultCompetition = Object.keys(COMPETITIONS).find(
-            (key) => COMPETITIONS[key].sport === newSport && COMPETITIONS[key].defaultForSport
-        );
+        console.log(newSport, selectedSport)
+        // Prevent unecessary updates if sport is the same
+        // if (newSport === selectedSport) return;
 
-        if (!defaultCompetition) {
-            console.error(`[Sport Change] No default competition found for ${newSport}`);
-            return;
+        // Check if there are any previously stored competitions for this sport
+        const storedCompetitionsForSport = localStorage.getItem(`attie.competitions.${newSport}`);
+        let newCompetitionsForSport;
+
+        if (storedCompetitionsForSport) {
+            // Use previously stored competitions if they exist
+            newCompetitionsForSport = JSON.parse(storedCompetitionsForSport);
+        } else {
+            // Otherwise, use the default competition for this sport
+            const defaultCompetitionForSport = Object.keys(COMPETITIONS).find(
+                (key) => COMPETITIONS[key].sport === newSport && COMPETITIONS[key].defaultForSport
+            );
+
+            if (!defaultCompetitionForSport) {
+                console.error(`[Sport Change] No default competition found for ${newSport}`);
+                return;
+            }
+            newCompetitionsForSport = [defaultCompetitionForSport]
         }
 
+        // Update sport
         setSelectedSport(newSport);
-        setSelectedCompetitions([defaultCompetition]);
+        localStorage.setItem("attie.sport", newSport);
+        // Update competition(s)
+        setSelectedCompetitions(newCompetitionsForSport)
+        if (!storedCompetitionsForSport) {
+            localStorage.setItem(`attie.competitions.${newSport}`, JSON.stringify(newCompetitionsForSport))
+        }
+        // Reset fixture-related state
         setFixtures([]);
         setNextCursor(null);
         setCurrentPage(1);
         setHasReachedEnd(false);
+    }, []);
+
+    // Initialize from localStorage after mount
+    useEffect(() => {
+        initializeStorage();
     }, []);
 
     // Load initial fixtures
@@ -148,16 +231,16 @@ export function useFixtures(initialParams) {
             ? new Date(endDate.getTime() + 24 * 60 * 60 * 1000).toISOString().split("T")[0]
             : dateTo;
 
-        console.log(`[Fetch] Date range for ${competitionKey}:`, {
-            windowStart,
-            windowEnd,
-            dateFrom,
-            dateTo,
-            adjustedDateTo,
-            showFutureFixtures,
-            startDate: startDate.toISOString(),
-            endDate: endDate.toISOString()
-        });
+        // console.log(`[Fetch] Date range for ${competitionKey}:`, {
+        //     windowStart,
+        //     windowEnd,
+        //     dateFrom,
+        //     dateTo,
+        //     adjustedDateTo,
+        //     showFutureFixtures,
+        //     startDate: startDate.toISOString(),
+        //     endDate: endDate.toISOString()
+        // });
 
         try {
             const response = await fetch(
@@ -289,12 +372,16 @@ export function useFixtures(initialParams) {
 
     const handleCompetitionChange = useCallback(async (competitionKey) => {
         setLoading(true);
-        console.log('[Competition Change] Current competitions:', { selectedCompetitions });
+        // console.log('[Competition Change] Current competitions:', { selectedCompetitions });
+        // console.log(competitionKey, selectedCompetitions)
 
         try {
+            let newSelectedCompetitions;
             if (selectedCompetitions.includes(competitionKey)) {
-                const newSelectedCompetitions = selectedCompetitions.filter(l => l !== competitionKey);
+                newSelectedCompetitions = selectedCompetitions.filter(l => l !== competitionKey);
                 setSelectedCompetitions(newSelectedCompetitions);
+                // console.log({ newSelectedCompetitions })
+
                 setFixtures(prevFixtures => {
                     const filtered = prevFixtures.filter(fixture => {
                         // Get the competition key from the competition name
@@ -307,7 +394,8 @@ export function useFixtures(initialParams) {
                 });
             } else {
                 // Add competition
-                setSelectedCompetitions(prev => [...prev, competitionKey]);
+                newSelectedCompetitions = [...selectedCompetitions, competitionKey];
+                setSelectedCompetitions(newSelectedCompetitions);
 
                 // Only fetch data for the new competition
                 const newMatches = await fetchFixturesForCompetition(competitionKey, dateWindow);
@@ -322,6 +410,8 @@ export function useFixtures(initialParams) {
                     return sortFixtures(unique, showFutureFixtures);
                 });
             }
+            // if (typeof window !== 'undefined') {
+            localStorage.setItem(`attie.competitions.${selectedSport}`, JSON.stringify(newSelectedCompetitions));
         } catch (error) {
             console.error("[Competition Change] Error:", error);
         } finally {

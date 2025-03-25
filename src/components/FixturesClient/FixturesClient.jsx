@@ -39,7 +39,6 @@ import { DEFAULTS } from "@/constants/defaults";
 export default function FixturesClient({ initialParams }) {
   const [isClient, setIsClient] = useState(false);
   const [showAllScores, setShowAllScores] = useState(false);
-  const [useSoundEffects, setUseSoundEffects] = useState(true);
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -58,6 +57,8 @@ export default function FixturesClient({ initialParams }) {
 
   // Pass params to useFixtures
   const {
+    useSoundEffects,
+    setUseSoundEffects,
     fixtures,
     loading,
     loadingMore,
@@ -73,6 +74,8 @@ export default function FixturesClient({ initialParams }) {
     handleLoadMore,
     loadInitialFixtures,
   } = useFixtures(params);
+
+  // console.log({ useSoundEffects });
 
   // Filter competitions based on selected sport
   const availableCompetitions = Object.entries(
@@ -372,9 +375,9 @@ export default function FixturesClient({ initialParams }) {
             ))}
 
             {(() => {
-              console.log(
-                `[Render] hasReachedEnd: ${hasReachedEnd}, fixtures length: ${fixtures.length}`
-              );
+              // console.log(
+              //   `[Render] hasReachedEnd: ${hasReachedEnd}, fixtures length: ${fixtures.length}`
+              // );
               return !hasReachedEnd ? (
                 <Button onClick={() => handleLoadMore()} disabled={loadingMore}>
                   {loadingMore ? (
