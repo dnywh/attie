@@ -11,7 +11,6 @@ export interface CommonFixture {
   status: StatusObject;
   competition: {
     name: string;
-    type?: string;
   };
   homeTeam: {
     name: string;

@@ -27,7 +27,6 @@ export const adaptFootballDataFixture = (
     },
     competition: {
       name: competition.name,
-      type: competition.type,
     },
     homeTeam: {
       name: rawFixture.homeTeam.name,

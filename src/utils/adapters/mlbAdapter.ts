@@ -19,7 +19,6 @@ export const adaptMLBFixture = (
     },
     competition: {
       name: competition.name,
-      type: competition.type,
     },
     homeTeam: {
       name: rawFixture.home_team.display_name,

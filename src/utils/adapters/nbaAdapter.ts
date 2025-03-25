@@ -35,7 +35,6 @@ export const adaptNBAFixture = (
     status: statusObject,
     competition: {
       name: competition.name,
-      type: competition.type,
     },
     homeTeam: {
       name: rawFixture.home_team.full_name,

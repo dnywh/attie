@@ -60,7 +60,6 @@ export const adaptESPNFixture = (
     status: statusObject,
     competition: {
       name: competition.name,
-      type: competition.type,
     },
     homeTeam: {
       name: homeTeam.team.name,

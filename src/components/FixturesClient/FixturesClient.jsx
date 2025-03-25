@@ -85,7 +85,7 @@ export default function FixturesClient({ initialParams }) {
   // Filter competitions based on selected sport
   const availableCompetitions = Object.entries(
     getCompetitionsForSport(selectedSport)
-  ).filter(([, competition]) => competition.tier !== "paid");
+  );
 
   // Handle icon component for selected sport
   const getSportIcon = (sport) => {

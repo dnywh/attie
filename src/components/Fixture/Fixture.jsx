@@ -118,15 +118,7 @@ function Fixture({ fixture, showAllScores, useSoundEffects, showCompetition }) {
       </OpponentsList>
 
       {showCompetition && (
-        <CompetitionName>
-          {fixture.competition.name}{" "}
-          {fixture.competition.type === "CUP" && fixture.group
-            ? `· ${fixture.group}`
-            : null}{" "}
-          {fixture.competition.type === "CUP" && fixture.stage
-            ? `· ${fixture.stage}`
-            : null}
-        </CompetitionName>
+        <CompetitionName>{fixture.competition.name}</CompetitionName>
       )}
     </FixtureRow>
   );

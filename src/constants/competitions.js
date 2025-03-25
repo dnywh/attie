@@ -1,20 +1,8 @@
-export const COMPETITION_TYPES = {
-    LEAGUE: 'league',
-    CUP: 'cup',
-};
-
-export const TIERS = {
-    FREE: 'free',
-    PAID: 'pro',
-};
-
 // Use nice, literal, camel-case names for the keys as these are used for slugs on individually generated competition pages
 export const COMPETITIONS = {
     'afl': {
         sport: 'aussie-rules',
         name: 'AFL',
-        type: COMPETITION_TYPES.LEAGUE,
-        tier: TIERS.FREE,
         defaultForSport: true,
         api: {
             adapter: 'espn',
@@ -25,8 +13,6 @@ export const COMPETITIONS = {
     'nrl': {
         sport: 'rugby-league',
         name: 'NRL',
-        type: COMPETITION_TYPES.LEAGUE,
-        tier: TIERS.FREE,
         defaultForSport: true,
         api: {
             adapter: 'espn',
@@ -37,19 +23,32 @@ export const COMPETITIONS = {
     'premier-league': {
         sport: 'football',
         name: 'Premier League',
-        type: COMPETITION_TYPES.LEAGUE,
-        tier: TIERS.FREE,
         defaultForSport: true,
         api: {
             adapter: 'football-data',
             code: 'PL',
         },
     },
+    'fa-cup': {
+        sport: 'football',
+        name: 'FA Cup',
+        api: {
+            adapter: 'espn',
+            sport: 'soccer',
+            league: 'eng.fa'
+        },
+    },
+    'championship': {
+        sport: 'football',
+        name: 'Championship',
+        api: {
+            adapter: 'football-data',
+            code: 'ELC',
+        },
+    },
     'champions-league': {
         sport: 'football',
         name: 'UEFA Champions League',
-        type: COMPETITION_TYPES.CUP,
-        tier: TIERS.FREE,
         api: {
             adapter: 'football-data',
             code: 'CL',
@@ -58,8 +57,6 @@ export const COMPETITIONS = {
     'europa-league': {
         sport: 'football',
         name: 'UEFA Europa League',
-        type: COMPETITION_TYPES.CUP,
-        tier: TIERS.FREE,
         api: {
             adapter: 'espn',
             sport: 'soccer',
@@ -69,28 +66,14 @@ export const COMPETITIONS = {
     'la-liga': {
         sport: 'football',
         name: 'La Liga',
-        type: COMPETITION_TYPES.LEAGUE,
-        tier: TIERS.FREE,
         api: {
             adapter: 'football-data',
             code: 'PD', // Primera Division (La Liga)
         },
     },
-    'championship': {
-        sport: 'football',
-        name: 'Championship',
-        type: COMPETITION_TYPES.LEAGUE,
-        tier: TIERS.FREE,
-        api: {
-            adapter: 'football-data',
-            code: 'ELC',
-        },
-    },
     'serie-a': {
         sport: 'football',
         name: 'Serie A',
-        type: COMPETITION_TYPES.LEAGUE,
-        tier: TIERS.FREE,
         api: {
             adapter: 'football-data',
             code: 'SA',
@@ -99,8 +82,6 @@ export const COMPETITIONS = {
     'bundesliga': {
         sport: 'football',
         name: 'Bundesliga',
-        type: COMPETITION_TYPES.LEAGUE,
-        tier: TIERS.FREE,
         api: {
             adapter: 'football-data',
             code: 'BL1',
@@ -109,8 +90,6 @@ export const COMPETITIONS = {
     'ligue-1': {
         sport: 'football',
         name: 'Ligue 1',
-        type: COMPETITION_TYPES.LEAGUE,
-        tier: TIERS.FREE,
         api: {
             adapter: 'football-data',
             code: 'FL1',
@@ -119,8 +98,6 @@ export const COMPETITIONS = {
     'liga-portugal': {
         sport: 'football',
         name: 'Primeira Liga',
-        type: COMPETITION_TYPES.LEAGUE,
-        tier: TIERS.FREE,
         api: {
             adapter: 'football-data',
             code: 'PPL',
@@ -129,8 +106,6 @@ export const COMPETITIONS = {
     'eredivisie': {
         sport: 'football',
         name: 'Eredivisie',
-        type: COMPETITION_TYPES.LEAGUE,
-        tier: TIERS.FREE,
         api: {
             adapter: 'football-data',
             code: 'DED',
@@ -139,8 +114,6 @@ export const COMPETITIONS = {
     'brasileirao': {
         sport: 'football',
         name: 'Brasileiro Série A', // Brasileirão
-        type: COMPETITION_TYPES.LEAGUE,
-        tier: TIERS.FREE,
         api: {
             adapter: 'football-data',
             code: 'BSA',
@@ -149,8 +122,6 @@ export const COMPETITIONS = {
     'nba': {
         sport: 'basketball',
         name: 'NBA',
-        type: COMPETITION_TYPES.LEAGUE,
-        tier: TIERS.FREE,
         defaultForSport: true,
         api: {
             adapter: 'balldontlie-nba',
@@ -159,8 +130,6 @@ export const COMPETITIONS = {
     'wnba': {
         sport: 'basketball',
         name: 'WNBA',
-        type: COMPETITION_TYPES.LEAGUE,
-        tier: TIERS.FREE,
         api: {
             adapter: 'espn',
             sport: 'basketball',
@@ -170,8 +139,6 @@ export const COMPETITIONS = {
     'college-basketball-men': {
         sport: 'basketball',
         name: 'NCAAM college basketball',
-        type: COMPETITION_TYPES.LEAGUE,
-        tier: TIERS.FREE,
         api: {
             adapter: 'espn',
             sport: 'basketball',
@@ -182,8 +149,6 @@ export const COMPETITIONS = {
     'college-basketball-women': {
         sport: 'basketball',
         name: 'NCAAW college basketball',
-        type: COMPETITION_TYPES.LEAGUE,
-        tier: TIERS.FREE,
         api: {
             adapter: 'espn',
             sport: 'basketball',
@@ -195,8 +160,6 @@ export const COMPETITIONS = {
     'mlb': {
         sport: 'baseball',
         name: 'MLB',
-        type: COMPETITION_TYPES.LEAGUE,
-        tier: TIERS.FREE,
         defaultForSport: true,
         api: {
             adapter: 'balldontlie-mlb',
@@ -205,8 +168,6 @@ export const COMPETITIONS = {
     'college-baseball': {
         sport: 'baseball',
         name: 'NCAA college baseball',
-        type: COMPETITION_TYPES.LEAGUE,
-        tier: TIERS.FREE,
         api: {
             adapter: 'espn',
             sport: 'baseball',
@@ -216,8 +177,6 @@ export const COMPETITIONS = {
     'nfl': {
         sport: 'american-football',
         name: 'NFL',
-        type: COMPETITION_TYPES.LEAGUE,
-        tier: TIERS.FREE,
         defaultForSport: true,
         api: {
             adapter: 'balldontlie-nfl',
@@ -226,8 +185,6 @@ export const COMPETITIONS = {
     'college-football': {
         sport: 'american-football',
         name: 'NCAA college football',
-        type: COMPETITION_TYPES.LEAGUE,
-        tier: TIERS.FREE,
         api: {
             adapter: 'espn',
             sport: 'football',
@@ -237,8 +194,6 @@ export const COMPETITIONS = {
     'super-rugby': {
         sport: 'rugby-union',
         name: 'Super Rugby',
-        type: COMPETITION_TYPES.LEAGUE,
-        tier: TIERS.FREE,
         defaultForSport: true,
         api: {
             adapter: 'espn',
@@ -249,8 +204,6 @@ export const COMPETITIONS = {
     'united-rugby-championship': {
         sport: 'rugby-union',
         name: 'United Rugby Championship',
-        type: COMPETITION_TYPES.LEAGUE,
-        tier: TIERS.FREE,
         api: {
             adapter: 'espn',
             sport: 'rugby',
