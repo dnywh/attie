@@ -6,6 +6,19 @@ import { adaptFixture } from '@/utils/adapters';
 import { DEFAULTS } from "@/constants/defaults";
 import { ADAPTER_BASE_PATHS } from '@/utils/adapters';
 
+// Helper function to find default competition for a sport
+const findDefaultCompetition = (sport) => {
+    const defaultCompetition = Object.keys(COMPETITIONS).find(
+        key => COMPETITIONS[key].sport === sport && COMPETITIONS[key].defaultForSport
+    );
+
+    if (!defaultCompetition) {
+        console.warn(`No default competition found for sport: ${sport}`);
+    }
+
+    return defaultCompetition;
+};
+
 // Helper function to safely get stored preferences (client-side only)
 export const getStoredPreferences = () => {
     // Just use standard defaults if this is run on server
@@ -26,9 +39,7 @@ export const getStoredPreferences = () => {
 
     if (!storedCompetitions || storedCompetitions === '[]') {
         // If no stored competitions, get default for current sport
-        const defaultCompetition = Object.keys(COMPETITIONS).find(
-            key => COMPETITIONS[key].sport === storedSport && COMPETITIONS[key].defaultForSport
-        );
+        const defaultCompetition = findDefaultCompetition(storedSport);
         competitions = defaultCompetition ? [defaultCompetition] : DEFAULTS.COMPETITIONS;
     } else {
         competitions = JSON.parse(storedCompetitions);
@@ -121,11 +132,18 @@ export function useFixtures(initialParams) {
         if (!initialParams?.competitions) {
             return getStoredPreferences().competitions;
         }
+
         const comps = typeof initialParams.competitions === 'string'
             ? initialParams.competitions.split(',').filter(Boolean)
             : initialParams.competitions;
 
-        return comps.length > 0 ? comps : getStoredPreferences().competitions;
+        // Validate that all competitions exist and belong to the current sport
+        const validComps = comps.filter(comp => {
+            const competition = COMPETITIONS[comp];
+            return competition && competition.sport === selectedSport;
+        });
+
+        return validComps.length > 0 ? validComps : [findDefaultCompetition(selectedSport)];
     });
     const [fixtures, setFixtures] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -150,36 +168,24 @@ export function useFixtures(initialParams) {
 
     // Sport change handler
     const handleSportChange = useCallback((newSport) => {
-        // Prevent unecessary updates if sport is the same
-        // if (newSport === selectedSport) return;
-
-        // Check if there are any previously stored competitions for this sport
         const storedCompetitionsForSport = localStorage.getItem(`attie.competitions.${newSport}`);
         let newCompetitionsForSport;
 
         if (storedCompetitionsForSport) {
-            // Use previously stored competitions if they exist
             newCompetitionsForSport = JSON.parse(storedCompetitionsForSport);
         } else {
-            // Otherwise, use the default competition for this sport
-            const defaultCompetitionForSport = Object.keys(COMPETITIONS).find(
-                key => COMPETITIONS[key].sport === newSport && COMPETITIONS[key].defaultForSport
-            );
-
-            if (!defaultCompetitionForSport) {
-                console.error(`[Sport Change] No default competition found for ${newSport}`);
-                return;
-            }
-            newCompetitionsForSport = [defaultCompetitionForSport]
+            const defaultCompetition = findDefaultCompetition(newSport);
+            if (!defaultCompetition) return; // Exit if no default found
+            newCompetitionsForSport = [defaultCompetition];
         }
 
         // Update sport
         setSelectedSport(newSport);
         localStorage.setItem("attie.sport", newSport);
         // Update competition(s)
-        setSelectedCompetitions(newCompetitionsForSport)
+        setSelectedCompetitions(newCompetitionsForSport);
         if (!storedCompetitionsForSport) {
-            localStorage.setItem(`attie.competitions.${newSport}`, JSON.stringify(newCompetitionsForSport))
+            localStorage.setItem(`attie.competitions.${newSport}`, JSON.stringify(newCompetitionsForSport));
         }
         // Reset fixture-related state
         setFixtures([]);
@@ -206,20 +212,16 @@ export function useFixtures(initialParams) {
 
         if (!competition) {
             console.warn(`Competition "${competitionKey}" not found, falling back to default for ${selectedSport}`);
+            const defaultCompetition = findDefaultCompetition(selectedSport);
 
-            const defaultCompetitionForSport = Object.keys(COMPETITIONS).find(
-                key => COMPETITIONS[key].sport === selectedSport && COMPETITIONS[key].defaultForSport
-            );
-            console.log('[Competition Not Found] Falling back to default:', { defaultCompetitionForSport });
-
-            if (!defaultCompetitionForSport) {
+            if (!defaultCompetition) {
                 console.error(`No default competition found for sport: ${selectedSport}`);
                 return [];
             }
 
             // Reset to defaults and skip this fetch
-            setSelectedCompetitions([defaultCompetitionForSport]);
-            localStorage.setItem(`attie.competitions.${selectedSport}`, JSON.stringify([defaultCompetitionForSport]));
+            setSelectedCompetitions([defaultCompetition]);
+            localStorage.setItem(`attie.competitions.${selectedSport}`, JSON.stringify([defaultCompetition]));
             return [];
         }
 
