@@ -10,14 +10,18 @@ const Block = styled("div")(({ theme }) => ({
   alignItems: "center",
   width: "2rem",
   height: "2rem",
-  color: "black",
   borderRadius: "50%",
-  transition: `transform 180ms ${theme.curves.spring.heavy}`,
-  "&:hover": {
-    transform: "scale(1.1)",
-  },
-  "&:active": {
-    transform: "scale(0.9)",
+  color: "black",
+
+  // Prepare for isVisible styles
+  position: "relative",
+  "&::after": {
+    transition: `transform 250ms ${theme.curves.spring.heavy}`,
+    content: "''",
+    borderRadius: "50%",
+    height: "100%",
+    width: "100%",
+    position: "absolute",
   },
 
   variants: [
@@ -25,18 +29,28 @@ const Block = styled("div")(({ theme }) => ({
       props: { isVisible: false },
       style: {
         cursor: "pointer",
-        backgroundColor: "black",
+        "&:hover": {
+          "&::after": {
+            transform: "scale(1.1)",
+          },
+        },
+        "&:active": {
+          "&::after": {
+            transform: "scale(0.9)",
+          },
+        },
+        "&::after": {
+          backgroundColor: "black",
+        },
       },
     },
     {
       props: { isVisible: true },
       style: {
-        backgroundColor: "white",
-        border: "0.5px dashed black",
-        "&:hover, &:active": {
-          transform: "unset",
+        "&::after": {
+          // backgroundColor: "white",
+          border: "0.5px dashed black",
         },
-
         "& p": {
           userSelect: "none",
           cursor: "default",
