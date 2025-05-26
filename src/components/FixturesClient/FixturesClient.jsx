@@ -402,7 +402,7 @@ export default function FixturesClient({ initialParams }) {
                     linkText="Reach out"
                   >
                     <p>
-                      Attie is lovingly crafted by one-man-band,{" "}
+                      Attie is lovingly crafted by product designer{" "}
                       {/* TODO: Use (i.e. automate) same link params as in Interstitial component footer */}
                       <Link
                         href="https://www.dannywhite.net/?utm_source=attie&utm_medium=sponsorship"
@@ -410,7 +410,7 @@ export default function FixturesClient({ initialParams }) {
                       >
                         Danny White
                       </Link>
-                      . Got an idea that needs making? Get Danny involved.
+                      . Got a product that needs making? Get Danny involved.
                     </p>
                   </Interstitial>
                 )}

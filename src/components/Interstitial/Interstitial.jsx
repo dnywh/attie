@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { styled } from "@pigment-css/react";
 import {
   smallText,
@@ -17,10 +18,25 @@ const Visible = styled("div")(({ theme }) => ({
   flexDirection: "column",
   gap: "0.65rem",
   padding: "1rem",
+  marginTop: "3.25rem",
   ...veryBasicCardStyle({ theme }),
   ...createStippledBackground({ fill: theme.colors.background.interstitial })({
     theme,
   }),
+
+  position: "relative",
+  "&::after": {
+    position: "absolute",
+    content: '""',
+    width: "100%",
+    height: "88px",
+    left: 0,
+    top: "-67px",
+    backgroundSize: "contain",
+    backgroundRepeat: "no-repeat",
+    backgroundPositionX: "55%",
+    backgroundImage: "url('/images/boys-test-a.png')",
+  },
 
   "& > h2, & > a": {
     ...smallText,
@@ -45,6 +61,10 @@ const Visible = styled("div")(({ theme }) => ({
 const Inner = styled("div")(({ theme }) => ({
   padding: "2.5rem 1.25rem",
   ...bleedingWhiteCard({ theme }),
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  gap: "1.5rem",
 
   "& > p": {
     textAlign: "center",
@@ -70,7 +90,16 @@ function Interstitial({
     <Aside>
       <Visible>
         <h2>{intro}</h2>
-        <Inner>{children}</Inner>
+
+        <Inner>
+          <Image
+            src="/images/eye.svg"
+            width={64}
+            height={64}
+            alt="An eye shape with an at-symbol instead of a pupil"
+          />
+          {children}
+        </Inner>
         {linkUrl && (
           <Link
             href={`${linkUrl}?utm_source=attie&utm_medium=sponsorship`}
