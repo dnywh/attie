@@ -7,6 +7,8 @@ The anti-scores scores app, live at [attie.app](https://www.attie.app). Built on
 First, run the development server:
 
 ```bash
+pnpm dev
+# or
 npm run dev
 # or
 yarn dev

@@ -1,5 +1,7 @@
 // import { css } from "@pigment-css/react";
 
+// Reload dev server to see changes
+
 // Common card-like element with black border and shadow
 // export const cardStyle = ({ theme }) => ({
 //     border: `1px solid ${theme.colors.text.primary}`,
