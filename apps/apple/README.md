@@ -17,24 +17,22 @@ folders together.
 
 ## Run on iPhone
 
-These sources are native SwiftUI. The shared logic is already in the
-`AttieCore` Swift package; the app files live under `Apps/Attie/Shared`.
+These sources are native SwiftUI. The installable iOS app target is `Attie`;
+the reusable package target is `AttieCore`.
 
 1. Open `apps/apple/Attie.xcworkspace` in Xcode.
-2. If Xcode does not already show an iOS app target, create one with
-   **File > New > Target... > iOS > App**.
-3. Name the target `Attie`, choose **SwiftUI** for the interface, choose
-   **Swift** for the language, and add it to the existing workspace.
-4. In the target's **Build Phases > Compile Sources**, add the Swift files from
-   `Apps/Attie/Shared`.
-5. In the target's **Frameworks, Libraries, and Embedded Content**, add the
-   local `AttieCore` package product.
-6. In **Signing & Capabilities**, select your personal or team Apple Developer
-   account and set a unique bundle identifier, for example
-   `net.dannywhite.attie`.
-7. Connect your iPhone with a cable, or use an already-paired wireless device,
-   then select it from Xcode's run destination menu.
-8. Press **Run**. If iOS asks whether to trust the developer app, approve it in
+2. Use the scheme picker in Xcode's toolbar to choose **Attie**, not
+   **AttieCore**.
+3. In the same toolbar, choose your connected iPhone as the run destination.
+   The toolbar should read something like **Attie > Danny's iPhone**.
+4. Select the `Attie` project in the Project Navigator, then select the
+   `Attie` target.
+5. In **Signing & Capabilities**, select your personal or team Apple Developer
+   account. If Xcode reports that the bundle identifier is already taken,
+   change it to something unique, for example `net.dannywhite.attie.dev`.
+6. Press **Run**. Building `AttieCore` can succeed, but it will not install or
+   launch an app. Running the `Attie` scheme should install Attie on the phone.
+7. If iOS asks whether to trust the developer app, approve it in
    **Settings > General > VPN & Device Management** on the phone.
 
 For a personal Apple Developer account, the installed development build may

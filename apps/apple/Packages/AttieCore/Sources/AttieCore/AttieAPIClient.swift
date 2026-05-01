@@ -6,19 +6,16 @@ public enum AttieAPIError: Error, Equatable, Sendable {
     case server(statusCode: Int)
 }
 
-public struct AttieAPIClient {
+public struct AttieAPIClient: @unchecked Sendable {
     public var baseURL: URL
     public var urlSession: URLSession
-    public var decoder: JSONDecoder
 
     public init(
         baseURL: URL = URL(string: "https://www.attie.app")!,
-        urlSession: URLSession = .shared,
-        decoder: JSONDecoder = JSONDecoder()
+        urlSession: URLSession = .shared
     ) {
         self.baseURL = baseURL
         self.urlSession = urlSession
-        self.decoder = decoder
     }
 
     public func fetchFixtures(
@@ -64,6 +61,6 @@ public struct AttieAPIClient {
             throw AttieAPIError.server(statusCode: statusCode)
         }
 
-        return try decoder.decode(FixtureListResponse.self, from: data)
+        return try JSONDecoder().decode(FixtureListResponse.self, from: data)
     }
 }
