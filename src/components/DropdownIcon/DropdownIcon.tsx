@@ -1,4 +1,5 @@
-import { styled } from "@pigment-css/react";
+// @ts-nocheck
+import { css, styled } from "next-yak";
 
 // 8x12 originally
 const WIDTH = 8;
@@ -8,7 +9,7 @@ const SCALE = 1.5;
 function DropdownIcon({ size = "large" }) {
   return (
     <StyledDropdownIcon
-      size={size}
+      $size={size}
       viewBox="0 0 8 12"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -23,34 +24,21 @@ function DropdownIcon({ size = "large" }) {
 
 export default DropdownIcon;
 
-const StyledDropdownIcon = styled("svg")({
-  // Positioning
-  position: "absolute", // Requires position: "relative" on parent
-  right: "1rem",
-  // Ignore events
-  pointerEvents: "none",
-  // Color
-  // Handled on SVG via fill="currentColor"
-  variants: [
-    {
-      props: { size: "large" },
-      style: {
-        // Size
-        width: `${WIDTH * SCALE}px`,
-        height: `${HEIGHT * SCALE}px`,
-        // Positioning
-        top: `calc(50% - calc(${HEIGHT * SCALE}px / 2))`, // Half of SVG height
-      },
-    },
-    {
-      props: { size: "small" },
-      style: {
-        // Size
-        width: `${WIDTH}px`,
-        height: `${HEIGHT}px`,
-        // Positioning
-        top: `calc(50% - calc(${HEIGHT}px / 2))`, // Half of SVG height
-      },
-    },
-  ],
-});
+const largeStyles = css`
+  height: ${HEIGHT * SCALE}px;
+  top: calc(50% - (${HEIGHT * SCALE}px / 2));
+  width: ${WIDTH * SCALE}px;
+`;
+
+const smallStyles = css`
+  height: ${HEIGHT}px;
+  top: calc(50% - (${HEIGHT}px / 2));
+  width: ${WIDTH}px;
+`;
+
+const StyledDropdownIcon = styled.svg`
+  pointer-events: none;
+  position: absolute;
+  right: 1rem;
+  ${({ $size }) => ($size === "small" ? smallStyles : largeStyles)}
+`;

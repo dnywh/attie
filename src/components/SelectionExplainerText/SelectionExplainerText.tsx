@@ -1,8 +1,9 @@
-import { styled } from "@pigment-css/react";
+// @ts-nocheck
+import { styled } from "next-yak";
 
-const StyledParagraph = styled("p")(({ theme }) => ({
-  textAlign: "center",
-}));
+const StyledParagraph = styled.p`
+  text-align: center;
+`;
 function SelectionExplainerText({ children }) {
   return <StyledParagraph>{children}</StyledParagraph>;
 }

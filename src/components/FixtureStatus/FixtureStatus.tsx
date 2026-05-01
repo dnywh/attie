@@ -1,31 +1,35 @@
-import { styled, keyframes } from "@pigment-css/react";
+// @ts-nocheck
+import { styled, keyframes } from "next-yak";
+import { webTheme } from "@/styles/theme.yak";
 
-const RegularStatus = styled("p")({});
+const RegularStatus = styled.p``;
 
-const blink = keyframes({
-  from: {
-    scale: "100%",
-  },
-  to: {
-    scale: "60%",
-  },
-});
+const blink = keyframes`
+  from {
+    scale: 100%;
+  }
 
-const LiveStatus = styled(RegularStatus)(({ theme }) => ({
-  color: theme.colors.text.live,
-  display: "flex",
-  alignItems: "center",
-  gap: "0.35rem",
-  "&::before": {
-    content: "''",
-    width: "0.5rem",
-    height: "0.5rem",
-    backgroundColor: theme.colors.text.live,
-    borderRadius: "50%",
-    display: "inline-block",
-    animation: `${blink} 1s infinite alternate`,
-  },
-}));
+  to {
+    scale: 60%;
+  }
+`;
+
+const LiveStatus = styled(RegularStatus)`
+  align-items: center;
+  color: ${webTheme.colors.text.live};
+  display: flex;
+  gap: 0.35rem;
+
+  &::before {
+    animation: ${blink} 1s infinite alternate;
+    background-color: ${webTheme.colors.text.live};
+    border-radius: 50%;
+    content: "";
+    display: inline-block;
+    height: 0.5rem;
+    width: 0.5rem;
+  }
+`;
 
 function FixtureStatus({ fixture }) {
   // Unpack status

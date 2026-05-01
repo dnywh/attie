@@ -199,14 +199,6 @@ export function useFixtures(initialParams) {
         initializeStorage();
     }, []);
 
-    // Load initial fixtures
-    useEffect(() => {
-        // Only load fixtures if we have selected competitions
-        if (selectedCompetitions.length > 0) {
-            loadInitialFixtures();
-        }
-    }, [selectedSport, selectedDirection]);
-
     const fetchFixturesForCompetition = useCallback(async (competitionKey, customDateWindow, cursor = null) => {
         const competition = COMPETITIONS[competitionKey];
 
@@ -292,49 +284,57 @@ export function useFixtures(initialParams) {
             return;
         }
 
-        loadAttemptsRef.current += 1;
-        console.log("[Load More] Starting load more with attempts:", loadAttemptsRef.current);
-
         setLoadingMore(true);
 
         try {
             const increment = DEFAULT_WINDOWS.INCREMENT.DAYS;
-            const newWindow = { ...currentWindow };
+            let nextWindow = { ...currentWindow };
 
-            if (selectedDirection === "forwards") {
-                // Move the window forward by increment
-                newWindow.start = newWindow.end;
-                newWindow.end += increment;
-            } else {
-                // Move the window backward by increment
-                newWindow.end = newWindow.start;
-                newWindow.start += increment;
+            while (loadAttemptsRef.current < DEFAULT_WINDOWS.MAX_ATTEMPTS) {
+                loadAttemptsRef.current += 1;
+                console.log("[Load More] Starting load more with attempts:", loadAttemptsRef.current);
+
+                const newWindow = { ...nextWindow };
+
+                if (selectedDirection === "forwards") {
+                    // Move the window forward by increment
+                    newWindow.start = newWindow.end;
+                    newWindow.end += increment;
+                } else {
+                    // Move the window backward by increment
+                    newWindow.end = newWindow.start;
+                    newWindow.start += increment;
+                }
+
+                console.log("[Load More] New date window:", newWindow);
+
+                const newMatches = await Promise.all(
+                    selectedCompetitions.map((competitionKey) =>
+                        fetchFixturesForCompetition(competitionKey, newWindow)
+                    )
+                );
+
+                const allNewMatches = newMatches.flat();
+                console.log("[Load More] Found new matches:", allNewMatches.length);
+
+                if (allNewMatches.length > 0) {
+                    setFixtures(prevFixtures => {
+                        const combined = [...prevFixtures, ...allNewMatches];
+                        const unique = Array.from(
+                            new Map(combined.map((fixture) => [fixture.id, fixture])).values()
+                        );
+                        return sortFixtures(unique, selectedDirection);
+                    });
+                    setDateWindow(newWindow);
+                    loadAttemptsRef.current = 0;
+                    return;
+                }
+
+                nextWindow = newWindow;
             }
 
-            console.log("[Load More] New date window:", newWindow);
-
-            const newMatches = await Promise.all(
-                selectedCompetitions.map((competitionKey) =>
-                    fetchFixturesForCompetition(competitionKey, newWindow)
-                )
-            );
-
-            const allNewMatches = newMatches.flat();
-            console.log("[Load More] Found new matches:", allNewMatches.length);
-
-            if (allNewMatches.length > 0) {
-                setFixtures(prevFixtures => {
-                    const combined = [...prevFixtures, ...allNewMatches];
-                    const unique = Array.from(
-                        new Map(combined.map((fixture) => [fixture.id, fixture])).values()
-                    );
-                    return sortFixtures(unique, selectedDirection);
-                });
-                setDateWindow(newWindow);
-                loadAttemptsRef.current = 0;
-            } else {
-                await handleLoadMore(newWindow);
-            }
+            console.log("[Load More] Max attempts reached");
+            setHasReachedEnd(true);
         } catch (error) {
             console.error("[Load More] Error:", error);
             if (error.message === "RATE_LIMIT_EXCEEDED") {
@@ -376,7 +376,7 @@ export function useFixtures(initialParams) {
 
             if (allMatches.length === 0) {
                 console.log("[Initial Load] No fixtures found, attempting to load more");
-                await handleLoadMore();
+                await handleLoadMore(initialWindow);
             } else {
                 setFixtures(sortFixtures(allMatches, selectedDirection));
             }
@@ -388,7 +388,26 @@ export function useFixtures(initialParams) {
         } finally {
             setLoading(false);
         }
-    }, [fetchFixturesForCompetition, selectedCompetitions, selectedDirection, handleLoadMore]);
+    }, [fetchFixturesForCompetition, handleLoadMore, handleSportChange, selectedCompetitions, selectedDirection, selectedSport]);
+
+    const hasSelectedCompetitions = selectedCompetitions.length > 0;
+
+    // Load initial fixtures
+    useEffect(() => {
+        let shouldLoad = true;
+
+        if (hasSelectedCompetitions) {
+            queueMicrotask(() => {
+                if (shouldLoad) {
+                    loadInitialFixtures();
+                }
+            });
+        }
+
+        return () => {
+            shouldLoad = false;
+        };
+    }, [hasSelectedCompetitions, loadInitialFixtures]);
 
     const handleCompetitionChange = useCallback(async (competitionKey) => {
         setLoading(true);
@@ -437,7 +456,7 @@ export function useFixtures(initialParams) {
         } finally {
             setLoading(false);
         }
-    }, [fetchFixturesForCompetition, selectedCompetitions, selectedDirection, dateWindow]);
+    }, [dateWindow, fetchFixturesForCompetition, selectedCompetitions, selectedDirection, selectedSport]);
 
     return {
         // State

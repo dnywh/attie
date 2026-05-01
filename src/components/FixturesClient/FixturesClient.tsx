@@ -1,5 +1,6 @@
+// @ts-nocheck
 "use client";
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect, Fragment, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Legend } from "@headlessui/react";
@@ -23,7 +24,7 @@ import {
 } from "@/constants/competitions";
 import { SPORTS } from "@/config/sportConfig";
 
-import { dashedBorder, createStippledBackground } from "@/styles/commonStyles";
+import { dashedBorder, interstitialStippledBackground } from "@/styles/commonStyles";
 import { formatDateForDisplay, groupFixturesByDate } from "@/utils/dates";
 import { useFixtures } from "@/hooks/useFixtures";
 
@@ -33,11 +34,20 @@ import FixturesBackwardIcon from "@/components/FixturesBackwardIcon";
 import FixturesForwardIcon from "@/components/FixturesForwardIcon";
 import RadioDotIcon from "@/components/RadioDotIcon"; // Placeholder for sport icon when loading
 
-import { styled } from "@pigment-css/react";
+import { styled } from "next-yak";
 import { DEFAULTS } from "@/constants/defaults";
+import { webTheme } from "@/styles/theme.yak";
+
+const subscribeToClientHydration = () => () => {};
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
 
 export default function FixturesClient({ initialParams }) {
-  const [isClient, setIsClient] = useState(false);
+  const isClient = useSyncExternalStore(
+    subscribeToClientHydration,
+    getClientSnapshot,
+    getServerSnapshot
+  );
   const [showAllScores, setShowAllScores] = useState(false);
   const [useSoundEffects, setUseSoundEffects] = useState(() => {
     // Check if window exists (we're on the client)
@@ -51,10 +61,6 @@ export default function FixturesClient({ initialParams }) {
     return DEFAULTS.SOUND;
   });
   const searchParams = useSearchParams();
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   // Get URL params, but prioritize initialParams if they exist
   const urlParams = {
@@ -193,7 +199,6 @@ export default function FixturesClient({ initialParams }) {
     // Only attempt to use localStorage on the client
     if (typeof window !== "undefined") {
       localStorage.setItem("attie.sound", JSON.stringify(newValue));
-      console.log("Sound effects changed to:", newValue);
     }
   };
 
@@ -203,7 +208,6 @@ export default function FixturesClient({ initialParams }) {
     // Only attempt to use localStorage on the client
     if (typeof window !== "undefined") {
       localStorage.setItem("attie.direction", newDirection);
-      console.log("Direction changed to:", newDirection);
     }
   };
 
@@ -458,50 +462,47 @@ export default function FixturesClient({ initialParams }) {
   );
 }
 
-const Main = styled("main")({
-  display: "flex",
-  flexDirection: "column",
-  gap: "1.5rem",
-});
+const Main = styled.main`
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+`;
 
-const ControlBar = styled("section")(({ theme }) => ({
-  display: "flex",
-  flexDirection: "row",
-  gap: "0.5rem",
-  padding: "0.5rem",
-  alignItems: "center",
-  ...createStippledBackground({ fill: theme.colors.background.interstitial })({
-    theme,
-  }),
-  overflowX: "hidden",
+const ControlBar = styled.section`
+  ${interstitialStippledBackground};
+  align-items: center;
+  border: 1px solid ${webTheme.colors.text.primary};
+  border-radius: 3px;
+  box-shadow: 0 3px 0 0 ${webTheme.colors.text.primary};
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  overflow-x: hidden;
+  padding: 0.5rem;
+`;
 
-  border: `1px solid ${theme.colors.text.primary}`,
-  boxShadow: `0 3px 0 0 ${theme.colors.text.primary}`,
-  borderRadius: "3px",
-}));
+const AllFixturesList = styled.ul`
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+`;
 
-const AllFixturesList = styled("ul")({
-  display: "flex",
-  flexDirection: "column",
-  gap: "1.5rem",
-});
+const DateGroup = styled.li`
+  ${dashedBorder};
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+`;
 
-const DateGroup = styled("li")(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  gap: "0.25rem", // Between header and another ul
-  ...dashedBorder({ theme }),
-}));
+const DateFixturesList = styled.ul`
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+`;
 
-const DateFixturesList = styled("ul")({
-  display: "flex",
-  flexDirection: "column",
-  gap: "1.5rem",
-});
-
-const EmptyState = styled("div")(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  gap: "0.5rem",
-  ...dashedBorder({ theme }),
-}));
+const EmptyState = styled.div`
+  ${dashedBorder};
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
