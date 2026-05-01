@@ -1,14 +1,15 @@
+// @ts-nocheck
 import { Checkbox } from "@headlessui/react";
 import FieldRow from "@/components/FieldRow";
 import FieldLabel from "@/components/FieldLabel";
 import InputIconContainer from "@/components/InputIconContainer";
-import { styled } from "@pigment-css/react";
+import { styled } from "next-yak";
 import { fieldInputStyle } from "@/styles/commonStyles";
 import RadioDotIcon from "@/components/RadioDotIcon";
 
-const StyledCheckbox = styled(Checkbox)(() => ({
-  ...fieldInputStyle,
-}));
+const StyledCheckbox = styled(Checkbox)`
+  ${fieldInputStyle};
+`;
 
 function FieldCheckboxRow({
   name,

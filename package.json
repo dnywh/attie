@@ -1,31 +1,33 @@
 {
   "name": "attie",
   "version": "0.1.0",
+  "type": "module",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint ."
   },
   "dependencies": {
     "@balldontlie/sdk": "^1.2.2",
     "@fontsource-variable/jost": "^5.2.8",
-    "@headlessui/react": "^2.2.8",
-    "@pigment-css/react": "^0.0.30",
-    "@vercel/analytics": "^1.5.0",
-    "@vercel/speed-insights": "^1.2.0",
-    "next": "15.5.3",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
+    "@headlessui/react": "^2.2.10",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
+    "next": "16.2.4",
+    "react": "19.2.5",
+    "react-dom": "19.2.5",
     "use-sound": "^5.0.0"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.1",
-    "@pigment-css/nextjs-plugin": "^0.0.30",
-    "@types/node": "24.5.2",
-    "@types/react": "19.1.13",
-    "eslint": "^9.36.0",
-    "eslint-config-next": "15.5.3"
+    "@eslint/eslintrc": "^3.3.5",
+    "@types/node": "25.6.0",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "16.2.4",
+    "next-yak": "9.4.1",
+    "typescript": "5.9.3"
   }
 }

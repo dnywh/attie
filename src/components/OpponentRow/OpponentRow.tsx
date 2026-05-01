@@ -1,45 +1,42 @@
+// @ts-nocheck
 import TeamLogo from "@/components/TeamLogo";
 import Score from "@/components/Score";
-import { styled } from "@pigment-css/react";
+import { css, styled } from "next-yak";
 import { teamText, ellipsizedText } from "@/styles/commonStyles";
 import { FIXTURE_STATUS } from "@/constants/fixtureStatus";
+import { webTheme } from "@/styles/theme.yak";
 
-const StyledOpponentRow = styled("li")({
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  gap: "0.625rem",
+const StyledOpponentRow = styled.li`
+  align-items: center;
+  display: flex;
+  gap: 0.625rem;
+  justify-content: space-between;
 
-  "&:not(:last-child)": {
-    borderWidth: "1px",
-    padding: "0.85rem 0.85rem 0.525rem 0.85rem",
-  },
+  &:not(:last-child) {
+    border-width: 1px;
+    padding: 0.85rem 0.85rem 0.525rem;
+  }
 
-  "&:last-child": {
-    borderWidth: "0 1px 1px 1px",
-    padding: "0.525rem 0.85rem 0.85rem 0.85rem",
-  },
-});
+  &:last-child {
+    border-width: 0 1px 1px;
+    padding: 0.525rem 0.85rem 0.85rem;
+  }
+`;
 
-const OpponentName = styled("p")(({ theme }) => ({
-  flex: "1",
-  ...teamText,
-  ...ellipsizedText,
-  variants: [
-    {
-      props: { isKnown: true },
-      style: {
-        color: theme.colors.text.primary,
-      },
-    },
-    {
-      props: { isKnown: false },
-      style: {
-        color: theme.colors.text.tertiary,
-      },
-    },
-  ],
-}));
+const knownNameStyles = css`
+  color: ${webTheme.colors.text.primary};
+`;
+
+const unknownNameStyles = css`
+  color: ${webTheme.colors.text.tertiary};
+`;
+
+const OpponentName = styled.p`
+  ${teamText};
+  ${ellipsizedText};
+  flex: 1;
+  ${({ $isKnown }) => ($isKnown ? knownNameStyles : unknownNameStyles)}
+`;
 
 function OpponentRow({
   team,
@@ -74,9 +71,10 @@ function OpponentRow({
         alt={`Crest for ${teamName}`}
         isHomeTeam={isHomeTeam}
       />
-      <OpponentName isKnown={isKnown}>{teamName}</OpponentName>
+      <OpponentName $isKnown={isKnown}>{teamName}</OpponentName>
       {shouldShowScoreComponent && (
         <Score
+          key={showAllScores ? "all-scores" : "hidden-scores"}
           score={score}
           showAllScores={showAllScores}
           useSoundEffects={useSoundEffects}
