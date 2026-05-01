@@ -41,12 +41,12 @@
 		1D01D0012C00000100000001 = {
 			isa = PBXGroup;
 			children = (
-				1D01D0022C00000100000001 /* Attie */,
+				1D01D0022C00000100000001 /* Apps/Attie */,
 				1D01D0032C00000100000001 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		1D01D0022C00000100000001 /* Attie */ = {
+		1D01D0022C00000100000001 /* Apps/Attie */ = {
 			isa = PBXGroup;
 			children = (
 				1D01D0042C00000100000001 /* Shared */,
@@ -123,7 +123,7 @@
 			mainGroup = 1D01D0012C00000100000001;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				1D01E0022C00000100000001 /* XCLocalSwiftPackageReference "AttieCore" */,
+				1D01E0022C00000100000001 /* XCLocalSwiftPackageReference "Packages/AttieCore" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 1D01D0032C00000100000001 /* Products */;
@@ -286,6 +286,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = RQFKDUDCNX;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Attie;
@@ -316,6 +317,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = RQFKDUDCNX;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Attie;
@@ -363,7 +365,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		1D01E0022C00000100000001 /* XCLocalSwiftPackageReference "AttieCore" */ = {
+		1D01E0022C00000100000001 /* XCLocalSwiftPackageReference "Packages/AttieCore" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Packages/AttieCore;
 		};
@@ -372,7 +374,7 @@
 /* Begin XCSwiftPackageProductDependency section */
 		1D01E0012C00000100000001 /* AttieCore */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 1D01E0022C00000100000001 /* XCLocalSwiftPackageReference "AttieCore" */;
+			package = 1D01E0022C00000100000001 /* XCLocalSwiftPackageReference "Packages/AttieCore" */;
 			productName = AttieCore;
 		};
 /* End XCSwiftPackageProductDependency section */
