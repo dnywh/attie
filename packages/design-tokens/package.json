@@ -1,0 +1,11 @@
+{
+  "name": "@attie/design-tokens",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./tokens.json": "./tokens.json"
+  },
+  "types": "./src/index.ts"
+}

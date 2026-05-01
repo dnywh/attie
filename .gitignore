@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+**/node_modules
 /.pnp
 .pnp.*
 .yarn/*
@@ -12,11 +13,15 @@
 
 # testing
 /coverage
+.build/
+**/.build/
 
 # next.js
+apps/web/.next/
 /.next/
 /out/
 /.swc/
+apps/web/.swc/
 
 # production
 /build
@@ -24,6 +29,9 @@
 # misc
 .DS_Store
 *.pem
+DerivedData/
+*.xcuserstate
+xcuserdata/
 
 # debug
 npm-debug.log*

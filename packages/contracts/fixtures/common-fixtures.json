@@ -1,0 +1,68 @@
+{
+  "fixtures": [
+    {
+      "id": "premier-league:fixture:sample-1",
+      "utcDate": "2026-04-30T19:00:00Z",
+      "status": {
+        "type": "FINISHED",
+        "detail": "Full-time"
+      },
+      "competition": {
+        "name": "Premier League"
+      },
+      "homeTeam": {
+        "name": "Arsenal",
+        "shortName": "ARS",
+        "crest": "https://example.com/arsenal.png"
+      },
+      "awayTeam": {
+        "name": "Tottenham Hotspur",
+        "shortName": "TOT",
+        "crest": "https://example.com/tottenham.png"
+      },
+      "score": {
+        "fullTime": {
+          "home": 2,
+          "away": 1
+        }
+      }
+    },
+    {
+      "id": "nba:fixture:sample-1",
+      "utcDate": "2026-05-02T01:30:00Z",
+      "status": {
+        "type": "SCHEDULED",
+        "detail": null
+      },
+      "competition": {
+        "name": "NBA"
+      },
+      "homeTeam": {
+        "name": "New York Knicks",
+        "shortName": "NYK",
+        "crest": "https://example.com/knicks.png"
+      },
+      "awayTeam": {
+        "name": "Boston Celtics",
+        "shortName": "BOS",
+        "crest": "https://example.com/celtics.png"
+      },
+      "score": {
+        "fullTime": {
+          "home": null,
+          "away": null
+        }
+      }
+    }
+  ],
+  "meta": {
+    "next_cursor": null,
+    "per_page": null,
+    "has_more": false,
+    "count": 2,
+    "dateFrom": "2026-04-30",
+    "dateTo": "2026-05-02",
+    "direction": "past",
+    "competitions": ["premier-league", "nba"]
+  }
+}
