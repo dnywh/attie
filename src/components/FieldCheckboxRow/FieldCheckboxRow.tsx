@@ -1,7 +1,6 @@
 import type { PropsWithChildren, ReactNode } from "react";
 import { Checkbox } from "@headlessui/react";
-import FieldRow from "@/components/FieldRow";
-import FieldLabel from "@/components/FieldLabel";
+import FieldChoiceRow from "@/components/FieldChoiceRow";
 import InputIconContainer from "@/components/InputIconContainer";
 import { styled } from "next-yak";
 import { fieldInputStyle } from "@/styles/commonStyles";
@@ -26,12 +25,15 @@ function FieldCheckboxRow({
   children,
 }: PropsWithChildren<FieldCheckboxRowProps>) {
   return (
-    <FieldRow>
-      <StyledCheckbox name={name} checked={checked} onChange={onChange}>
-        <InputIconContainer>{icon}</InputIconContainer>
-      </StyledCheckbox>
-      <FieldLabel>{children}</FieldLabel>
-    </FieldRow>
+    <FieldChoiceRow
+      control={
+        <StyledCheckbox name={name} checked={checked} onChange={onChange}>
+          <InputIconContainer>{icon}</InputIconContainer>
+        </StyledCheckbox>
+      }
+    >
+      {children}
+    </FieldChoiceRow>
   );
 }
 

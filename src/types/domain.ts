@@ -90,7 +90,7 @@ export interface StoredPreferences {
 export type ScoreValue = number | string | null;
 
 export interface StatusObject {
-  type: FixtureStatusType;
+  type: FixtureStatusType | string;
   detail: string | null;
 }
 

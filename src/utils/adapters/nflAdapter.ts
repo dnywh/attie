@@ -1,38 +1,56 @@
 import { FIXTURE_STATUS } from "@/constants/fixtureStatus";
-import type { CommonFixture } from "./types";
+import type { CommonFixture, CompetitionConfig, ScoreValue } from "@/types/domain";
+
+interface NFLFixture {
+  id: number | string;
+  date: string;
+  status: string;
+  home_team: BallDontLieTeam;
+  visitor_team: BallDontLieTeam;
+  home_team_score: ScoreValue;
+  visitor_team_score: ScoreValue;
+}
+
+interface BallDontLieTeam {
+  full_name: string;
+  name: string;
+  abbreviation: string;
+}
 
 const STATUS_MAP: Record<string, string> = {
   Final: FIXTURE_STATUS.FINISHED,
 };
 
 export const adaptNFLFixture = (
-  rawFixture: any,
-  competition: any
+  rawFixture: unknown,
+  competition: CompetitionConfig
 ): CommonFixture => {
+  const fixture = rawFixture as NFLFixture;
+
   return {
-    id: rawFixture.id.toString(),
-    utcDate: rawFixture.date,
+    id: fixture.id.toString(),
+    utcDate: fixture.date,
     status: {
-      type: STATUS_MAP[rawFixture.status] || rawFixture.status,
+      type: STATUS_MAP[fixture.status] || fixture.status,
       detail: null,
     },
     competition: {
       name: competition.name,
     },
     homeTeam: {
-      name: rawFixture.home_team.full_name,
-      shortName: rawFixture.home_team.name,
-      crest: `https://a1.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/scoreboard/${rawFixture.home_team.abbreviation}.png&h=112&w=112`,
+      name: fixture.home_team.full_name,
+      shortName: fixture.home_team.name,
+      crest: `https://a1.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/scoreboard/${fixture.home_team.abbreviation}.png&h=112&w=112`,
     },
     awayTeam: {
-      name: rawFixture.visitor_team.full_name,
-      shortName: rawFixture.visitor_team.name,
-      crest: `https://a1.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/scoreboard/${rawFixture.visitor_team.abbreviation}.png&h=112&w=112`,
+      name: fixture.visitor_team.full_name,
+      shortName: fixture.visitor_team.name,
+      crest: `https://a1.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/scoreboard/${fixture.visitor_team.abbreviation}.png&h=112&w=112`,
     },
     score: {
       fullTime: {
-        home: rawFixture.home_team_score,
-        away: rawFixture.visitor_team_score,
+        home: fixture.home_team_score,
+        away: fixture.visitor_team_score,
       },
     },
   };

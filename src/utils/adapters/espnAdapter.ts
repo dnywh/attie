@@ -1,5 +1,31 @@
 import { FIXTURE_STATUS } from "@/constants/fixtureStatus";
-import type { CommonFixture } from "./types";
+import type { CommonFixture, CompetitionConfig, ScoreValue } from "@/types/domain";
+
+interface ESPNFixture {
+  id: string;
+  date: string;
+  competitions: ESPNFixtureCompetition[];
+}
+
+interface ESPNFixtureCompetition {
+  status: {
+    type: {
+      name: string;
+      shortDetail?: string | null;
+    };
+  };
+  competitors: ESPNCompetitor[];
+}
+
+interface ESPNCompetitor {
+  homeAway: string;
+  score?: ScoreValue;
+  team: {
+    name: string;
+    shortDisplayName?: string;
+    logo?: string;
+  };
+}
 
 const STATUS_MAP: Record<string, string> = {
   STATUS_SCHEDULED: FIXTURE_STATUS.SCHEDULED,
@@ -15,22 +41,21 @@ const STATUS_MAP: Record<string, string> = {
 };
 
 export const adaptESPNFixture = (
-  rawFixture: any,
-  competition: any
+  rawFixture: unknown,
+  competition: CompetitionConfig
 ): CommonFixture | null => {
-  // Get the first competition (there should only be one per fixture)
-  const fixtureCompetition = rawFixture.competitions[0];
+  const fixture = rawFixture as ESPNFixture;
+  const fixtureCompetition = fixture.competitions[0];
 
   if (!fixtureCompetition) {
-    console.error("No competition found in fixture:", rawFixture);
+    console.error("No competition found in fixture:", fixture);
     return null;
   }
 
-  let status =
+  const status =
     STATUS_MAP[fixtureCompetition.status.type.name] ||
     fixtureCompetition.status.type.name;
 
-  // Create status object with optional detail
   const statusObject = {
     type: status,
     detail: fixtureCompetition.status.type.shortDetail
@@ -38,12 +63,11 @@ export const adaptESPNFixture = (
       : null,
   };
 
-  // Get the competitors
   const homeTeam = fixtureCompetition.competitors.find(
-    (c: any) => c.homeAway === "home"
+    (competitor) => competitor.homeAway === "home"
   );
   const awayTeam = fixtureCompetition.competitors.find(
-    (c: any) => c.homeAway === "away"
+    (competitor) => competitor.homeAway === "away"
   );
 
   if (!homeTeam || !awayTeam) {
@@ -55,26 +79,26 @@ export const adaptESPNFixture = (
   }
 
   return {
-    id: rawFixture.id,
-    utcDate: rawFixture.date,
+    id: fixture.id,
+    utcDate: fixture.date,
     status: statusObject,
     competition: {
       name: competition.name,
     },
     homeTeam: {
       name: homeTeam.team.name,
-      shortName: homeTeam.team.shortDisplayName,
-      crest: homeTeam.team.logo,
+      shortName: homeTeam.team.shortDisplayName ?? homeTeam.team.name,
+      crest: homeTeam.team.logo ?? "",
     },
     awayTeam: {
       name: awayTeam.team.name,
-      shortName: awayTeam.team.shortDisplayName,
-      crest: awayTeam.team.logo,
+      shortName: awayTeam.team.shortDisplayName ?? awayTeam.team.name,
+      crest: awayTeam.team.logo ?? "",
     },
     score: {
       fullTime: {
-        home: homeTeam.score,
-        away: awayTeam.score,
+        home: homeTeam.score ?? null,
+        away: awayTeam.score ?? null,
       },
     },
   };

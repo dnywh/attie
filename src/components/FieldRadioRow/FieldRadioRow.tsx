@@ -1,7 +1,6 @@
 import type { PropsWithChildren } from "react";
 import { Radio } from "@headlessui/react";
-import FieldRow from "@/components/FieldRow";
-import FieldLabel from "@/components/FieldLabel";
+import FieldChoiceRow from "@/components/FieldChoiceRow";
 import InputIconContainer from "@/components/InputIconContainer";
 import RadioDotIcon from "@/components/RadioDotIcon";
 import { styled } from "next-yak";
@@ -13,14 +12,17 @@ const StyledRadio = styled(Radio)`
 
 function FieldRadioRow({ value, children, ...props }: PropsWithChildren<{ value: boolean }>) {
   return (
-    <FieldRow>
-      <StyledRadio value={value} {...props}>
-        <InputIconContainer>
-          <RadioDotIcon />
-        </InputIconContainer>
-      </StyledRadio>
-      <FieldLabel>{children}</FieldLabel>
-    </FieldRow>
+    <FieldChoiceRow
+      control={
+        <StyledRadio value={value} {...props}>
+          <InputIconContainer>
+            <RadioDotIcon />
+          </InputIconContainer>
+        </StyledRadio>
+      }
+    >
+      {children}
+    </FieldChoiceRow>
   );
 }
 

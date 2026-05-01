@@ -1,7 +1,8 @@
-import type { ElementType, PropsWithChildren } from "react";
-import { styled } from "next-yak";
+import type { PropsWithChildren } from "react";
+import { Legend } from "@headlessui/react";
+import { css, styled } from "next-yak";
 
-const StyledHeading = styled.h2`
+const headingBannerStyles = css`
   background-color: black;
   border-radius: 3px;
   color: white;
@@ -22,13 +23,23 @@ const StyledHeading = styled.h2`
   }
 `;
 
+const StyledHeading = styled.h2`
+  ${headingBannerStyles};
+`;
+
+const StyledLabel = styled.label`
+  ${headingBannerStyles};
+`;
+
+const StyledLegend = styled(Legend)`
+  ${headingBannerStyles};
+`;
+
 interface HeadingBannerProps {
-  as?: ElementType;
+  as?: "h2" | "label" | typeof Legend;
   sticky?: "true" | "false";
   htmlFor?: string;
 }
-
-const PolymorphicHeading = StyledHeading as unknown as ElementType;
 
 function HeadingBanner({
   as = "h2",
@@ -36,10 +47,22 @@ function HeadingBanner({
   children = "Heading Title",
   ...props
 }: PropsWithChildren<HeadingBannerProps>) {
+  if (as === "label") {
+    return (
+      <StyledLabel data-sticky={sticky} {...props}>
+        {children}
+      </StyledLabel>
+    );
+  }
+
+  if (as === Legend) {
+    return <StyledLegend data-sticky={sticky}>{children}</StyledLegend>;
+  }
+
   return (
-    <PolymorphicHeading as={as} data-sticky={sticky} {...props}>
+    <StyledHeading data-sticky={sticky}>
       {children}
-    </PolymorphicHeading>
+    </StyledHeading>
   );
 }
 

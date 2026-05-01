@@ -54,8 +54,7 @@ function TeamLogo({
 }: TeamLogoProps) {
   const [imageLoadFailed, setImageLoadFailed] = useState(false);
 
-  // Combine the initial isKnown prop with the image load state
-  const isKnown = initialIsKnown && !imageLoadFailed;
+  const isKnown = initialIsKnown && Boolean(src) && !imageLoadFailed;
 
   return (
     <Container
