@@ -1,4 +1,5 @@
 import { styled, keyframes } from "next-yak";
+import { FIXTURE_STATUS } from "@/constants/fixtureStatus";
 import { webTheme } from "@/styles/theme.yak";
 import type { CommonFixture } from "@/types/domain";
 
@@ -32,22 +33,18 @@ const LiveStatus = styled(RegularStatus)`
 `;
 
 function FixtureStatus({ fixture }: { fixture: CommonFixture }) {
-  // Unpack status
   const { status } = fixture;
-  const statusType = typeof status === "string" ? status : status.type;
-  // Handle both string status and status objects (for competitions with live fixture details, like "2nd Qtr")
-  const statusDetail = typeof status === "object" ? status.detail : null;
 
-  if (statusType === "LIVE") {
+  if (status.type === FIXTURE_STATUS.LIVE) {
     return (
       <LiveStatus>
         Live
-        {statusDetail && `: ${statusDetail}`}
+        {status.detail && `: ${status.detail}`}
       </LiveStatus>
     );
-  } else {
-    return <RegularStatus>{statusType}</RegularStatus>;
   }
+
+  return <RegularStatus>{status.type}</RegularStatus>;
 }
 
 export default FixtureStatus;

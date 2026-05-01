@@ -1,5 +1,26 @@
 import { FIXTURE_STATUS } from "@/constants/fixtureStatus";
-import type { CommonFixture } from "./types";
+import type { CommonFixture, CompetitionConfig, ScoreValue } from "@/types/domain";
+
+interface MLBFixture {
+  id: number | string;
+  date: string;
+  status: string;
+  home_team: BallDontLieTeam;
+  away_team: BallDontLieTeam;
+  home_team_data: {
+    runs: ScoreValue;
+  };
+  away_team_data: {
+    runs: ScoreValue;
+  };
+}
+
+interface BallDontLieTeam {
+  display_name?: string;
+  full_name?: string;
+  name: string;
+  abbreviation: string;
+}
 
 const STATUS_MAP: Record<string, string> = {
   STATUS_SCHEDULED: FIXTURE_STATUS.SCHEDULED,
@@ -8,33 +29,35 @@ const STATUS_MAP: Record<string, string> = {
 };
 
 export const adaptMLBFixture = (
-  rawFixture: any,
-  competition: any
+  rawFixture: unknown,
+  competition: CompetitionConfig
 ): CommonFixture => {
+  const fixture = rawFixture as MLBFixture;
+
   return {
-    id: rawFixture.id.toString(),
-    utcDate: rawFixture.date,
+    id: fixture.id.toString(),
+    utcDate: fixture.date,
     status: {
-      type: STATUS_MAP[rawFixture.status] || rawFixture.status,
+      type: STATUS_MAP[fixture.status] || fixture.status,
       detail: null,
     },
     competition: {
       name: competition.name,
     },
     homeTeam: {
-      name: rawFixture.home_team.display_name,
-      shortName: rawFixture.home_team.name,
-      crest: `https://a1.espncdn.com/combiner/i?img=/i/teamlogos/mlb/500/scoreboard/${rawFixture.home_team.abbreviation}.png&h=112&w=112`,
+      name: fixture.home_team.display_name ?? fixture.home_team.name,
+      shortName: fixture.home_team.name,
+      crest: `https://a1.espncdn.com/combiner/i?img=/i/teamlogos/mlb/500/scoreboard/${fixture.home_team.abbreviation}.png&h=112&w=112`,
     },
     awayTeam: {
-      name: rawFixture.away_team.full_name,
-      shortName: rawFixture.away_team.name,
-      crest: `https://a1.espncdn.com/combiner/i?img=/i/teamlogos/mlb/500/scoreboard/${rawFixture.away_team.abbreviation}.png&h=112&w=112`,
+      name: fixture.away_team.full_name ?? fixture.away_team.name,
+      shortName: fixture.away_team.name,
+      crest: `https://a1.espncdn.com/combiner/i?img=/i/teamlogos/mlb/500/scoreboard/${fixture.away_team.abbreviation}.png&h=112&w=112`,
     },
     score: {
       fullTime: {
-        home: rawFixture.home_team_data.runs,
-        away: rawFixture.away_team_data.runs,
+        home: fixture.home_team_data.runs,
+        away: fixture.away_team_data.runs,
       },
     },
   };

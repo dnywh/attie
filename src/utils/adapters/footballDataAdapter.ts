@@ -1,5 +1,26 @@
 import { FIXTURE_STATUS } from "@/constants/fixtureStatus";
-import type { CommonFixture } from "./types";
+import type { CommonFixture, CompetitionConfig, ScoreValue } from "@/types/domain";
+
+interface FootballDataFixture {
+  id: number | string;
+  utcDate: string;
+  status: string;
+  homeTeam: FootballDataTeam;
+  awayTeam: FootballDataTeam;
+  score: {
+    fullTime: {
+      home: ScoreValue;
+      away: ScoreValue;
+    };
+  };
+}
+
+interface FootballDataTeam {
+  name: string;
+  shortName?: string | null;
+  tla?: string | null;
+  crest: string;
+}
 
 const STATUS_MAP: Record<string, string> = {
   TIMED: FIXTURE_STATUS.SCHEDULED,
@@ -15,33 +36,41 @@ const STATUS_MAP: Record<string, string> = {
 };
 
 export const adaptFootballDataFixture = (
-  rawFixture: any,
-  competition: any
+  rawFixture: unknown,
+  competition: CompetitionConfig
 ): CommonFixture => {
+  const fixture = rawFixture as FootballDataFixture;
+
   return {
-    id: rawFixture.id,
-    utcDate: rawFixture.utcDate,
+    id: String(fixture.id),
+    utcDate: fixture.utcDate,
     status: {
-      type: STATUS_MAP[rawFixture.status] || rawFixture.status,
+      type: STATUS_MAP[fixture.status] || fixture.status,
       detail: null,
     },
     competition: {
       name: competition.name,
     },
     homeTeam: {
-      name: rawFixture.homeTeam.name,
-      shortName: rawFixture.homeTeam.shortName || rawFixture.homeTeam.tla,
-      crest: rawFixture.homeTeam.crest,
+      name: fixture.homeTeam.name,
+      shortName:
+        fixture.homeTeam.shortName ||
+        fixture.homeTeam.tla ||
+        fixture.homeTeam.name,
+      crest: fixture.homeTeam.crest,
     },
     awayTeam: {
-      name: rawFixture.awayTeam.name,
-      shortName: rawFixture.awayTeam.shortName || rawFixture.awayTeam.tla,
-      crest: rawFixture.awayTeam.crest,
+      name: fixture.awayTeam.name,
+      shortName:
+        fixture.awayTeam.shortName ||
+        fixture.awayTeam.tla ||
+        fixture.awayTeam.name,
+      crest: fixture.awayTeam.crest,
     },
     score: {
       fullTime: {
-        home: rawFixture.score.fullTime.home,
-        away: rawFixture.score.fullTime.away,
+        home: fixture.score.fullTime.home,
+        away: fixture.score.fullTime.away,
       },
     },
   };

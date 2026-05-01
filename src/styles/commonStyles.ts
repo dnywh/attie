@@ -112,37 +112,6 @@ export const veryBasicCardStyle = css`
   box-shadow: 0 4px 0 0 ${webTheme.colors.text.primary};
 `;
 
-export const interactiveStyles = css`
-  background: red;
-
-  &:hover {
-    background: yellow;
-  }
-
-  &:focus,
-  &:active {
-    background: blue;
-  }
-`;
-
-export const smallCardStyle = css`
-  border: 1px solid ${webTheme.colors.text.primary};
-  border-radius: 3px;
-  box-shadow: 0 3px 0 0 ${webTheme.colors.text.primary};
-`;
-
-export const smallCardStyleInteractive = css`
-  ${smallCardStyle};
-  ${interactiveStyles};
-  cursor: pointer;
-`;
-
-export const elevatedCard = css`
-  border: 1px solid ${webTheme.colors.text.primary};
-  border-radius: 3px;
-  box-shadow: 0 3px 0 0 ${webTheme.colors.text.primary};
-`;
-
 export const bleedingWhiteCard = css`
   background-color: ${webTheme.colors.background.foremost};
   border: 1px solid ${webTheme.colors.text.primary};

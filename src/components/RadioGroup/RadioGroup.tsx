@@ -27,7 +27,7 @@ function RadioGroup({ children, ...props }: PropsWithChildren<RadioGroupProps>) 
   return (
     <StyledRadioGroup
       {...props}
-      onChange={props.onChange as (value: unknown) => void}
+      onChange={(value) => props.onChange(value === true)}
     >
       {children}
     </StyledRadioGroup>
