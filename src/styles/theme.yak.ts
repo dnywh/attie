@@ -1,6 +1,6 @@
-import { curves, spacing, typography } from "./tokens.js";
+import { curves, spacing, typography } from "./tokens.ts";
 
-const cssVar = (name) => `var(${name})`;
+const cssVar = (name: string) => `var(${name})`;
 
 export const webTheme = {
   colors: {

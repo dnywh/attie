@@ -1,4 +1,4 @@
-// @ts-nocheck
+import type { PropsWithChildren } from "react";
 import { Field } from "@headlessui/react";
 import { styled } from "next-yak";
 import { webTheme } from "@/styles/theme.yak";
@@ -17,7 +17,7 @@ const StyledField = styled(Field)`
   }
 `;
 
-function FieldRow({ children, ...props }) {
+function FieldRow({ children, ...props }: PropsWithChildren) {
   return <StyledField {...props}>{children}</StyledField>;
 }
 

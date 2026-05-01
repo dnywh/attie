@@ -1,6 +1,12 @@
-// @ts-nocheck
 "use client";
-import { useState, useEffect, Fragment, useSyncExternalStore } from "react";
+import {
+  useState,
+  useEffect,
+  Fragment,
+  useSyncExternalStore,
+  type ChangeEvent,
+  type ReactNode,
+} from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Legend } from "@headlessui/react";
@@ -22,11 +28,19 @@ import {
   COMPETITIONS,
   getCompetitionsForSport,
 } from "@/constants/competitions";
-import { SPORTS } from "@/config/sportConfig";
+import { SPORTS, isSportKey } from "@/config/sportConfig";
 
 import { dashedBorder, interstitialStippledBackground } from "@/styles/commonStyles";
 import { formatDateForDisplay, groupFixturesByDate } from "@/utils/dates";
 import { useFixtures } from "@/hooks/useFixtures";
+import type { FixtureParams } from "@/hooks/useFixtures";
+import { STORAGE_KEYS, readStoredSoundPreference } from "@/utils/preferences";
+import type {
+  CompetitionConfig,
+  CompetitionKey,
+  Direction,
+  SportKey,
+} from "@/types/domain";
 
 import ScoresHiddenIcon from "@/components/ScoresHiddenIcon";
 import ScoresRevealedIcon from "@/components/ScoresRevealedIcon";
@@ -42,28 +56,26 @@ const subscribeToClientHydration = () => () => {};
 const getClientSnapshot = () => true;
 const getServerSnapshot = () => false;
 
-export default function FixturesClient({ initialParams }) {
+export default function FixturesClient({
+  initialParams,
+}: {
+  initialParams?: FixtureParams;
+}) {
   const isClient = useSyncExternalStore(
     subscribeToClientHydration,
     getClientSnapshot,
     getServerSnapshot
   );
   const [showAllScores, setShowAllScores] = useState(false);
-  const [useSoundEffects, setUseSoundEffects] = useState(() => {
-    // Check if window exists (we're on the client)
-    if (typeof window !== "undefined") {
-      const storedSoundPref = localStorage.getItem("attie.sound");
-      return storedSoundPref !== null
-        ? JSON.parse(storedSoundPref)
-        : DEFAULTS.SOUND;
-    }
-    // Default to the default value when on the server
-    return DEFAULTS.SOUND;
-  });
+  const [useSoundEffects, setUseSoundEffects] = useState(() =>
+    readStoredSoundPreference(
+      typeof window === "undefined" ? undefined : window.localStorage
+    )
+  );
   const searchParams = useSearchParams();
 
   // Get URL params, but prioritize initialParams if they exist
-  const urlParams = {
+  const urlParams: FixtureParams = {
     sport: searchParams?.get("sport"),
     competitions: searchParams?.get("competitions")?.split(","),
     direction: searchParams?.get("direction"),
@@ -91,10 +103,10 @@ export default function FixturesClient({ initialParams }) {
   // Filter competitions based on selected sport
   const availableCompetitions = Object.entries(
     getCompetitionsForSport(selectedSport)
-  );
+  ) as [CompetitionKey, CompetitionConfig][];
 
   // Handle icon component for selected sport
-  const getSportIcon = (sport) => {
+  const getSportIcon = (sport: SportKey): ReactNode => {
     const SportIcon = SPORTS[sport]?.icon;
     return SportIcon ? <SportIcon /> : <RadioDotIcon />;
   };
@@ -102,11 +114,23 @@ export default function FixturesClient({ initialParams }) {
   const selectedSportIcon = getSportIcon(selectedSport);
 
   // Helper function to compare arrays with null safety
-  function arraysEqual(a, b) {
+  function arraysEqual<T>(a?: readonly T[] | null, b?: readonly T[] | null) {
     // Handle cases where either array is undefined/null
     if (!a || !b) return a === b;
     if (a.length !== b.length) return false;
     return a.every((item, index) => item === b[index]);
+  }
+
+  function competitionsForComparison(
+    competitions: FixtureParams["competitions"]
+  ): string[] {
+    if (!competitions) {
+      return [];
+    }
+
+    return typeof competitions === "string"
+      ? competitions.split(",").filter(Boolean)
+      : competitions;
   }
 
   // Update the URL params comparison logic
@@ -129,7 +153,11 @@ export default function FixturesClient({ initialParams }) {
     // redirect to the home page with the new params
     if (
       isCompetitionPage &&
-      !arraysEqual(selectedCompetitions, initialParams.competitions)
+      initialParams &&
+      !arraysEqual(
+        selectedCompetitions,
+        competitionsForComparison(initialParams.competitions)
+      )
     ) {
       if (selectedSport !== initialParams.sport) {
         params.set("sport", selectedSport);
@@ -149,7 +177,7 @@ export default function FixturesClient({ initialParams }) {
 
     // For the homepage, only add params if they differ from defaults
     // For competition pages, compare against initialParams
-    const compareAgainst = isCompetitionPage
+    const compareAgainst = isCompetitionPage && initialParams
       ? initialParams
       : {
           sport: DEFAULTS.SPORT,
@@ -167,7 +195,12 @@ export default function FixturesClient({ initialParams }) {
       if (selectedSport !== compareAgainst.sport) {
         params.set("sport", selectedSport);
       }
-      if (!arraysEqual(selectedCompetitions, compareAgainst.competitions)) {
+      if (
+        !arraysEqual(
+          selectedCompetitions,
+          competitionsForComparison(compareAgainst.competitions)
+        )
+      ) {
         params.set("competitions", selectedCompetitions.join(","));
       }
       if (selectedDirection !== compareAgainst.direction) {
@@ -194,20 +227,20 @@ export default function FixturesClient({ initialParams }) {
   ]);
 
   // Handle sound preference changes
-  const handleSoundEffectsChange = (newValue) => {
+  const handleSoundEffectsChange = (newValue: boolean) => {
     setUseSoundEffects(newValue);
     // Only attempt to use localStorage on the client
     if (typeof window !== "undefined") {
-      localStorage.setItem("attie.sound", JSON.stringify(newValue));
+      localStorage.setItem(STORAGE_KEYS.sound, JSON.stringify(newValue));
     }
   };
 
-  const handleDirectionChange = (newValue) => {
-    const newDirection = newValue ? "forwards" : "backwards";
+  const handleDirectionChange = (newValue: boolean) => {
+    const newDirection: Direction = newValue ? "forwards" : "backwards";
     setSelectedDirection(newDirection);
     // Only attempt to use localStorage on the client
     if (typeof window !== "undefined") {
-      localStorage.setItem("attie.direction", newDirection);
+      localStorage.setItem(STORAGE_KEYS.direction, newDirection);
     }
   };
 
@@ -259,7 +292,11 @@ export default function FixturesClient({ initialParams }) {
                 id="sport"
                 name="sport"
                 value={selectedSport}
-                onChange={(e) => setSelectedSport(e.target.value)}
+                onChange={(event: ChangeEvent<HTMLSelectElement>) => {
+                  if (isSportKey(event.target.value)) {
+                    setSelectedSport(event.target.value);
+                  }
+                }}
               >
                 {Object.entries(SPORTS).map(([sportKey, sport]) => (
                   <option key={sportKey} value={sportKey}>
@@ -380,46 +417,52 @@ export default function FixturesClient({ initialParams }) {
                     : fixtureDate <= now;
                 })
               )
-            ).map(([groupingKey, dateFixtures], index, array) => (
-              <Fragment key={groupingKey}>
-                <DateGroup>
-                  <HeadingBanner sticky="true">
-                    {formatDateForDisplay(dateFixtures[0].localDate)}
-                  </HeadingBanner>
-                  <DateFixturesList>
-                    {dateFixtures.map((fixture) => (
-                      <Fixture
-                        key={fixture.id}
-                        fixture={fixture}
-                        showAllScores={showAllScores}
-                        useSoundEffects={useSoundEffects}
-                        showCompetition={
-                          selectedCompetitions.length > 1 ? true : false
-                        }
-                      />
-                    ))}
-                  </DateFixturesList>
-                </DateGroup>
-                {index === 1 && (
-                  <Interstitial
-                    linkUrl="https://www.dannywhite.net/"
-                    linkText="Reach out"
-                  >
-                    <p>
-                      Attie is lovingly crafted by product designer{" "}
-                      {/* TODO: Use (i.e. automate) same link params as in Interstitial component footer */}
-                      <Link
-                        href="https://www.dannywhite.net/?utm_source=attie&utm_medium=sponsorship"
-                        target="_blank"
-                      >
-                        Danny White
-                      </Link>
-                      . Got a product that needs making? Get Danny involved.
-                    </p>
-                  </Interstitial>
-                )}
-              </Fragment>
-            ))}
+            ).map(([groupingKey, dateFixtures], index) => {
+              const firstFixture = dateFixtures[0];
+
+              if (!firstFixture) {
+                return null;
+              }
+
+              return (
+                <Fragment key={groupingKey}>
+                  <DateGroup>
+                    <HeadingBanner sticky="true">
+                      {formatDateForDisplay(firstFixture.localDate)}
+                    </HeadingBanner>
+                    <DateFixturesList>
+                      {dateFixtures.map((fixture) => (
+                        <Fixture
+                          key={fixture.id}
+                          fixture={fixture}
+                          showAllScores={showAllScores}
+                          useSoundEffects={useSoundEffects}
+                          showCompetition={selectedCompetitions.length > 1}
+                        />
+                      ))}
+                    </DateFixturesList>
+                  </DateGroup>
+                  {index === 1 && (
+                    <Interstitial
+                      linkUrl="https://www.dannywhite.net/"
+                      linkText="Reach out"
+                    >
+                      <p>
+                        Attie is lovingly crafted by product designer{" "}
+                        {/* TODO: Use (i.e. automate) same link params as in Interstitial component footer */}
+                        <Link
+                          href="https://www.dannywhite.net/?utm_source=attie&utm_medium=sponsorship"
+                          target="_blank"
+                        >
+                          Danny White
+                        </Link>
+                        . Got a product that needs making? Get Danny involved.
+                      </p>
+                    </Interstitial>
+                  )}
+                </Fragment>
+              );
+            })}
 
             {(() => {
               // console.log(

@@ -1,4 +1,4 @@
-// @ts-nocheck
+import type { PropsWithChildren } from "react";
 import { Fieldset as HeadlessFieldset } from "@headlessui/react";
 import { styled } from "next-yak";
 
@@ -8,7 +8,7 @@ const StyledFieldset = styled(HeadlessFieldset)`
   gap: 0.25rem;
 `;
 
-function Fieldset({ children }) {
+function Fieldset({ children }: PropsWithChildren) {
   return <StyledFieldset>{children}</StyledFieldset>;
 }
 

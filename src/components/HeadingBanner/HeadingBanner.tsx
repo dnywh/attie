@@ -1,4 +1,4 @@
-// @ts-nocheck
+import type { ElementType, PropsWithChildren } from "react";
 import { styled } from "next-yak";
 
 const StyledHeading = styled.h2`
@@ -22,16 +22,24 @@ const StyledHeading = styled.h2`
   }
 `;
 
+interface HeadingBannerProps {
+  as?: ElementType;
+  sticky?: "true" | "false";
+  htmlFor?: string;
+}
+
+const PolymorphicHeading = StyledHeading as unknown as ElementType;
+
 function HeadingBanner({
   as = "h2",
   sticky = "false",
   children = "Heading Title",
   ...props
-}) {
+}: PropsWithChildren<HeadingBannerProps>) {
   return (
-    <StyledHeading as={as} data-sticky={sticky} {...props}>
+    <PolymorphicHeading as={as} data-sticky={sticky} {...props}>
       {children}
-    </StyledHeading>
+    </PolymorphicHeading>
   );
 }
 

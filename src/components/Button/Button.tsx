@@ -1,4 +1,4 @@
-// @ts-nocheck
+import type { PropsWithChildren, ButtonHTMLAttributes } from "react";
 import { styled } from "next-yak";
 import { ellipsizedText } from "@/styles/commonStyles";
 
@@ -27,7 +27,10 @@ const StyledButton = styled.button`
   }
 `;
 
-function Button({ children, ...props }) {
+function Button({
+  children,
+  ...props
+}: PropsWithChildren<ButtonHTMLAttributes<HTMLButtonElement>>) {
   return <StyledButton {...props}>{children}</StyledButton>;
 }
 

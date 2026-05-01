@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { errorMessage, espnParams } from '@/utils/api/params';
 
 const API_BASE_URL = 'https://site.api.espn.com/apis/site/v2/sports';
 // https://site.api.espn.com/apis/site/v2/sports/rugby/270557/scoreboard // United Rugby CHampionship
@@ -9,25 +10,28 @@ const API_BASE_URL = 'https://site.api.espn.com/apis/site/v2/sports';
 // https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard
 // http://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/scoreboard
 
-export async function GET(request) {
+export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
+    const params = espnParams(searchParams);
 
-    // Get required parameters
-    const dateFrom = searchParams.get('dateFrom').replace(/-/g, "");
-    const dateTo = searchParams.get('dateTo').replace(/-/g, "");
-    const direction = searchParams.get('direction');
-    // Specific to ESPN
-    const sport = searchParams.get('sport');
-    const league = searchParams.get('league');
-    const groups = searchParams.get('groups'); // Required for college basketball, both mens and womens
-    const limit = searchParams.get('limit'); // Optional
-
-    if (!dateFrom || !dateTo) {
+    if (!params.ok) {
         return NextResponse.json(
-            { error: 'Missing required date parameters' },
+            { error: params.error },
             { status: 400 }
         );
     }
+
+    const {
+        dateFrom: rawDateFrom,
+        dateTo: rawDateTo,
+        direction,
+        sport,
+        league,
+        groups,
+        limit
+    } = params.value;
+    const dateFrom = rawDateFrom.replace(/-/g, "");
+    const dateTo = rawDateTo.replace(/-/g, "");
 
     console.log(`[ESPN API] Getting ${direction} games for sport: ${sport}, competition: ${league}`);
 
@@ -75,7 +79,7 @@ export async function GET(request) {
     } catch (error) {
         console.error('[ESPN API] Fetch error:', error);
         return NextResponse.json(
-            { error: 'Failed to fetch fixtures', message: error.message },
+            { error: 'Failed to fetch fixtures', message: errorMessage(error) },
             { status: 500 }
         );
     }

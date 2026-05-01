@@ -1,9 +1,9 @@
-// @ts-nocheck
+import type { PropsWithChildren } from "react";
 import { styled } from "next-yak";
 import { mediumText } from "@/styles/commonStyles";
 import { webTheme } from "@/styles/theme.yak";
 
-function CountDot({ children }) {
+function CountDot({ children }: PropsWithChildren) {
   return <StyledCount>{children}</StyledCount>;
 }
 

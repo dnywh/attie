@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { APP_CONFIG } from '@/constants/config';
+import { errorMessage, footballDataParams } from '@/utils/api/params';
 
 const API_BASE_URL = 'https://api.football-data.org/v4';
 
@@ -10,22 +11,18 @@ const API_BASE_URL = 'https://api.football-data.org/v4';
 //     return date.toISOString().split('T')[0];
 // }
 
-export async function GET(request, { params }) {
+export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
+    const params = footballDataParams(searchParams);
 
-    // Get required parameters
-    const dateFrom = searchParams.get('dateFrom');
-    const dateTo = searchParams.get('dateTo');
-    const direction = searchParams.get('direction');
-    // Custom to football-data
-    const competitionCode = searchParams.get('competition');
-
-    if (!dateFrom || !dateTo) {
+    if (!params.ok) {
         return NextResponse.json(
-            { error: 'Missing required date parameters' },
+            { error: params.error },
             { status: 400 }
         );
     }
+
+    const { dateFrom, dateTo, direction, competitionCode } = params.value;
 
     console.log(`[Football-Data API] Getting ${direction} games for ${competitionCode}`);
     console.log(`[Football-Data API] Date range: ${dateFrom} to ${dateTo}`);
@@ -35,7 +32,7 @@ export async function GET(request, { params }) {
             `${API_BASE_URL}/competitions/${competitionCode}/matches?dateFrom=${dateFrom}&dateTo=${dateTo}`,
             {
                 headers: {
-                    "X-Auth-Token": process.env.FOOTBALL_DATA_API_KEY,
+                    "X-Auth-Token": process.env.FOOTBALL_DATA_API_KEY ?? "",
                     "User-Agent": APP_CONFIG.USER_AGENT,
                 },
             }
@@ -79,7 +76,7 @@ export async function GET(request, { params }) {
     } catch (error) {
         console.error('[Football-Data API] Fetch error:', error);
         return NextResponse.json(
-            { error: 'Failed to fetch fixtures', message: error.message },
+            { error: 'Failed to fetch fixtures', message: errorMessage(error) },
             { status: 500 }
         );
     }

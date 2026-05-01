@@ -1,6 +1,5 @@
-// @ts-nocheck
 "use client";
-import { useState } from "react";
+import { useState, type PropsWithChildren, type ReactNode } from "react";
 import {
   Dialog,
   DialogBackdrop,
@@ -58,7 +57,7 @@ const fixedButtonStyles = css`
   flex-shrink: 0;
 `;
 
-const StyledButton = styled.button`
+const StyledButton = styled.button<{ $fillSpace: boolean }>`
   ${mediumText};
   align-items: center;
   background-color: ${webTheme.colors.background.foremost};
@@ -96,7 +95,7 @@ const fillContentStyles = css`
   flex-grow: 1;
 `;
 
-const ContentSpan = styled.span`
+const ContentSpan = styled.span<{ $fillSpace: boolean }>`
   text-align: left;
   ${({ $fillSpace }) => ($fillSpace ? fillContentStyles : "")}
 `;
@@ -181,13 +180,20 @@ const StyledDialogBackdropTwo = styled(DialogBackdrop)`
   }
 `;
 
+interface FancyDropdownProps {
+  icon?: ReactNode;
+  label?: string;
+  fillSpace?: boolean;
+  count?: number;
+}
+
 function FancyDropdown({
   icon = <FootballIcon />,
   label,
   fillSpace = false,
   count,
   children,
-}) {
+}: PropsWithChildren<FancyDropdownProps>) {
   const [isOpen, setIsOpen] = useState(false);
   function open() {
     setIsOpen(true);
@@ -202,7 +208,9 @@ function FancyDropdown({
       <StyledButton $fillSpace={fillSpace} onClick={open}>
         <IconSpan>{icon}</IconSpan>
         {label && <ContentSpan $fillSpace={fillSpace}>{label}</ContentSpan>}
-        {count > 0 && <CountDot>{count > 9 ? "9+" : count}</CountDot>}
+        {typeof count === "number" && count > 0 && (
+          <CountDot>{count > 9 ? "9+" : count}</CountDot>
+        )}
         <DropdownIcon size="small" />
       </StyledButton>
 

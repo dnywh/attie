@@ -4,6 +4,7 @@ import { adaptFootballDataFixture } from '@/utils/adapters/footballDataAdapter';
 import { adaptNBAFixture } from '@/utils/adapters/nbaAdapter';
 import { adaptMLBFixture } from '@/utils/adapters/mlbAdapter';
 import { adaptNFLFixture } from '@/utils/adapters/nflAdapter';
+import type { AdapterType, CommonFixture, CompetitionKey } from '@/types/domain';
 
 const ADAPTERS = {
     'espn': adaptESPNFixture,
@@ -11,7 +12,7 @@ const ADAPTERS = {
     'balldontlie-nba': adaptNBAFixture,
     'balldontlie-mlb': adaptMLBFixture,
     'balldontlie-nfl': adaptNFLFixture,
-};
+} satisfies Record<AdapterType, (rawFixture: unknown, competition: typeof COMPETITIONS[CompetitionKey]) => CommonFixture | null>;
 
 export const ADAPTER_BASE_PATHS = {
     'espn': '/api/espn',
@@ -19,9 +20,12 @@ export const ADAPTER_BASE_PATHS = {
     'balldontlie-nba': '/api/nba',
     'balldontlie-mlb': '/api/mlb',
     'balldontlie-nfl': '/api/nfl',
-};
+} as const satisfies Record<AdapterType, string>;
 
-export const adaptFixture = (rawFixture, competitionKey) => {
+export const adaptFixture = (
+    rawFixture: unknown,
+    competitionKey: CompetitionKey
+): CommonFixture | null => {
     // Look up competition by its key
     const competition = COMPETITIONS[competitionKey];
 
@@ -37,5 +41,4 @@ export const adaptFixture = (rawFixture, competitionKey) => {
 
     return adapter(rawFixture, competition);
 };
-
 

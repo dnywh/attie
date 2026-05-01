@@ -1,4 +1,4 @@
-// @ts-nocheck
+import type { PropsWithChildren } from "react";
 import { styled, keyframes } from "next-yak";
 
 const loadingStagger = keyframes`
@@ -29,7 +29,7 @@ const StyledText = styled.span`
   }
 `;
 
-function LoadingText({ children }) {
+function LoadingText({ children }: PropsWithChildren) {
   return (
     <StyledText>
       {children}

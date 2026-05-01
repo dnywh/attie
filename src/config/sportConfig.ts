@@ -3,6 +3,7 @@ import BasketballIcon from "@/components/BasketballIcon";
 import BaseballIcon from "@/components/BaseballIcon";
 import AmericanFootballIcon from "@/components/AmericanFootballIcon";
 import RugbyLeagueIcon from "@/components/RugbyLeagueIcon";
+import type { SportConfig, SportKey } from "@/types/domain";
 
 export const SPORTS = {
     'american-football': {
@@ -34,4 +35,7 @@ export const SPORTS = {
         name: 'Rugby Union',
         icon: AmericanFootballIcon,
     },
-};
+} as const satisfies Record<SportKey, SportConfig>;
+
+export const isSportKey = (value: string | null | undefined): value is SportKey =>
+    typeof value === "string" && value in SPORTS;

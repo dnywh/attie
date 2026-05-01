@@ -1,3 +1,5 @@
+import type { CompetitionConfig, CompetitionKey, SportKey } from "@/types/domain";
+
 // Use nice, literal, camel-case names for the keys as these are used for slugs on individually generated competition pages
 export const COMPETITIONS = {
     'afl': {
@@ -213,20 +215,28 @@ export const COMPETITIONS = {
             league: '270557',
         },
     },
-};
+} as const satisfies Record<CompetitionKey, CompetitionConfig>;
+
+export const isCompetitionKey = (
+    value: string | null | undefined
+): value is CompetitionKey => typeof value === "string" && value in COMPETITIONS;
 
 // Helper functions
-export const getDefaultCompetitionForSport = (sport) => {
+export const getDefaultCompetitionForSport = (
+    sport: SportKey
+): CompetitionKey | undefined => {
     return Object.entries(COMPETITIONS).find(
-        ([_, comp]) => comp.sport === sport && comp.defaultForSport
-    )?.[0];
+        ([, comp]) => comp.sport === sport && "defaultForSport" in comp && comp.defaultForSport
+    )?.[0] as CompetitionKey | undefined;
 };
 
-export const getCompetitionsForSport = (sport) => {
+export const getCompetitionsForSport = (
+    sport: SportKey
+): Partial<Record<CompetitionKey, CompetitionConfig>> => {
     return Object.entries(COMPETITIONS)
-        .filter(([_, comp]) => comp.sport === sport)
+        .filter(([, comp]) => comp.sport === sport)
         .reduce((acc, [key, value]) => {
-            acc[key] = value;
+            acc[key as CompetitionKey] = value;
             return acc;
-        }, {});
+        }, {} as Partial<Record<CompetitionKey, CompetitionConfig>>);
 };
