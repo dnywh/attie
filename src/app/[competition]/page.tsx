@@ -1,10 +1,18 @@
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
+import type { Metadata } from 'next';
 import FixturesClient from "@/components/FixturesClient";
-import { COMPETITIONS } from '@/constants/competitions';
+import { COMPETITIONS, isCompetitionKey } from '@/constants/competitions';
 import { siteConfig } from "@/config/site";
 import { SPORTS } from "@/config/sportConfig"
 import { DEFAULTS } from "@/constants/defaults";
+import type { CompetitionKey } from '@/types/domain';
+
+interface CompetitionPageProps {
+    params: Promise<{
+        competition: string;
+    }>;
+}
 
 export async function generateStaticParams() {
     // Convert object keys to array of param objects
@@ -17,12 +25,21 @@ export async function generateStaticParams() {
 // 1. Allows for distinct, clean URLs for each competition across all sports (e.g. attie.app/eredivisie for Dutch football)
 // 2. Meaning they are easily shareable
 // 3. And most importantly, provide SEO-friendly pages for distinct searches (e.g. "NFL results without the scores")
-export async function generateMetadata({ params }) {
+export async function generateMetadata({ params }: CompetitionPageProps): Promise<Metadata> {
     const { competition } = await params;
+
+    if (!isCompetitionKey(competition)) {
+        return {
+            title: `${siteConfig.name}: ${siteConfig.byline}`,
+            description: siteConfig.description,
+        };
+    }
+
     const selectedCompetition = COMPETITIONS[competition];
 
     // Get local sport name so it flows more nicely
-    const selectedSport = SPORTS[selectedCompetition.sport].localName ? SPORTS[selectedCompetition.sport].localName : SPORTS[selectedCompetition.sport].name
+    const sportConfig = SPORTS[selectedCompetition.sport];
+    const selectedSport = "localName" in sportConfig ? sportConfig.localName : sportConfig.name;
 
     const pageTitle = `Attie: ${selectedCompetition.name} results without the scores`
     const pageDescription = `See who played ${selectedSport.toLowerCase()} recently without spoiling the results. Attie shows ${selectedCompetition.name} games with scores hidden by default.`
@@ -41,19 +58,19 @@ export async function generateMetadata({ params }) {
             type: "website",
             description: pageDescription,
             siteName: siteConfig.name,
-            url: `${siteConfig.url}/${Object.keys(COMPETITIONS).find(key => COMPETITIONS[key] === selectedCompetition)}`,
+            url: `${siteConfig.url}/${Object.keys(COMPETITIONS).find(key => COMPETITIONS[key as CompetitionKey] === selectedCompetition)}`,
             // TODO: The `opengraph-image` does not get passed down automatically, presumedly because this counts as a separate route segment
         },
     };
 };
 
 
-export default async function CompetitionPage({ params }) {
+export default async function CompetitionPage({ params }: CompetitionPageProps) {
     const { competition } = await params;
     // The dynamic generation of pages meanings that going to a non-existant slug will crash this React app once it tries to find its corresponding competition details
     // We therefore should check if the passed path matches a competition before continuing
     // Check if the page slug exists as a competition in COMPETITIONS
-    if (!COMPETITIONS[competition]) {
+    if (!isCompetitionKey(competition)) {
         console.log(`Invalid competition requested: ${competition}`);
         redirect('/');
     }

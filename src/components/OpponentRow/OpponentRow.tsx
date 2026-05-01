@@ -1,10 +1,10 @@
-// @ts-nocheck
 import TeamLogo from "@/components/TeamLogo";
 import Score from "@/components/Score";
 import { css, styled } from "next-yak";
 import { teamText, ellipsizedText } from "@/styles/commonStyles";
 import { FIXTURE_STATUS } from "@/constants/fixtureStatus";
 import { webTheme } from "@/styles/theme.yak";
+import type { CommonFixture, ScoreValue, StatusObject } from "@/types/domain";
 
 const StyledOpponentRow = styled.li`
   align-items: center;
@@ -31,12 +31,21 @@ const unknownNameStyles = css`
   color: ${webTheme.colors.text.tertiary};
 `;
 
-const OpponentName = styled.p`
+const OpponentName = styled.p<{ $isKnown: boolean }>`
   ${teamText};
   ${ellipsizedText};
   flex: 1;
   ${({ $isKnown }) => ($isKnown ? knownNameStyles : unknownNameStyles)}
 `;
+
+interface OpponentRowProps {
+  team: CommonFixture["homeTeam"];
+  score: ScoreValue;
+  showAllScores: boolean;
+  status: StatusObject;
+  isHomeTeam: boolean;
+  useSoundEffects: boolean;
+}
 
 function OpponentRow({
   team,
@@ -45,7 +54,7 @@ function OpponentRow({
   status,
   isHomeTeam,
   useSoundEffects,
-}) {
+}: OpponentRowProps) {
   // Prepare for 'null' cases like a not-yet-determined opponent in upcoming knockout stage
   const teamName = team.shortName
     ? team.shortName
@@ -61,7 +70,7 @@ function OpponentRow({
   const shouldShowScoreComponent = [
     FIXTURE_STATUS.LIVE,
     FIXTURE_STATUS.FINISHED,
-  ].includes(status.type);
+  ].some((scoreStatus) => scoreStatus === status.type);
 
   return (
     <StyledOpponentRow>

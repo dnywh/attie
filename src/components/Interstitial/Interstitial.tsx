@@ -1,4 +1,4 @@
-// @ts-nocheck
+import type { PropsWithChildren } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { styled } from "next-yak";
@@ -84,12 +84,18 @@ const Inner = styled.div`
   }
 `;
 
+interface InterstitialProps {
+  intro?: string;
+  linkUrl?: string;
+  linkText?: string;
+}
+
 function Interstitial({
   intro = "Did you know?",
   linkUrl,
   linkText,
   children,
-}) {
+}: PropsWithChildren<InterstitialProps>) {
   return (
     <Aside>
       <Visible>

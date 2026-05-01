@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from "react";
 import Image from "next/image";
 import { css, styled } from "next-yak";
@@ -17,7 +16,7 @@ const unknownLogoStyles = css`
   background: ${webTheme.colors.background.crest};
 `;
 
-const Container = styled.div`
+const Container = styled.div<{ $isKnown: boolean }>`
   aspect-ratio: 1 / 1;
   border: 1px solid black;
   border-radius: 2px;
@@ -40,7 +39,19 @@ const StyledImage = styled(Image)`
   width: auto;
 `;
 
-function TeamLogo({ src, alt, isHomeTeam, isKnown: initialIsKnown = true }) {
+interface TeamLogoProps {
+  src: string;
+  alt: string;
+  isHomeTeam: boolean;
+  isKnown?: boolean;
+}
+
+function TeamLogo({
+  src,
+  alt,
+  isHomeTeam,
+  isKnown: initialIsKnown = true,
+}: TeamLogoProps) {
   const [imageLoadFailed, setImageLoadFailed] = useState(false);
 
   // Combine the initial isKnown prop with the image load state

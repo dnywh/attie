@@ -1,4 +1,4 @@
-// @ts-nocheck
+import type { PropsWithChildren } from "react";
 import { RadioGroup as HeadlessRadioGroup } from "@headlessui/react";
 import { fieldsetGroupStyle } from "@/styles/commonStyles";
 import { styled } from "next-yak";
@@ -16,8 +16,22 @@ const StyledRadioGroup = styled(HeadlessRadioGroup)`
   }
 `;
 
-function RadioGroup({ children, ...props }) {
-  return <StyledRadioGroup {...props}>{children}</StyledRadioGroup>;
+interface RadioGroupProps {
+  value: boolean;
+  onChange: (value: boolean) => void;
+  "aria-label"?: string;
+  disabled?: boolean;
+}
+
+function RadioGroup({ children, ...props }: PropsWithChildren<RadioGroupProps>) {
+  return (
+    <StyledRadioGroup
+      {...props}
+      onChange={props.onChange as (value: unknown) => void}
+    >
+      {children}
+    </StyledRadioGroup>
+  );
 }
 
 export default RadioGroup;

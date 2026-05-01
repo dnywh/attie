@@ -1,9 +1,9 @@
-// @ts-nocheck
 import FixtureStatus from "@/components/FixtureStatus";
 import OpponentRow from "@/components/OpponentRow";
 import { styled } from "next-yak";
 import { smallText, cardStippledBackground } from "@/styles/commonStyles";
 import { webTheme } from "@/styles/theme.yak";
+import type { CommonFixture } from "@/types/domain";
 
 const FixtureRow = styled.li`
   ${cardStippledBackground};
@@ -106,7 +106,19 @@ const OpponentsList = styled.ul`
   box-shadow: 0.5px 1.5px 0 0 ${webTheme.colors.background.foremost};
 `;
 
-function Fixture({ fixture, showAllScores, useSoundEffects, showCompetition }) {
+interface FixtureProps {
+  fixture: CommonFixture;
+  showAllScores: boolean;
+  useSoundEffects: boolean;
+  showCompetition: boolean;
+}
+
+function Fixture({
+  fixture,
+  showAllScores,
+  useSoundEffects,
+  showCompetition,
+}: FixtureProps) {
   const formattedDate = new Date(fixture.utcDate).toLocaleDateString(
     "default",
     {

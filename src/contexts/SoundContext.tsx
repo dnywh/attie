@@ -1,10 +1,12 @@
 "use client";
-import { createContext, useContext } from "react";
+import { createContext, useContext, type ReactNode } from "react";
 import useSound from "use-sound";
 
-const SoundContext = createContext(null);
+type PlaySound = () => void;
 
-export function SoundProvider({ children }) {
+const SoundContext = createContext<{ play: PlaySound } | null>(null);
+
+export function SoundProvider({ children }: { children: ReactNode }) {
   const [play] = useSound("/sounds/scratch.mp3");
 
   return (
@@ -12,7 +14,7 @@ export function SoundProvider({ children }) {
   );
 }
 
-export function useScoreSound() {
+export function useScoreSound(): PlaySound {
   const context = useContext(SoundContext);
   if (!context) {
     throw new Error("useScoreSound must be used within a SoundProvider");

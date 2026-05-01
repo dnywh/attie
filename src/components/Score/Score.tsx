@@ -1,9 +1,9 @@
-// @ts-nocheck
 "use client";
-import { useState } from "react";
+import { useState, type MouseEvent } from "react";
 import { useScoreSound } from "@/contexts/SoundContext";
 import { css, styled } from "next-yak";
 import { webTheme } from "@/styles/theme.yak";
+import type { ScoreValue } from "@/types/domain";
 
 const hiddenScoreStyles = css`
   cursor: pointer;
@@ -32,7 +32,7 @@ const visibleScoreStyles = css`
   }
 `;
 
-const Block = styled.div`
+const Block = styled.div<{ $isVisible: boolean }>`
   align-items: center;
   border-radius: 50%;
   color: black;
@@ -55,13 +55,19 @@ const Block = styled.div`
   ${({ $isVisible }) => ($isVisible ? visibleScoreStyles : hiddenScoreStyles)}
 `;
 
-function Score({ score, showAllScores = false, useSoundEffects }) {
+interface ScoreProps {
+  score: ScoreValue;
+  showAllScores?: boolean;
+  useSoundEffects: boolean;
+}
+
+function Score({ score, showAllScores = false, useSoundEffects }: ScoreProps) {
   const [hasBeenRevealed, setHasBeenRevealed] = useState(false);
   const play = useScoreSound();
 
   const isScoreVisible = showAllScores || hasBeenRevealed;
 
-  const handleReveal = (e) => {
+  const handleReveal = (_event: MouseEvent<HTMLDivElement>) => {
     if (!showAllScores && !hasBeenRevealed) {
       useSoundEffects && play();
       setHasBeenRevealed(true);

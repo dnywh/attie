@@ -1,12 +1,14 @@
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { siteConfig } from "@/config/site";
 import { SoundProvider } from "@/contexts/SoundContext";
 import FixturesHeader from '@/components/FixturesHeader';
 import { COMPETITIONS } from '@/constants/competitions';
 import './theme.css';
 
-export const metadata = {
+export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: `${siteConfig.name}: ${siteConfig.byline}`,
   description: siteConfig.description,
@@ -23,7 +25,7 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>

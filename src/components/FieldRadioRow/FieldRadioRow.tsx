@@ -1,4 +1,4 @@
-// @ts-nocheck
+import type { PropsWithChildren } from "react";
 import { Radio } from "@headlessui/react";
 import FieldRow from "@/components/FieldRow";
 import FieldLabel from "@/components/FieldLabel";
@@ -11,7 +11,7 @@ const StyledRadio = styled(Radio)`
   ${fieldInputStyle};
 `;
 
-function FieldRadioRow({ value, children, ...props }) {
+function FieldRadioRow({ value, children, ...props }: PropsWithChildren<{ value: boolean }>) {
   return (
     <FieldRow>
       <StyledRadio value={value} {...props}>

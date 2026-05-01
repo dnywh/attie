@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { siteConfig } from "@/config/site";
 import { styled, keyframes } from "next-yak";
 

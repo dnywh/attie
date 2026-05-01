@@ -1,4 +1,4 @@
-// @ts-nocheck
+import type { PropsWithChildren } from "react";
 import { Label as HeadlessLabel } from "@headlessui/react";
 import { teamText, ellipsizedText } from "@/styles/commonStyles";
 import { styled } from "next-yak";
@@ -13,7 +13,7 @@ const FieldLabel = styled(HeadlessLabel)`
   text-align: left;
 `;
 
-function InputLabel({ children, ...props }) {
+function InputLabel({ children, ...props }: PropsWithChildren) {
   return <FieldLabel {...props}>{children}</FieldLabel>;
 }
 

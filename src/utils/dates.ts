@@ -1,12 +1,14 @@
+import type { CommonFixture, Direction, FixtureWithLocalDate } from "@/types/domain";
+
 /**
  * Format a date for display with relative terms (Today, Yesterday, etc.)
  */
-export const formatDateForDisplay = (date) => {
+export const formatDateForDisplay = (date: Date | string): string => {
     const now = new Date();
     const localDate = new Date(date);
 
     // Convert both dates to start of day in local timezone
-    const stripTime = (d) => {
+    const stripTime = (d: Date): number => {
         const local = new Date(d);
         local.setHours(0, 0, 0, 0);
         return local.getTime();
@@ -35,7 +37,7 @@ export const formatDateForDisplay = (date) => {
 /**
  * Get the ordinal suffix for a number (1st, 2nd, 3rd, etc.)
  */
-export const getOrdinalSuffix = (day) => {
+export const getOrdinalSuffix = (day: number): string => {
     const j = day % 10,
         k = day % 100;
     if (j == 1 && k != 11) return "st";
@@ -47,21 +49,28 @@ export const getOrdinalSuffix = (day) => {
 /**
  * Sort fixtures by date
  */
-export const sortFixtures = (fixtures, selectedDirection) => {
-    return fixtures.sort((a, b) => {
+export const sortFixtures = <T extends Pick<CommonFixture, "utcDate">>(
+    fixtures: T[],
+    selectedDirection: Direction
+): T[] => {
+    return [...fixtures].sort((a, b) => {
         const dateA = new Date(a.utcDate);
         const dateB = new Date(b.utcDate);
         // When fixtures direction backwards: most recent first (B-A)
         // When fixtures direction forwards: soonest first (A-B)
-        return selectedDirection === "forwards" ? dateA - dateB : dateB - dateA;
+        return selectedDirection === "forwards"
+            ? dateA.getTime() - dateB.getTime()
+            : dateB.getTime() - dateA.getTime();
     });
 };
 
 /**
  * Group fixtures by date
  */
-export const groupFixturesByDate = (fixtures) => {
-    return fixtures.reduce((groups, fixture) => {
+export const groupFixturesByDate = (
+    fixtures: CommonFixture[]
+): Record<string, FixtureWithLocalDate[]> => {
+    return fixtures.reduce<Record<string, FixtureWithLocalDate[]>>((groups, fixture) => {
         const localDate = new Date(fixture.utcDate);
         const dayStart = new Date(localDate).setHours(0, 0, 0, 0); // Use timestamp as key
 
@@ -79,7 +88,7 @@ export const groupFixturesByDate = (fixtures) => {
 // Some APIs (balldontlie MLB and NFL namely) do not support date range, only passing single dates in an array
 // But my adaptors just pass a dateFrom and dateTo
 // This function makes so make an array based on dateFrom and dateTo
-export function generateDateRange(startDate, endDate) {
+export function generateDateRange(startDate: string, endDate: string): string[] {
     const dates = [];
     const currentDate = new Date(startDate);
     const lastDate = new Date(endDate);

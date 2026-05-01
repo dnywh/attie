@@ -1,12 +1,12 @@
-// @ts-nocheck
 import { css, styled } from "next-yak";
 
 // 8x12 originally
 const WIDTH = 8;
 const HEIGHT = 12;
 const SCALE = 1.5;
+type DropdownIconSize = "small" | "large";
 
-function DropdownIcon({ size = "large" }) {
+function DropdownIcon({ size = "large" }: { size?: DropdownIconSize }) {
   return (
     <StyledDropdownIcon
       $size={size}
@@ -36,7 +36,7 @@ const smallStyles = css`
   width: ${WIDTH}px;
 `;
 
-const StyledDropdownIcon = styled.svg`
+const StyledDropdownIcon = styled.svg<{ $size: DropdownIconSize }>`
   pointer-events: none;
   position: absolute;
   right: 1rem;

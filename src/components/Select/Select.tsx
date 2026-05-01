@@ -1,4 +1,4 @@
-// @ts-nocheck
+import type { PropsWithChildren, SelectHTMLAttributes } from "react";
 import { Select as HeadlessSelect } from "@headlessui/react";
 import DropdownIcon from "@/components/DropdownIcon";
 import {
@@ -9,7 +9,10 @@ import {
 import { styled } from "next-yak";
 import { webTheme } from "@/styles/theme.yak";
 
-function Select({ children, ...props }) {
+function Select({
+  children,
+  ...props
+}: PropsWithChildren<SelectHTMLAttributes<HTMLSelectElement>>) {
   return (
     <Wrapper>
       <StyledSelect {...props}>{children}</StyledSelect>

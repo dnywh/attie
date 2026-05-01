@@ -1,6 +1,6 @@
-// @ts-nocheck
 import { styled, keyframes } from "next-yak";
 import { webTheme } from "@/styles/theme.yak";
+import type { CommonFixture } from "@/types/domain";
 
 const RegularStatus = styled.p``;
 
@@ -31,7 +31,7 @@ const LiveStatus = styled(RegularStatus)`
   }
 `;
 
-function FixtureStatus({ fixture }) {
+function FixtureStatus({ fixture }: { fixture: CommonFixture }) {
   // Unpack status
   const { status } = fixture;
   const statusType = typeof status === "string" ? status : status.type;
