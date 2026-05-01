@@ -4,8 +4,15 @@ The anti-scores scores app, live at [attie.app](https://www.attie.app). Built on
 
 ## Getting Started
 
-This project uses `npm` and is pinned to Node 24 LTS. If you use a Node
-version manager, it should pick up `.node-version` automatically.
+This repo is a small monorepo:
+
+- `apps/web` contains the Next.js app and Attie API facade.
+- `apps/apple` contains the native SwiftUI app sources and `AttieCore` Swift package.
+- `packages/contracts` contains shared fixture contracts and catalogue defaults.
+- `packages/design-tokens` contains platform-neutral design tokens.
+
+This project uses `npm` and is pinned to Node 24 LTS. If you use a Node version
+manager, it should pick up `.node-version` automatically.
 
 ```bash
 npm install
@@ -13,6 +20,14 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+For the Apple package:
+
+```bash
+swift test --package-path apps/apple/Packages/AttieCore
+```
+
+Open `apps/apple/Attie.xcworkspace` in Xcode to work with the native sources.
 
 ## Maintenance
 
