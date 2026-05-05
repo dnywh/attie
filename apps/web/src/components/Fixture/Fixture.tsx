@@ -9,7 +9,8 @@ const FixtureRow = styled.li`
   ${cardStippledBackground};
   border: 1px solid ${webTheme.colors.text.primary};
   border-radius: 3px;
-  box-shadow: 0 3px 0 0 ${webTheme.colors.text.primary};
+  box-shadow: 0 3px 0 0 black;
+  color: ${webTheme.colors.text.primary};
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
@@ -101,9 +102,10 @@ const CompetitionName = styled.p`
 
 const OpponentsList = styled.ul`
   background-color: ${webTheme.colors.background.foremost};
-  border: 1px solid black;
+  border: 1px solid ${webTheme.colors.text.primary};
   border-radius: 2px;
-  box-shadow: 0.5px 1.5px 0 0 ${webTheme.colors.background.foremost};
+  box-shadow: 0.5px 1.5px 0 0 black;
+  color: ${webTheme.colors.text.primary};
 `;
 
 interface FixtureProps {

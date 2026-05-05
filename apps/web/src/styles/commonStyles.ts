@@ -9,6 +9,7 @@ export const fieldInputStyle = css`
 export const fieldsetGroupStyle = css`
   background-color: ${webTheme.colors.background.foremost};
   border: 1px solid ${webTheme.colors.text.primary};
+  color: ${webTheme.colors.text.primary};
   display: flex;
   flex-direction: column;
 
@@ -89,17 +90,28 @@ export const interstitialStippledBackground = css`
 `;
 
 export const dashedBorder = css`
-  background-blend-mode: overlay;
   background-color: ${webTheme.colors.background.page};
   background-image:
     none,
     repeating-linear-gradient(
       90deg,
-      rgb(255 255 255 / 30%),
-      rgb(255 255 255 / 30%) 3px,
+      color-mix(
+        in srgb,
+        ${webTheme.colors.border.page},
+        transparent 70%
+      ),
+      color-mix(
+        in srgb,
+        ${webTheme.colors.border.page},
+        transparent 70%
+      ) 3px,
       transparent 3px,
       transparent 6px,
-      rgb(0 0 0 / 95%) 1.25rem
+      color-mix(
+        in srgb,
+        ${webTheme.colors.border.page},
+        transparent 70%
+      ) 1.25rem
     );
   background-repeat: no-repeat;
   background-size: 0 100%, 100% 1.5px, 0 100%, 100% 0;
@@ -107,14 +119,15 @@ export const dashedBorder = css`
 `;
 
 export const veryBasicCardStyle = css`
-  border: 1px solid ${webTheme.colors.text.primary};
+  border: 1px solid ${webTheme.colors.border.page};
   border-radius: 3px;
-  box-shadow: 0 4px 0 0 ${webTheme.colors.text.primary};
+  box-shadow: 0 4px 0 0 black;
 `;
 
 export const bleedingWhiteCard = css`
   background-color: ${webTheme.colors.background.foremost};
   border: 1px solid ${webTheme.colors.text.primary};
   border-radius: 2px;
-  box-shadow: 0.5px 1.5px 0 0 ${webTheme.colors.background.foremost};
+  box-shadow: 0.5px 1.5px 0 0 black;
+  color: ${webTheme.colors.text.primary};
 `;

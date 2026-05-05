@@ -1,10 +1,11 @@
 import type { PropsWithChildren, ButtonHTMLAttributes } from "react";
 import { styled } from "next-yak";
 import { ellipsizedText } from "@/styles/commonStyles";
+import { webTheme } from "@/styles/theme.yak";
 
 const StyledButton = styled.button`
   ${ellipsizedText};
-  color: black;
+  color: ${webTheme.colors.text.page};
   font-size: 0.85rem;
   font-style: italic;
   font-weight: 700;

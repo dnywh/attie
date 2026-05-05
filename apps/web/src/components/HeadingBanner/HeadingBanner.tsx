@@ -1,11 +1,12 @@
 import type { PropsWithChildren } from "react";
 import { Legend } from "@headlessui/react";
 import { css, styled } from "next-yak";
+import { webTheme } from "@/styles/theme.yak";
 
 const headingBannerStyles = css`
-  background-color: black;
+  background-color: ${webTheme.colors.background.heading};
   border-radius: 3px;
-  color: white;
+  color: ${webTheme.colors.text.heading};
   display: block;
   font-size: 1.0625rem;
   font-style: italic;

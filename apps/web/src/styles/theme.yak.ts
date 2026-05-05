@@ -15,9 +15,15 @@ export const webTheme = {
         hover: cssVar("--color-background-focus-hover"),
         active: cssVar("--color-background-focus-active"),
       },
+      heading: cssVar("--color-background-heading"),
+    },
+    border: {
+      page: cssVar("--color-border-page"),
     },
     text: {
       primary: cssVar("--color-text-primary"),
+      page: cssVar("--color-text-page"),
+      heading: cssVar("--color-text-heading"),
       tertiary: cssVar("--color-text-tertiary"),
       live: cssVar("--color-text-live"),
     },

@@ -67,6 +67,11 @@ const Inner = styled.div`
   gap: 1.5rem;
   padding: 2.5rem 1.25rem;
 
+  & > img {
+    border: 1px solid black;
+    border-radius: 50%;
+  }
+
   & > p {
     text-align: center;
 
