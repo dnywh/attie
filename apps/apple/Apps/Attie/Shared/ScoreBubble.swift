@@ -7,25 +7,16 @@ struct ScoreBubble: View {
     let reveal: () -> Void
 
     var body: some View {
-        Button(action: reveal) {
-            ZStack {
-                Circle()
-                    .fill(isVisible ? .clear : .primary)
-                    .overlay {
-                        Circle()
-                            .strokeBorder(.primary, style: StrokeStyle(lineWidth: isVisible ? 0.5 : 0))
-                    }
-
-                if isVisible {
-                    Text(score.displayValue)
-                        .font(.headline)
-                        .foregroundStyle(.primary)
-                }
-            }
-            .frame(width: 34, height: 34)
+        if isVisible {
+            Text(score.displayValue)
+                .font(.headline)
+                .monospacedDigit()
+                .accessibilityLabel("Score \(score.displayValue)")
+        } else {
+            Button("Reveal", action: reveal)
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+                .accessibilityLabel("Reveal score")
         }
-        .buttonStyle(.plain)
-        .disabled(isVisible)
-        .accessibilityLabel(isVisible ? "Score \(score.displayValue)" : "Reveal score")
     }
 }

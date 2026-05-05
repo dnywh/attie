@@ -77,5 +77,4 @@ public enum AttieDefaults {
     public static let sport = SportKey.football
     public static let competitions = [CompetitionKey.premierLeague]
     public static let direction = Direction.backwards
-    public static let sound = false
 }

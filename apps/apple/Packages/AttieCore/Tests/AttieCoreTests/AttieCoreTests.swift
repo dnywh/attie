@@ -53,13 +53,57 @@ struct AttieCoreTests {
         let preferences = AttiePreferences(defaults: defaults)
 
         preferences.initialise()
-        preferences.setSoundEnabled(true)
         preferences.setCompetitions([.nba], for: .basketball)
 
         #expect(defaults.string(forKey: AttiePreferences.Key.sport) == "football")
         #expect(defaults.string(forKey: AttiePreferences.Key.direction) == "backwards")
-        #expect(defaults.bool(forKey: AttiePreferences.Key.sound) == true)
         #expect(preferences.competitions(for: .basketball) == [.nba])
+    }
+
+    @Test("watch fixture snapshots encode and decode")
+    func watchFixtureSnapshotsEncodeAndDecode() throws {
+        let snapshot = WatchFixtureSnapshot(
+            selectedSport: .football,
+            selectedCompetitions: [.premierLeague],
+            selectedDirection: .backwards,
+            fixtures: [fixture(id: "ars-che", date: "2026-05-01T12:00:00Z")],
+            generatedAt: Date(timeIntervalSince1970: 1_777_593_600)
+        )
+
+        let data = try JSONEncoder().encode(snapshot)
+        let decoded = try JSONDecoder().decode(WatchFixtureSnapshot.self, from: data)
+
+        #expect(decoded == snapshot)
+    }
+
+    @Test("watch fixture selection falls back to preferences")
+    func watchFixtureSelectionFallsBackToPreferences() throws {
+        let suiteName = "attie.tests.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let preferences = AttiePreferences(defaults: defaults)
+
+        preferences.initialise()
+
+        let selection = WatchFixtureSelection.resolved(
+            snapshot: nil,
+            preferences: preferences
+        )
+
+        #expect(selection.selectedSport == .football)
+        #expect(selection.selectedCompetitions == [.premierLeague])
+        #expect(selection.selectedDirection == .backwards)
+    }
+
+    @Test("score reveal state reveals a single team score")
+    func scoreRevealStateRevealsASingleTeamScore() {
+        var state = FixtureScoreRevealState()
+
+        state.revealScore(fixtureID: "fixture-a", sideID: "home")
+
+        #expect(state.isScoreRevealed(fixtureID: "fixture-a", sideID: "home"))
+        #expect(!state.isScoreRevealed(fixtureID: "fixture-a", sideID: "away"))
+        #expect(!state.isScoreRevealed(fixtureID: "fixture-b", sideID: "home"))
     }
 
     private func fixture(id: String, date: String) -> CommonFixture {

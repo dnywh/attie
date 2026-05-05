@@ -10,11 +10,11 @@ struct FixtureRow: View {
             HStack {
                 Text(formattedDate)
                     .font(.caption)
-                    .textCase(.uppercase)
+                    .foregroundStyle(.secondary)
                 Spacer()
                 Text(fixture.status.detail ?? fixture.status.type)
                     .font(.caption)
-                    .textCase(.uppercase)
+                    .foregroundStyle(.secondary)
             }
 
             VStack(spacing: 0) {
@@ -30,14 +30,8 @@ struct FixtureRow: View {
                     side: .away
                 )
             }
-            .background(.background)
-            .clipShape(RoundedRectangle(cornerRadius: 3))
-            .overlay {
-                RoundedRectangle(cornerRadius: 3)
-                    .stroke(.primary, lineWidth: 1)
-            }
         }
-        .padding(.vertical, 6)
+        .padding(.vertical, 4)
     }
 
     private func teamRow(
@@ -65,15 +59,16 @@ struct FixtureRow: View {
 
             Spacer()
 
-            ScoreBubble(
-                score: score,
-                isVisible: model.isScoreVisible(fixtureID: fixture.id, side: side)
-            ) {
-                model.revealScore(fixture.id, side: side)
+            if model.selectedDirection == .backwards {
+                ScoreBubble(
+                    score: score,
+                    isVisible: model.isScoreVisible(fixtureID: fixture.id, side: side)
+                ) {
+                    model.revealScore(fixture.id, side: side)
+                }
             }
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
+        .padding(.vertical, 6)
     }
 
     private var formattedDate: String {
