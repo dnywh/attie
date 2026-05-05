@@ -1,4 +1,5 @@
 import AttieCore
+import Combine
 import Foundation
 import SwiftUI
 
@@ -14,27 +15,54 @@ final class FixturesViewModel: ObservableObject {
     @Published var isLoadingMore = false
     @Published var hasReachedEnd = false
     @Published var hasRateLimitError = false
-    @Published var revealedScoreIDs = Set<String>()
+    @Published var scoreRevealState = FixtureScoreRevealState()
+    @Published var isUsingSyncedSnapshot = false
+    @Published var latestSyncedAt: Date?
 
     private let client: AttieAPIClient
     private let preferences: AttiePreferences
+    private let syncService: FixtureSyncService?
+    private let mode: FixturesViewMode
     private var currentWindow: FixtureDateWindow
     private var loadAttempts = 0
+    private var cancellables = Set<AnyCancellable>()
 
     init(
         client: AttieAPIClient = AttieAPIClient(),
-        preferences: AttiePreferences = AttiePreferences()
+        preferences: AttiePreferences = AttiePreferences(),
+        syncService: FixtureSyncService? = .shared,
+        mode: FixturesViewMode = .standard
     ) {
         preferences.initialise()
 
-        let sport = preferences.sport()
+        let selection = WatchFixtureSelection.resolved(
+            snapshot: mode == .watchMirror ? syncService?.latestSnapshot : nil,
+            preferences: preferences
+        )
         self.client = client
         self.preferences = preferences
-        self.selectedSport = sport
-        self.selectedCompetitions = preferences.competitions(for: sport)
-        self.selectedDirection = preferences.direction()
+        self.syncService = syncService
+        self.mode = mode
+        self.selectedSport = selection.selectedSport
+        self.selectedCompetitions = selection.selectedCompetitions
+        self.selectedDirection = selection.selectedDirection
         self.useSoundEffects = preferences.soundEnabled()
-        self.currentWindow = FixtureWindows.initialWindow(direction: preferences.direction())
+        self.currentWindow = FixtureWindows.initialWindow(direction: selection.selectedDirection)
+
+        if mode == .watchMirror, let snapshot = syncService?.latestSnapshot {
+            applySyncedSnapshot(snapshot)
+        }
+
+        syncService?.$latestSnapshot
+            .compactMap { $0 }
+            .sink { [weak self] snapshot in
+                guard self?.mode == .watchMirror else {
+                    return
+                }
+
+                self?.applySyncedSnapshot(snapshot)
+            }
+            .store(in: &cancellables)
     }
 
     var availableCompetitions: [CompetitionKey] {
@@ -55,6 +83,7 @@ final class FixturesViewModel: ObservableObject {
         preferences.setSport(sport)
         preferences.setCompetitions(selectedCompetitions, for: sport)
         resetPaging()
+        publishSnapshot()
         Task { await loadInitialFixtures() }
     }
 
@@ -67,6 +96,7 @@ final class FixturesViewModel: ObservableObject {
 
         preferences.setCompetitions(selectedCompetitions, for: selectedSport)
         resetPaging()
+        publishSnapshot()
         Task { await loadInitialFixtures() }
     }
 
@@ -74,6 +104,7 @@ final class FixturesViewModel: ObservableObject {
         selectedDirection = direction
         preferences.setDirection(direction)
         resetPaging()
+        publishSnapshot()
         Task { await loadInitialFixtures() }
     }
 
@@ -83,17 +114,26 @@ final class FixturesViewModel: ObservableObject {
     }
 
     func revealScore(_ fixtureID: String, side: FixtureSide) {
-        revealedScoreIDs.insert("\(fixtureID)-\(side.rawValue)")
+        scoreRevealState.revealFixture(fixtureID)
     }
 
     func isScoreVisible(fixtureID: String, side: FixtureSide) -> Bool {
-        showAllScores || revealedScoreIDs.contains("\(fixtureID)-\(side.rawValue)")
+        showAllScores || scoreRevealState.isFixtureRevealed(fixtureID)
+    }
+
+    func revealFixture(_ fixtureID: String) {
+        scoreRevealState.revealFixture(fixtureID)
+    }
+
+    func isFixtureScoreVisible(_ fixtureID: String) -> Bool {
+        showAllScores || scoreRevealState.isFixtureRevealed(fixtureID)
     }
 
     func loadInitialFixtures() async {
         guard !selectedCompetitions.isEmpty else {
             fixtures = []
             isLoading = false
+            publishSnapshot()
             return
         }
 
@@ -112,6 +152,9 @@ final class FixturesViewModel: ObservableObject {
             )
 
             fixtures = sortedFixtures(response.fixtures, direction: selectedDirection)
+            isUsingSyncedSnapshot = false
+            latestSyncedAt = nil
+            publishSnapshot()
 
             if fixtures.isEmpty {
                 await loadMore()
@@ -157,6 +200,9 @@ final class FixturesViewModel: ObservableObject {
                     fixtures = result.fixtures
                     loadAttempts = 0
                     isLoadingMore = false
+                    isUsingSyncedSnapshot = false
+                    latestSyncedAt = nil
+                    publishSnapshot()
                     return
                 }
             }
@@ -174,15 +220,50 @@ final class FixturesViewModel: ObservableObject {
 
     private func resetPaging() {
         fixtures = []
-        revealedScoreIDs = []
+        scoreRevealState.reset()
         hasReachedEnd = false
         hasRateLimitError = false
         loadAttempts = 0
         currentWindow = FixtureWindows.initialWindow(direction: selectedDirection)
+    }
+
+    private func applySyncedSnapshot(_ snapshot: WatchFixtureSnapshot) {
+        selectedSport = snapshot.selectedSport
+        selectedCompetitions = snapshot.selectedCompetitions
+        selectedDirection = snapshot.selectedDirection
+        fixtures = sortedFixtures(snapshot.fixtures, direction: snapshot.selectedDirection)
+        latestSyncedAt = snapshot.generatedAt
+        isUsingSyncedSnapshot = true
+        isLoading = false
+        isLoadingMore = false
+        hasReachedEnd = true
+        hasRateLimitError = false
+        currentWindow = FixtureWindows.initialWindow(direction: snapshot.selectedDirection)
+        scoreRevealState.reset()
+    }
+
+    private func publishSnapshot() {
+        guard mode == .standard else {
+            return
+        }
+
+        syncService?.publish(
+            WatchFixtureSnapshot(
+                selectedSport: selectedSport,
+                selectedCompetitions: selectedCompetitions,
+                selectedDirection: selectedDirection,
+                fixtures: fixtures
+            )
+        )
     }
 }
 
 enum FixtureSide: String {
     case home
     case away
+}
+
+enum FixturesViewMode {
+    case standard
+    case watchMirror
 }

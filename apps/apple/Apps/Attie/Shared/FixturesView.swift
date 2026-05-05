@@ -7,7 +7,9 @@ struct FixturesView: View {
     var body: some View {
         NavigationStack {
             List {
-                controls
+                Section("Filters") {
+                    controls
+                }
 
                 if model.isLoading {
                     ProgressView("Loading fixtures")
@@ -17,16 +19,15 @@ struct FixturesView: View {
                         systemImage: "sportscourt"
                     )
                 } else {
-                    ForEach(model.fixtures) { fixture in
-                        FixtureRow(fixture: fixture, model: model)
-                            .listRowBackground(AttieColor.card)
-                    }
+                    Section("Fixtures") {
+                        ForEach(model.fixtures) { fixture in
+                            FixtureRow(fixture: fixture, model: model)
+                        }
 
-                    loadMoreRow
+                        loadMoreRow
+                    }
                 }
             }
-            .scrollContentBackground(.hidden)
-            .background(AttieColor.page)
             .navigationTitle("Attie")
             .task {
                 await model.loadInitialFixtures()
@@ -34,59 +35,58 @@ struct FixturesView: View {
         }
     }
 
+    @ViewBuilder
     private var controls: some View {
-        Section {
-            Picker("Sport", selection: Binding(
-                get: { model.selectedSport },
-                set: { model.setSport($0) }
-            )) {
-                ForEach(SportKey.allCases, id: \.self) { sport in
-                    Text(model.sportName(sport)).tag(sport)
-                }
+        Picker("Sport", selection: Binding(
+            get: { model.selectedSport },
+            set: { model.setSport($0) }
+        )) {
+            ForEach(SportKey.allCases, id: \.self) { sport in
+                Text(model.sportName(sport)).tag(sport)
             }
+        }
 
-            Menu {
-                ForEach(model.availableCompetitions, id: \.self) { competition in
-                    Button {
-                        model.toggleCompetition(competition)
-                    } label: {
-                        Label(
-                            model.competitionName(competition),
-                            systemImage: model.selectedCompetitions.contains(competition)
-                                ? "checkmark.circle.fill"
-                                : "circle"
-                        )
-                    }
-                }
-            } label: {
-                Label(
-                    model.selectedCompetitions.isEmpty
-                        ? "Nothing selected"
-                        : model.selectedCompetitions.map(model.competitionName).joined(separator: ", "),
-                    systemImage: "list.bullet.rectangle"
-                )
-            }
-
-            Picker("Direction", selection: Binding(
-                get: { model.selectedDirection },
-                set: { model.setDirection($0) }
-            )) {
-                Text("Backwards").tag(Direction.backwards)
-                Text("Forwards").tag(Direction.forwards)
-            }
-            .pickerStyle(.segmented)
-
-            if model.selectedDirection == .backwards {
-                Toggle("Show all scores", isOn: $model.showAllScores)
-                Toggle(
-                    "Sound effects",
-                    isOn: Binding(
-                        get: { model.useSoundEffects },
-                        set: { model.setSoundEffects($0) }
+        Menu {
+            ForEach(model.availableCompetitions, id: \.self) { competition in
+                Button {
+                    model.toggleCompetition(competition)
+                } label: {
+                    Label(
+                        model.competitionName(competition),
+                        systemImage: model.selectedCompetitions.contains(competition)
+                            ? "checkmark.circle.fill"
+                            : "circle"
                     )
-                )
-                .disabled(model.showAllScores)
+                }
             }
+        } label: {
+            Label(
+                model.selectedCompetitions.isEmpty
+                    ? "Nothing selected"
+                    : model.selectedCompetitions.map(model.competitionName).joined(separator: ", "),
+                systemImage: "list.bullet.rectangle"
+            )
+        }
+
+        Picker("Direction", selection: Binding(
+            get: { model.selectedDirection },
+            set: { model.setDirection($0) }
+        )) {
+            Text("Backwards").tag(Direction.backwards)
+            Text("Forwards").tag(Direction.forwards)
+        }
+        .pickerStyle(.segmented)
+
+        if model.selectedDirection == .backwards {
+            Toggle("Show all scores", isOn: $model.showAllScores)
+            Toggle(
+                "Sound effects",
+                isOn: Binding(
+                    get: { model.useSoundEffects },
+                    set: { model.setSoundEffects($0) }
+                )
+            )
+            .disabled(model.showAllScores)
         }
     }
 

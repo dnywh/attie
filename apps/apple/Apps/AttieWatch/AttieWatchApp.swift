@@ -4,7 +4,7 @@ import SwiftUI
 struct AttieWatchApp: App {
     var body: some Scene {
         WindowGroup {
-            FixturesView()
+            WatchFixturesView()
         }
     }
 }

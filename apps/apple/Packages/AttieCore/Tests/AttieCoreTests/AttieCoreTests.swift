@@ -62,6 +62,51 @@ struct AttieCoreTests {
         #expect(preferences.competitions(for: .basketball) == [.nba])
     }
 
+    @Test("watch fixture snapshots encode and decode")
+    func watchFixtureSnapshotsEncodeAndDecode() throws {
+        let snapshot = WatchFixtureSnapshot(
+            selectedSport: .football,
+            selectedCompetitions: [.premierLeague],
+            selectedDirection: .backwards,
+            fixtures: [fixture(id: "ars-che", date: "2026-05-01T12:00:00Z")],
+            generatedAt: Date(timeIntervalSince1970: 1_777_593_600)
+        )
+
+        let data = try JSONEncoder().encode(snapshot)
+        let decoded = try JSONDecoder().decode(WatchFixtureSnapshot.self, from: data)
+
+        #expect(decoded == snapshot)
+    }
+
+    @Test("watch fixture selection falls back to preferences")
+    func watchFixtureSelectionFallsBackToPreferences() throws {
+        let suiteName = "attie.tests.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let preferences = AttiePreferences(defaults: defaults)
+
+        preferences.initialise()
+
+        let selection = WatchFixtureSelection.resolved(
+            snapshot: nil,
+            preferences: preferences
+        )
+
+        #expect(selection.selectedSport == .football)
+        #expect(selection.selectedCompetitions == [.premierLeague])
+        #expect(selection.selectedDirection == .backwards)
+    }
+
+    @Test("score reveal state reveals a single fixture row")
+    func scoreRevealStateRevealsASingleFixtureRow() {
+        var state = FixtureScoreRevealState()
+
+        state.revealFixture("fixture-a")
+
+        #expect(state.isFixtureRevealed("fixture-a"))
+        #expect(!state.isFixtureRevealed("fixture-b"))
+    }
+
     private func fixture(id: String, date: String) -> CommonFixture {
         CommonFixture(
             id: id,
