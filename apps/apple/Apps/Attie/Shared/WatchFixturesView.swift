@@ -11,7 +11,7 @@ struct WatchFixturesView: View {
                     get: { model.selectedDirection },
                     set: { model.setDirection($0) }
                 )) {
-                    Text("Back").tag(Direction.backwards)
+                    Text("Backward").tag(Direction.backwards)
                     Text("Forward").tag(Direction.forwards)
                 }
 

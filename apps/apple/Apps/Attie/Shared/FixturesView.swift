@@ -46,19 +46,8 @@ struct FixturesView: View {
             }
         }
 
-        Menu {
-            ForEach(model.availableCompetitions, id: \.self) { competition in
-                Button {
-                    model.toggleCompetition(competition)
-                } label: {
-                    Label(
-                        model.competitionName(competition),
-                        systemImage: model.selectedCompetitions.contains(competition)
-                            ? "checkmark.circle.fill"
-                            : "circle"
-                    )
-                }
-            }
+        NavigationLink {
+            LeagueSelectionView(model: model)
         } label: {
             HStack {
                 Text("League")
@@ -106,5 +95,29 @@ struct FixturesView: View {
                 }
             }
         }
+    }
+}
+
+private struct LeagueSelectionView: View {
+    @ObservedObject var model: FixturesViewModel
+
+    var body: some View {
+        List {
+            ForEach(model.availableCompetitions, id: \.self) { competition in
+                Button {
+                    model.toggleCompetition(competition)
+                } label: {
+                    HStack {
+                        Text(model.competitionName(competition))
+                            .foregroundStyle(.primary)
+                        Spacer()
+                        if model.selectedCompetitions.contains(competition) {
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                }
+            }
+        }
+        .navigationTitle("League")
     }
 }
