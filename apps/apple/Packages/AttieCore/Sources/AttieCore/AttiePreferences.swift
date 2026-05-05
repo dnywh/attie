@@ -4,7 +4,6 @@ public final class AttiePreferences {
     public enum Key {
         public static let sport = "attie.sport"
         public static let direction = "attie.direction"
-        public static let sound = "attie.sound"
 
         public static func competitions(for sport: SportKey) -> String {
             "attie.competitions.\(sport.rawValue)"
@@ -46,18 +45,6 @@ public final class AttiePreferences {
 
     public func setDirection(_ direction: Direction) {
         defaults.set(direction.rawValue, forKey: Key.direction)
-    }
-
-    public func soundEnabled() -> Bool {
-        guard defaults.object(forKey: Key.sound) != nil else {
-            return AttieDefaults.sound
-        }
-
-        return defaults.bool(forKey: Key.sound)
-    }
-
-    public func setSoundEnabled(_ enabled: Bool) {
-        defaults.set(enabled, forKey: Key.sound)
     }
 
     public func competitions(for sport: SportKey) -> [CompetitionKey] {

@@ -94,21 +94,25 @@ public struct WatchFixtureSelection: Equatable, Sendable {
 }
 
 public struct FixtureScoreRevealState: Equatable, Sendable {
-    private var revealedFixtureIDs: Set<String>
+    private var revealedScoreIDs: Set<String>
 
-    public init(revealedFixtureIDs: Set<String> = []) {
-        self.revealedFixtureIDs = revealedFixtureIDs
+    public init(revealedScoreIDs: Set<String> = []) {
+        self.revealedScoreIDs = revealedScoreIDs
     }
 
-    public mutating func revealFixture(_ fixtureID: String) {
-        revealedFixtureIDs.insert(fixtureID)
+    public mutating func revealScore(fixtureID: String, sideID: String) {
+        revealedScoreIDs.insert(key(fixtureID: fixtureID, sideID: sideID))
     }
 
-    public func isFixtureRevealed(_ fixtureID: String) -> Bool {
-        revealedFixtureIDs.contains(fixtureID)
+    public func isScoreRevealed(fixtureID: String, sideID: String) -> Bool {
+        revealedScoreIDs.contains(key(fixtureID: fixtureID, sideID: sideID))
     }
 
     public mutating func reset() {
-        revealedFixtureIDs.removeAll()
+        revealedScoreIDs.removeAll()
+    }
+
+    private func key(fixtureID: String, sideID: String) -> String {
+        "\(fixtureID)-\(sideID)"
     }
 }

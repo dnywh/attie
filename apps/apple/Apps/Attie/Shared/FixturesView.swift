@@ -60,12 +60,13 @@ struct FixturesView: View {
                 }
             }
         } label: {
-            Label(
-                model.selectedCompetitions.isEmpty
-                    ? "Nothing selected"
-                    : model.selectedCompetitions.map(model.competitionName).joined(separator: ", "),
-                systemImage: "list.bullet.rectangle"
-            )
+            HStack {
+                Text("League")
+                Spacer()
+                Text(selectedCompetitionSummary)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
         }
 
         Picker("Direction", selection: Binding(
@@ -79,15 +80,13 @@ struct FixturesView: View {
 
         if model.selectedDirection == .backwards {
             Toggle("Show all scores", isOn: $model.showAllScores)
-            Toggle(
-                "Sound effects",
-                isOn: Binding(
-                    get: { model.useSoundEffects },
-                    set: { model.setSoundEffects($0) }
-                )
-            )
-            .disabled(model.showAllScores)
         }
+    }
+
+    private var selectedCompetitionSummary: String {
+        model.selectedCompetitions.isEmpty
+            ? "Nothing selected"
+            : model.selectedCompetitions.map(model.competitionName).joined(separator: ", ")
     }
 
     @ViewBuilder

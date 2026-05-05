@@ -5,38 +5,58 @@ struct WatchFixtureRow: View {
     let fixture: CommonFixture
     let showsCompetition: Bool
     let allowsScoreReveal: Bool
-    let isScoreVisible: Bool
+    let isHomeScoreVisible: Bool
+    let isAwayScoreVisible: Bool
     let revealScores: () -> Void
 
     var body: some View {
-        Button(action: allowsScoreReveal ? revealScores : {}) {
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(alignment: .firstTextBaseline) {
-                    Text(formattedTime)
-                    Spacer()
-                    Text(fixture.status.detail ?? fixture.status.type)
-                }
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-
-                teamLine(team: fixture.homeTeam, score: fixture.score.fullTime.home)
-                teamLine(team: fixture.awayTeam, score: fixture.score.fullTime.away)
-
-                if showsCompetition {
-                    Text(fixture.competition.name)
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                }
+        if allowsScoreReveal {
+            Button(action: revealScores) {
+                content
             }
-            .contentShape(Rectangle())
+            .buttonStyle(.plain)
+            .accessibilityHint(accessibilityHint)
+        } else {
+            content
         }
-        .buttonStyle(.plain)
-        .disabled(!allowsScoreReveal)
-        .accessibilityHint(accessibilityHint)
     }
 
-    private func teamLine(team: FixtureTeam, score: ScoreValue) -> some View {
+    private var content: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .firstTextBaseline) {
+                Text(formattedTime)
+                Spacer()
+                Text(fixture.status.detail ?? fixture.status.type)
+            }
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+
+            teamLine(
+                team: fixture.homeTeam,
+                score: fixture.score.fullTime.home,
+                isScoreVisible: isHomeScoreVisible
+            )
+            teamLine(
+                team: fixture.awayTeam,
+                score: fixture.score.fullTime.away,
+                isScoreVisible: isAwayScoreVisible
+            )
+
+            if showsCompetition {
+                Text(fixture.competition.name)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
+        }
+        .contentShape(Rectangle())
+    }
+
+    private func teamLine(
+        team: FixtureTeam,
+        score: ScoreValue,
+        isScoreVisible: Bool
+    ) -> some View {
         HStack(alignment: .firstTextBaseline) {
             Text(team.shortName)
                 .font(.headline)
@@ -60,7 +80,11 @@ struct WatchFixtureRow: View {
             return "Scores are unavailable for upcoming fixtures"
         }
 
-        return isScoreVisible ? "Scores revealed" : "Reveals scores for this fixture"
+        if isHomeScoreVisible, isAwayScoreVisible {
+            return "Scores revealed"
+        }
+
+        return isHomeScoreVisible ? "Reveals the second score" : "Reveals the first score"
     }
 
     private var formattedTime: String {

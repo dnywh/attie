@@ -7,7 +7,13 @@ struct WatchFixturesView: View {
     var body: some View {
         NavigationStack {
             List {
-                statusRow
+                Picker("Direction", selection: Binding(
+                    get: { model.selectedDirection },
+                    set: { model.setDirection($0) }
+                )) {
+                    Text("Back").tag(Direction.backwards)
+                    Text("Forward").tag(Direction.forwards)
+                }
 
                 if model.isLoading {
                     ProgressView("Loading")
@@ -19,9 +25,10 @@ struct WatchFixturesView: View {
                             fixture: fixture,
                             showsCompetition: model.selectedCompetitions.count > 1,
                             allowsScoreReveal: model.selectedDirection == .backwards,
-                            isScoreVisible: model.isFixtureScoreVisible(fixture.id)
+                            isHomeScoreVisible: model.isFixtureScoreVisible(fixture.id, side: .home),
+                            isAwayScoreVisible: model.isFixtureScoreVisible(fixture.id, side: .away)
                         ) {
-                            model.revealFixture(fixture.id)
+                            model.revealNextScore(fixture.id)
                         }
                     }
                 }
@@ -41,19 +48,20 @@ struct WatchFixturesView: View {
             .refreshable {
                 await model.loadInitialFixtures()
             }
+            .safeAreaInset(edge: .bottom) {
+                statusText
+            }
         }
     }
 
     @ViewBuilder
-    private var statusRow: some View {
+    private var statusText: some View {
         if let latestSyncedAt = model.latestSyncedAt {
             Text("Synced \(latestSyncedAt, style: .relative)")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
-        } else if !model.fixtures.isEmpty {
-            Text("Loaded on Watch")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 3)
         }
     }
 

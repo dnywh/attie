@@ -9,7 +9,6 @@ final class FixturesViewModel: ObservableObject {
     @Published var selectedCompetitions: [CompetitionKey]
     @Published var selectedDirection: Direction
     @Published var showAllScores = false
-    @Published var useSoundEffects: Bool
     @Published var fixtures: [CommonFixture] = []
     @Published var isLoading = false
     @Published var isLoadingMore = false
@@ -46,7 +45,6 @@ final class FixturesViewModel: ObservableObject {
         self.selectedSport = selection.selectedSport
         self.selectedCompetitions = selection.selectedCompetitions
         self.selectedDirection = selection.selectedDirection
-        self.useSoundEffects = preferences.soundEnabled()
         self.currentWindow = FixtureWindows.initialWindow(direction: selection.selectedDirection)
 
         if mode == .watchMirror, let snapshot = syncService?.latestSnapshot {
@@ -108,25 +106,24 @@ final class FixturesViewModel: ObservableObject {
         Task { await loadInitialFixtures() }
     }
 
-    func setSoundEffects(_ enabled: Bool) {
-        useSoundEffects = enabled
-        preferences.setSoundEnabled(enabled)
-    }
-
     func revealScore(_ fixtureID: String, side: FixtureSide) {
-        scoreRevealState.revealFixture(fixtureID)
+        scoreRevealState.revealScore(fixtureID: fixtureID, sideID: side.rawValue)
     }
 
     func isScoreVisible(fixtureID: String, side: FixtureSide) -> Bool {
-        showAllScores || scoreRevealState.isFixtureRevealed(fixtureID)
+        showAllScores || scoreRevealState.isScoreRevealed(fixtureID: fixtureID, sideID: side.rawValue)
     }
 
-    func revealFixture(_ fixtureID: String) {
-        scoreRevealState.revealFixture(fixtureID)
+    func revealNextScore(_ fixtureID: String) {
+        if !scoreRevealState.isScoreRevealed(fixtureID: fixtureID, sideID: FixtureSide.home.rawValue) {
+            revealScore(fixtureID, side: .home)
+        } else if !scoreRevealState.isScoreRevealed(fixtureID: fixtureID, sideID: FixtureSide.away.rawValue) {
+            revealScore(fixtureID, side: .away)
+        }
     }
 
-    func isFixtureScoreVisible(_ fixtureID: String) -> Bool {
-        showAllScores || scoreRevealState.isFixtureRevealed(fixtureID)
+    func isFixtureScoreVisible(_ fixtureID: String, side: FixtureSide) -> Bool {
+        isScoreVisible(fixtureID: fixtureID, side: side)
     }
 
     func loadInitialFixtures() async {

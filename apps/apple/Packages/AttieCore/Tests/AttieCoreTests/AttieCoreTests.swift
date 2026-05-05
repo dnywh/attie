@@ -53,12 +53,10 @@ struct AttieCoreTests {
         let preferences = AttiePreferences(defaults: defaults)
 
         preferences.initialise()
-        preferences.setSoundEnabled(true)
         preferences.setCompetitions([.nba], for: .basketball)
 
         #expect(defaults.string(forKey: AttiePreferences.Key.sport) == "football")
         #expect(defaults.string(forKey: AttiePreferences.Key.direction) == "backwards")
-        #expect(defaults.bool(forKey: AttiePreferences.Key.sound) == true)
         #expect(preferences.competitions(for: .basketball) == [.nba])
     }
 
@@ -97,14 +95,15 @@ struct AttieCoreTests {
         #expect(selection.selectedDirection == .backwards)
     }
 
-    @Test("score reveal state reveals a single fixture row")
-    func scoreRevealStateRevealsASingleFixtureRow() {
+    @Test("score reveal state reveals a single team score")
+    func scoreRevealStateRevealsASingleTeamScore() {
         var state = FixtureScoreRevealState()
 
-        state.revealFixture("fixture-a")
+        state.revealScore(fixtureID: "fixture-a", sideID: "home")
 
-        #expect(state.isFixtureRevealed("fixture-a"))
-        #expect(!state.isFixtureRevealed("fixture-b"))
+        #expect(state.isScoreRevealed(fixtureID: "fixture-a", sideID: "home"))
+        #expect(!state.isScoreRevealed(fixtureID: "fixture-a", sideID: "away"))
+        #expect(!state.isScoreRevealed(fixtureID: "fixture-b", sideID: "home"))
     }
 
     private func fixture(id: String, date: String) -> CommonFixture {
