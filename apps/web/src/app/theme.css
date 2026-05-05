@@ -11,7 +11,11 @@
   --color-background-foremost: #FFFFFF;
   --color-background-focus-hover: hsl(48deg 99% 96%);
   --color-background-focus-active: hsl(48deg 99% 92%);
+  --color-background-heading: #000000;
+  --color-border-page: #000000;
   --color-text-primary: #000000;
+  --color-text-page: #000000;
+  --color-text-heading: #FFFFFF;
   --color-text-tertiary: rgb(128, 128, 128);
   --color-text-live: red;
   --color-shadow: rgba(0, 0, 0, 0.1);
@@ -21,15 +25,19 @@
   :root {
     color-scheme: dark;
 
-    --color-background-page: #181A2A;
+    --color-background-page: #1E2033;
     --color-background-card: #D8BD4F;
     --color-background-interstitial: #286B74;
     --color-background-informational: #59564C;
     --color-background-crest: rgb(45, 47, 54);
     --color-background-foremost: #F7F3E7;
-    --color-background-focus-hover: hsl(48deg 56% 24%);
-    --color-background-focus-active: hsl(48deg 56% 30%);
+    --color-background-focus-hover: hsl(48deg 56% 84%);
+    --color-background-focus-active: hsl(48deg 56% 78%);
+    --color-background-heading: #000000;
+    --color-border-page: #F7F3E7;
     --color-text-primary: #080808;
+    --color-text-page: #F7F3E7;
+    --color-text-heading: #FFFFFF;
     --color-text-tertiary: rgb(92, 92, 92);
     --color-text-live: #FF5A5A;
     --color-shadow: rgba(0, 0, 0, 0.28);
@@ -55,6 +63,7 @@ body {
 
 body {
   background-color: var(--color-background-page);
+  color: var(--color-text-page);
   display: flex;
   flex-direction: column;
   font-family: "Jost Variable", Futura, Helvetica, Arial, sans-serif;

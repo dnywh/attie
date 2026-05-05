@@ -40,6 +40,16 @@ const StyledSelect = styled(HeadlessSelect)`
   width: 100%;
   ${ellipsizedText};
   ${teamText};
+
+  & option {
+    background-color: ${webTheme.colors.background.foremost};
+    color: ${webTheme.colors.text.primary};
+  }
+
+  & option:checked {
+    background-color: ${webTheme.colors.background.focus.active};
+    color: ${webTheme.colors.text.primary};
+  }
 `;
 
 const Wrapper = styled.div`

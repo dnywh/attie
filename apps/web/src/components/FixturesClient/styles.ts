@@ -14,9 +14,9 @@ export const Main = styled.main`
 export const ControlBar = styled.section`
   ${interstitialStippledBackground};
   align-items: center;
-  border: 1px solid ${webTheme.colors.text.primary};
+  border: 1px solid ${webTheme.colors.border.page};
   border-radius: 3px;
-  box-shadow: 0 3px 0 0 ${webTheme.colors.text.primary};
+  box-shadow: 0 3px 0 0 black;
   display: flex;
   flex-direction: row;
   gap: 0.5rem;

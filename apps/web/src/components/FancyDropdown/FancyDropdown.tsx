@@ -41,8 +41,8 @@ const DialogHeader = styled.header`
   z-index: 1;
 
   @supports (animation-timeline: scroll()) {
-    --header-border-color: ${webTheme.colors.text.primary};
-    --header-shadow-color: ${webTheme.colors.shadow};
+    --header-border-color: ${webTheme.colors.border.page};
+    --header-shadow-color: black;
     animation: ${scrollShadow} linear both;
     animation-range: 0 0.5rem;
     animation-timeline: scroll();
@@ -63,7 +63,7 @@ const StyledButton = styled.button<{ $fillSpace: boolean }>`
   background-color: ${webTheme.colors.background.foremost};
   border: 1px solid ${webTheme.colors.text.primary};
   border-radius: 2px;
-  box-shadow: 0.5px 1.5px 0 0 ${webTheme.colors.background.foremost};
+  box-shadow: 0.5px 1.5px 0 0 black;
   color: ${webTheme.colors.text.primary};
   display: flex;
   gap: 0.65rem;
