@@ -4,11 +4,12 @@ import SwiftUI
 struct WatchFixtureRow: View {
     let fixture: CommonFixture
     let showsCompetition: Bool
+    let allowsScoreReveal: Bool
     let isScoreVisible: Bool
     let revealScores: () -> Void
 
     var body: some View {
-        Button(action: revealScores) {
+        Button(action: allowsScoreReveal ? revealScores : {}) {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(alignment: .firstTextBaseline) {
                     Text(formattedTime)
@@ -31,7 +32,8 @@ struct WatchFixtureRow: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityHint(isScoreVisible ? "Scores revealed" : "Reveals scores for this fixture")
+        .disabled(!allowsScoreReveal)
+        .accessibilityHint(accessibilityHint)
     }
 
     private func teamLine(team: FixtureTeam, score: ScoreValue) -> some View {
@@ -40,17 +42,25 @@ struct WatchFixtureRow: View {
                 .font(.headline)
                 .lineLimit(1)
             Spacer()
-            if isScoreVisible {
+            if allowsScoreReveal, isScoreVisible {
                 Text(score.displayValue)
                     .font(.headline)
                     .monospacedDigit()
-            } else {
+            } else if allowsScoreReveal {
                 Image(systemName: "eye.slash")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .accessibilityLabel("Score hidden")
             }
         }
+    }
+
+    private var accessibilityHint: String {
+        if !allowsScoreReveal {
+            return "Scores are unavailable for upcoming fixtures"
+        }
+
+        return isScoreVisible ? "Scores revealed" : "Reveals scores for this fixture"
     }
 
     private var formattedTime: String {

@@ -59,11 +59,13 @@ struct FixtureRow: View {
 
             Spacer()
 
-            ScoreBubble(
-                score: score,
-                isVisible: model.isScoreVisible(fixtureID: fixture.id, side: side)
-            ) {
-                model.revealScore(fixture.id, side: side)
+            if model.selectedDirection == .backwards {
+                ScoreBubble(
+                    score: score,
+                    isVisible: model.isScoreVisible(fixtureID: fixture.id, side: side)
+                ) {
+                    model.revealScore(fixture.id, side: side)
+                }
             }
         }
         .padding(.vertical, 6)

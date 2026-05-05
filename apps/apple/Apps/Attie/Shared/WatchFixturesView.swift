@@ -18,6 +18,7 @@ struct WatchFixturesView: View {
                         WatchFixtureRow(
                             fixture: fixture,
                             showsCompetition: model.selectedCompetitions.count > 1,
+                            allowsScoreReveal: model.selectedDirection == .backwards,
                             isScoreVisible: model.isFixtureScoreVisible(fixture.id)
                         ) {
                             model.revealFixture(fixture.id)
