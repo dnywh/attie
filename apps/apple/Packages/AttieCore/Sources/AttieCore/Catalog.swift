@@ -42,6 +42,7 @@ public enum AttieCatalog {
         .nrl: CompetitionDefinition(sport: .rugbyLeague, name: "NRL", isDefaultForSport: true),
         .premierLeague: CompetitionDefinition(sport: .football, name: "Premier League", isDefaultForSport: true),
         .faCup: CompetitionDefinition(sport: .football, name: "FA Cup"),
+        .fifaWorldCup: CompetitionDefinition(sport: .football, name: "FIFA World Cup"),
         .championship: CompetitionDefinition(sport: .football, name: "Championship"),
         .championsLeague: CompetitionDefinition(sport: .football, name: "UEFA Champions League"),
         .europaLeague: CompetitionDefinition(sport: .football, name: "UEFA Europa League"),

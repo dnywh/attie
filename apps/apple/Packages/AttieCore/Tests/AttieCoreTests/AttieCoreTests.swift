@@ -16,6 +16,27 @@ struct AttieCoreTests {
         #expect(response.fixtures.first?.score.fullTime.home == .number(2))
     }
 
+    @Test("catalog includes FIFA World Cup as a football competition")
+    func catalogIncludesFIFAWorldCup() throws {
+        let data = Data(#""fifa-world-cup""#.utf8)
+        let competition = try JSONDecoder().decode(CompetitionKey.self, from: data)
+
+        #expect(competition == .fifaWorldCup)
+        #expect(AttieCatalog.competitions(for: .football).contains(.fifaWorldCup))
+        #expect(AttieCatalog.competitions[.fifaWorldCup]?.name == "FIFA World Cup")
+        #expect(AttieCatalog.competitions[.fifaWorldCup]?.isDefaultForSport == false)
+        #expect(AttieCatalog.defaultCompetition(for: .football) == .premierLeague)
+    }
+
+    @Test("fixture competition decodes optional tournament stage")
+    func fixtureCompetitionDecodesStage() throws {
+        let data = Data(#"{"name":"FIFA World Cup","stage":"Round of 16"}"#.utf8)
+        let competition = try JSONDecoder().decode(FixtureCompetition.self, from: data)
+
+        #expect(competition.name == "FIFA World Cup")
+        #expect(competition.stage == "Round of 16")
+    }
+
     @Test("date windows match the web defaults")
     func dateWindowsMatchWebDefaults() {
         var calendar = Calendar(identifier: .gregorian)

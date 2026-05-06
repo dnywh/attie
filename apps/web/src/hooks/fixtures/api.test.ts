@@ -16,6 +16,18 @@ describe("fixture API helpers", () => {
     );
   });
 
+  it("builds the ESPN URL for the FIFA World Cup", () => {
+    const url = buildFixtureApiUrl(COMPETITIONS["fifa-world-cup"], {
+      dateFrom: "2026-06-11",
+      dateTo: "2026-07-19",
+      direction: "future",
+    });
+
+    expect(url).toBe(
+      "/api/espn?dateFrom=2026-06-11&dateTo=2026-07-19&direction=future&sport=soccer&league=fifa.world"
+    );
+  });
+
   it("follows Ball Don't Lie cursors within a fixture window", async () => {
     const fetcher = vi
       .fn<typeof fetch>()

@@ -30,6 +30,14 @@ struct FixtureRow: View {
                     side: .away
                 )
             }
+
+            if let competitionContext {
+                Text(competitionContext)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .lineLimit(1)
+            }
         }
         .padding(.vertical, 4)
     }
@@ -83,5 +91,15 @@ struct FixtureRow: View {
                 .hour()
                 .minute()
         )
+    }
+
+    private var competitionContext: String? {
+        if let stage = fixture.competition.stage, !stage.isEmpty {
+            return model.selectedCompetitions.count > 1
+                ? "\(fixture.competition.name) - \(stage)"
+                : stage
+        }
+
+        return model.selectedCompetitions.count > 1 ? fixture.competition.name : nil
     }
 }

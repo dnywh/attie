@@ -116,6 +116,15 @@ export const COMPETITIONS = {
       league: "eng.fa",
     },
   },
+  "fifa-world-cup": {
+    sport: "football",
+    name: "FIFA World Cup",
+    api: {
+      adapter: "espn",
+      sport: "soccer",
+      league: "fifa.world",
+    },
+  },
   championship: {
     sport: "football",
     name: "Championship",
@@ -310,6 +319,7 @@ export interface CommonFixture {
   status: StatusObject;
   competition: {
     name: string;
+    stage?: string | null;
   };
   homeTeam: {
     name: string;

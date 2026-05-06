@@ -43,6 +43,7 @@ public enum CompetitionKey: String, Codable, CaseIterable, Sendable {
     case nrl
     case premierLeague = "premier-league"
     case faCup = "fa-cup"
+    case fifaWorldCup = "fifa-world-cup"
     case championship
     case championsLeague = "champions-league"
     case europaLeague = "europa-league"
@@ -119,9 +120,11 @@ public struct StatusObject: Codable, Equatable, Sendable {
 
 public struct FixtureCompetition: Codable, Equatable, Sendable {
     public var name: String
+    public var stage: String?
 
-    public init(name: String) {
+    public init(name: String, stage: String? = nil) {
         self.name = name
+        self.stage = stage
     }
 }
 
