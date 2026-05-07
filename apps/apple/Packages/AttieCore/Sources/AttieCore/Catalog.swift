@@ -28,11 +28,11 @@ public struct CompetitionDefinition: Equatable, Sendable {
 
 public enum AttieCatalog {
     public static let sports: [SportKey: SportDefinition] = [
+        .football: SportDefinition(name: "Soccer"),
         .americanFootball: SportDefinition(name: "American Football", localName: "Football"),
         .aussieRules: SportDefinition(name: "Aussie Rules"),
         .baseball: SportDefinition(name: "Baseball"),
         .basketball: SportDefinition(name: "Basketball"),
-        .football: SportDefinition(name: "Football"),
         .rugbyLeague: SportDefinition(name: "Rugby League"),
         .rugbyUnion: SportDefinition(name: "Rugby Union")
     ]
@@ -40,6 +40,7 @@ public enum AttieCatalog {
     public static let competitions: [CompetitionKey: CompetitionDefinition] = [
         .afl: CompetitionDefinition(sport: .aussieRules, name: "AFL", isDefaultForSport: true),
         .nrl: CompetitionDefinition(sport: .rugbyLeague, name: "NRL", isDefaultForSport: true),
+        .fifaWorldCup: CompetitionDefinition(sport: .football, name: "FIFA World Cup", isDefaultForSport: true),
         .premierLeague: CompetitionDefinition(sport: .football, name: "Premier League", isDefaultForSport: true),
         .faCup: CompetitionDefinition(sport: .football, name: "FA Cup"),
         .championship: CompetitionDefinition(sport: .football, name: "Championship"),
@@ -71,10 +72,14 @@ public enum AttieCatalog {
     public static func defaultCompetition(for sport: SportKey) -> CompetitionKey? {
         competitions(for: sport).first { competitions[$0]?.isDefaultForSport == true }
     }
+
+    public static func defaultCompetitions(for sport: SportKey) -> [CompetitionKey] {
+        competitions(for: sport).filter { competitions[$0]?.isDefaultForSport == true }
+    }
 }
 
 public enum AttieDefaults {
     public static let sport = SportKey.football
-    public static let competitions = [CompetitionKey.premierLeague]
+    public static let competitions = [CompetitionKey.fifaWorldCup, CompetitionKey.premierLeague]
     public static let direction = Direction.backwards
 }

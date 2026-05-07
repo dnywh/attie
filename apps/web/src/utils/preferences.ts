@@ -1,7 +1,7 @@
 import { DEFAULTS } from "@/constants/defaults";
 import {
   COMPETITIONS,
-  getDefaultCompetitionForSport,
+  getDefaultCompetitionsForSport,
   isCompetitionKey,
 } from "@/constants/competitions";
 import { isSportKey } from "@/config/sportConfig";
@@ -22,8 +22,10 @@ const parseCompetitionList = (
   sport: SportKey
 ): CompetitionKey[] => {
   const fallback = (): CompetitionKey[] => {
-    const defaultCompetition = getDefaultCompetitionForSport(sport);
-    return defaultCompetition ? [defaultCompetition] : [...DEFAULTS.COMPETITIONS];
+    const defaultCompetitions = getDefaultCompetitionsForSport(sport);
+    return defaultCompetitions.length > 0
+      ? defaultCompetitions
+      : [...DEFAULTS.COMPETITIONS];
   };
 
   if (!value || value === "[]") {

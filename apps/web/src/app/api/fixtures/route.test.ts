@@ -68,6 +68,70 @@ describe("normalised fixtures route", () => {
     expect(body.meta.count).toBe(1);
   });
 
+  it("returns normalised FIFA World Cup fixtures", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      Response.json({
+        events: [
+          {
+            id: "760415",
+            date: "2026-06-11T19:00Z",
+            season: {
+              slug: "group-stage",
+            },
+            competitions: [
+              {
+                status: {
+                  type: {
+                    name: "STATUS_SCHEDULED",
+                    shortDetail: "11 Jun",
+                  },
+                },
+                competitors: [
+                  {
+                    homeAway: "home",
+                    score: "0",
+                    team: {
+                      name: "Mexico",
+                      shortDisplayName: "Mexico",
+                      logo: "https://a.espncdn.com/i/teamlogos/countries/500/mex.png",
+                    },
+                  },
+                  {
+                    homeAway: "away",
+                    score: "0",
+                    team: {
+                      name: "South Africa",
+                      shortDisplayName: "South Africa",
+                      logo: "https://a.espncdn.com/i/teamlogos/countries/500/rsa.png",
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      })
+    );
+
+    const response = await GET(
+      new Request(
+        "https://attie.test/api/fixtures?competition=fifa-world-cup&dateFrom=2026-06-11&dateTo=2026-07-19&direction=future"
+      )
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(fetchMock.mock.calls[0][0]?.toString()).toContain(
+      "/api/espn?dateFrom=2026-06-11&dateTo=2026-07-20&direction=future&sport=soccer&league=fifa.world"
+    );
+    expect(body.fixtures[0]).toMatchObject({
+      competition: { name: "FIFA World Cup", stage: "Group stage" },
+      homeTeam: { shortName: "Mexico" },
+      awayTeam: { shortName: "South Africa" },
+    });
+    expect(body.meta.competitions).toEqual(["fifa-world-cup"]);
+  });
+
   it("surfaces provider rate limits", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       Response.json({ error: "Rate limit exceeded" }, { status: 429 })

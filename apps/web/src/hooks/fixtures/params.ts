@@ -1,6 +1,6 @@
 import {
   COMPETITIONS,
-  getDefaultCompetitionForSport,
+  getDefaultCompetitionsForSport,
   isCompetitionKey,
 } from "@/constants/competitions";
 import { DEFAULTS } from "@/constants/defaults";
@@ -24,15 +24,17 @@ export const isDirection = (
 export const browserStorage = (): Storage | undefined =>
   typeof window === "undefined" ? undefined : window.localStorage;
 
-export const defaultCompetitionForSport = (sport: SportKey): CompetitionKey => {
-  const defaultCompetition = getDefaultCompetitionForSport(sport);
+export const defaultCompetitionsForSport = (
+  sport: SportKey
+): CompetitionKey[] => {
+  const defaultCompetitions = getDefaultCompetitionsForSport(sport);
 
-  if (!defaultCompetition) {
+  if (defaultCompetitions.length === 0) {
     console.warn(`No default competition found for sport: ${sport}`);
-    return DEFAULTS.COMPETITIONS[0];
+    return [...DEFAULTS.COMPETITIONS];
   }
 
-  return defaultCompetition;
+  return defaultCompetitions;
 };
 
 export const parseCompetitionParam = (
@@ -64,7 +66,7 @@ export const normaliseCompetitions = (
 
   return validCompetitions.length > 0
     ? validCompetitions
-    : [defaultCompetitionForSport(sport)];
+    : defaultCompetitionsForSport(sport);
 };
 
 export const normaliseInitialParams = (
@@ -111,6 +113,6 @@ export const normaliseInitialParams = (
     competitions:
       storedPreferences.sport === sport
         ? storedPreferences.competitions
-        : [defaultCompetitionForSport(sport)],
+        : defaultCompetitionsForSport(sport),
   };
 };

@@ -72,8 +72,10 @@ public final class AttiePreferences {
     }
 
     private func fallbackCompetitions(for sport: SportKey) -> [CompetitionKey] {
-        if let defaultCompetition = AttieCatalog.defaultCompetition(for: sport) {
-            return [defaultCompetition]
+        let defaultCompetitions = AttieCatalog.defaultCompetitions(for: sport)
+
+        if !defaultCompetitions.isEmpty {
+            return defaultCompetitions
         }
 
         return AttieDefaults.competitions

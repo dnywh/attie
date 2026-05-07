@@ -29,11 +29,11 @@ public enum ApiDirection: String, Codable, CaseIterable, Sendable {
 }
 
 public enum SportKey: String, Codable, CaseIterable, Sendable {
+    case football
     case americanFootball = "american-football"
     case aussieRules = "aussie-rules"
     case baseball
     case basketball
-    case football
     case rugbyLeague = "rugby-league"
     case rugbyUnion = "rugby-union"
 }
@@ -41,6 +41,7 @@ public enum SportKey: String, Codable, CaseIterable, Sendable {
 public enum CompetitionKey: String, Codable, CaseIterable, Sendable {
     case afl
     case nrl
+    case fifaWorldCup = "fifa-world-cup"
     case premierLeague = "premier-league"
     case faCup = "fa-cup"
     case championship
@@ -119,9 +120,11 @@ public struct StatusObject: Codable, Equatable, Sendable {
 
 public struct FixtureCompetition: Codable, Equatable, Sendable {
     public var name: String
+    public var stage: String?
 
-    public init(name: String) {
+    public init(name: String, stage: String? = nil) {
         self.name = name
+        self.stage = stage
     }
 }
 

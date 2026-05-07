@@ -115,12 +115,26 @@ interface FixtureProps {
   showCompetition: boolean;
 }
 
+const competitionContextLabel = (
+  fixture: CommonFixture,
+  showCompetition: boolean
+): string | null => {
+  if (fixture.competition.stage) {
+    return showCompetition
+      ? `${fixture.competition.name} · ${fixture.competition.stage}`
+      : fixture.competition.stage;
+  }
+
+  return showCompetition ? fixture.competition.name : null;
+};
+
 function Fixture({
   fixture,
   showAllScores,
   useSoundEffects,
   showCompetition,
 }: FixtureProps) {
+  const competitionContext = competitionContextLabel(fixture, showCompetition);
   const formattedDate = new Date(fixture.utcDate).toLocaleDateString(
     "default",
     {
@@ -158,8 +172,8 @@ function Fixture({
         />
       </OpponentsList>
 
-      {showCompetition && (
-        <CompetitionName>{fixture.competition.name}</CompetitionName>
+      {competitionContext && (
+        <CompetitionName>{competitionContext}</CompetitionName>
       )}
     </FixtureRow>
   );

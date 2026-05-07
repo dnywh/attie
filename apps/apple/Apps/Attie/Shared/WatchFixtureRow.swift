@@ -42,8 +42,8 @@ struct WatchFixtureRow: View {
                 isScoreVisible: isAwayScoreVisible
             )
 
-            if showsCompetition {
-                Text(fixture.competition.name)
+            if let competitionContext {
+                Text(competitionContext)
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
@@ -97,5 +97,13 @@ struct WatchFixtureRow: View {
                 .hour()
                 .minute()
         )
+    }
+
+    private var competitionContext: String? {
+        if let stage = fixture.competition.stage, !stage.isEmpty {
+            return showsCompetition ? "\(fixture.competition.name) · \(stage)" : stage
+        }
+
+        return showsCompetition ? fixture.competition.name : nil
     }
 }

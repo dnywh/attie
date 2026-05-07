@@ -4,6 +4,9 @@ import type { CommonFixture, CompetitionConfig, ScoreValue } from "@/types/domai
 interface ESPNFixture {
   id: string;
   date: string;
+  season?: {
+    slug?: string;
+  };
   competitions: ESPNFixtureCompetition[];
 }
 
@@ -38,6 +41,29 @@ const STATUS_MAP: Record<string, string> = {
   STATUS_FULL_TIME: FIXTURE_STATUS.FINISHED,
   STATUS_FINAL_PEN: FIXTURE_STATUS.FINISHED, // Football
   STATUS_FINAL_AET: FIXTURE_STATUS.FINISHED, // Football
+};
+
+const TOURNAMENT_STAGE_LABELS: Record<string, string> = {
+  "group-stage": "Group stage",
+  "round-of-32": "Round of 32",
+  "round-of-16": "Round of 16",
+  quarterfinals: "Quarter-finals",
+  semifinals: "Semi-finals",
+  "3rd-place-match": "Third-place match",
+  final: "Final",
+};
+
+const tournamentStageLabel = (
+  fixture: ESPNFixture,
+  competition: CompetitionConfig
+): string | null => {
+  if (competition.api.adapter !== "espn" || competition.api.league !== "fifa.world") {
+    return null;
+  }
+
+  const slug = fixture.season?.slug;
+
+  return slug ? TOURNAMENT_STAGE_LABELS[slug] ?? null : null;
 };
 
 export const adaptESPNFixture = (
@@ -84,6 +110,7 @@ export const adaptESPNFixture = (
     status: statusObject,
     competition: {
       name: competition.name,
+      stage: tournamentStageLabel(fixture, competition),
     },
     homeTeam: {
       name: homeTeam.team.name,

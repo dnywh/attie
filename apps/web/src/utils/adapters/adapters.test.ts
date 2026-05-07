@@ -52,6 +52,50 @@ describe("fixture adapters", () => {
     expect(fixture?.score.fullTime.away).toBe("1");
   });
 
+  it("normalises FIFA World Cup stages from ESPN fixtures", () => {
+    const fixture = adaptESPNFixture(
+      {
+        id: "760415",
+        date: "2026-07-04T19:00:00Z",
+        season: {
+          slug: "round-of-16",
+        },
+        competitions: [
+          {
+            status: {
+              type: {
+                name: "STATUS_SCHEDULED",
+                shortDetail: "Scheduled",
+              },
+            },
+            competitors: [
+              {
+                homeAway: "home",
+                score: "0",
+                team: {
+                  name: "Group A Winner",
+                },
+              },
+              {
+                homeAway: "away",
+                score: "0",
+                team: {
+                  name: "Group B Runner-up",
+                },
+              },
+            ],
+          },
+        ],
+      },
+      COMPETITIONS["fifa-world-cup"]
+    );
+
+    expect(fixture?.competition).toEqual({
+      name: "FIFA World Cup",
+      stage: "Round of 16",
+    });
+  });
+
   it("normalises football-data fixtures", () => {
     const fixture = adaptFootballDataFixture(
       {
