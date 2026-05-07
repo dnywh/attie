@@ -11,7 +11,7 @@ import { fetchFixtureWindow } from "@/hooks/fixtures/api";
 import { mergeFixtures } from "@/hooks/fixtures/merge";
 import {
   browserStorage,
-  defaultCompetitionForSport,
+  defaultCompetitionsForSport,
   normaliseInitialParams,
 } from "@/hooks/fixtures/params";
 import {
@@ -104,7 +104,7 @@ export function useFixtures(initialParams?: FixtureParams) {
       const storage = browserStorage();
       const newCompetitionsForSport = storage
         ? getStoredCompetitionsForSport(storage, newSport)
-        : [defaultCompetitionForSport(newSport)];
+        : defaultCompetitionsForSport(newSport);
 
       setLoading(true);
       setSelectedSport(newSport);

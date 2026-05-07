@@ -121,7 +121,7 @@ const competitionContextLabel = (
 ): string | null => {
   if (fixture.competition.stage) {
     return showCompetition
-      ? `${fixture.competition.name} - ${fixture.competition.stage}`
+      ? `${fixture.competition.name} · ${fixture.competition.stage}`
       : fixture.competition.stage;
   }
 

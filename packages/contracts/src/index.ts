@@ -23,6 +23,9 @@ export interface SportDefinition {
 }
 
 export const SPORTS = {
+  football: {
+    name: "Soccer",
+  },
   "american-football": {
     name: "American Football",
     localName: "Football",
@@ -35,9 +38,6 @@ export const SPORTS = {
   },
   basketball: {
     name: "Basketball",
-  },
-  football: {
-    name: "Football",
   },
   "rugby-league": {
     name: "Rugby League",
@@ -97,6 +97,16 @@ export const COMPETITIONS = {
       league: "3",
     },
   },
+  "fifa-world-cup": {
+    sport: "football",
+    name: "FIFA World Cup",
+    defaultForSport: true,
+    api: {
+      adapter: "espn",
+      sport: "soccer",
+      league: "fifa.world",
+    },
+  },
   "premier-league": {
     sport: "football",
     name: "Premier League",
@@ -114,15 +124,6 @@ export const COMPETITIONS = {
       adapter: "espn",
       sport: "soccer",
       league: "eng.fa",
-    },
-  },
-  "fifa-world-cup": {
-    sport: "football",
-    name: "FIFA World Cup",
-    api: {
-      adapter: "espn",
-      sport: "soccer",
-      league: "fifa.world",
     },
   },
   championship: {
@@ -360,7 +361,7 @@ export interface FixtureListResponse {
 
 export const DEFAULTS = {
   SPORT: "football",
-  COMPETITIONS: ["premier-league"],
+  COMPETITIONS: ["fifa-world-cup", "premier-league"],
   DIRECTION: "backwards",
   SOUND: false,
 } as const satisfies {
@@ -384,6 +385,15 @@ export const getDefaultCompetitionForSport = (
   (Object.entries(COMPETITIONS) as [CompetitionKey, CompetitionConfig][]).find(
     ([, competition]) => competition.sport === sport && competition.defaultForSport
   )?.[0];
+
+export const getDefaultCompetitionsForSport = (
+  sport: SportKey
+): CompetitionKey[] =>
+  (Object.entries(COMPETITIONS) as [CompetitionKey, CompetitionConfig][])
+    .filter(
+      ([, competition]) => competition.sport === sport && competition.defaultForSport
+    )
+    .map(([key]) => key);
 
 export const getCompetitionsForSport = (
   sport: SportKey

@@ -10,6 +10,10 @@ import {
 import type { SportConfig, SportKey } from "@/types/domain";
 
 export const SPORTS = {
+    'football': {
+        ...SHARED_SPORTS.football,
+        icon: FootballIcon,
+    },
     'american-football': {
         ...SHARED_SPORTS["american-football"],
         icon: AmericanFootballIcon,
@@ -25,10 +29,6 @@ export const SPORTS = {
     'basketball': {
         ...SHARED_SPORTS.basketball,
         icon: BasketballIcon,
-    },
-    'football': {
-        ...SHARED_SPORTS.football,
-        icon: FootballIcon,
     },
     'rugby-league': {
         ...SHARED_SPORTS["rugby-league"],

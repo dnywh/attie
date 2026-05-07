@@ -96,7 +96,7 @@ struct FixtureRow: View {
     private var competitionContext: String? {
         if let stage = fixture.competition.stage, !stage.isEmpty {
             return model.selectedCompetitions.count > 1
-                ? "\(fixture.competition.name) - \(stage)"
+                ? "\(fixture.competition.name) · \(stage)"
                 : stage
         }
 

@@ -29,11 +29,11 @@ public enum ApiDirection: String, Codable, CaseIterable, Sendable {
 }
 
 public enum SportKey: String, Codable, CaseIterable, Sendable {
+    case football
     case americanFootball = "american-football"
     case aussieRules = "aussie-rules"
     case baseball
     case basketball
-    case football
     case rugbyLeague = "rugby-league"
     case rugbyUnion = "rugby-union"
 }
@@ -41,9 +41,9 @@ public enum SportKey: String, Codable, CaseIterable, Sendable {
 public enum CompetitionKey: String, Codable, CaseIterable, Sendable {
     case afl
     case nrl
+    case fifaWorldCup = "fifa-world-cup"
     case premierLeague = "premier-league"
     case faCup = "fa-cup"
-    case fifaWorldCup = "fifa-world-cup"
     case championship
     case championsLeague = "champions-league"
     case europaLeague = "europa-league"

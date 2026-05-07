@@ -16,16 +16,18 @@ struct AttieCoreTests {
         #expect(response.fixtures.first?.score.fullTime.home == .number(2))
     }
 
-    @Test("catalog includes FIFA World Cup as a football competition")
+    @Test("catalog includes FIFA World Cup as the first default soccer competition")
     func catalogIncludesFIFAWorldCup() throws {
         let data = Data(#""fifa-world-cup""#.utf8)
         let competition = try JSONDecoder().decode(CompetitionKey.self, from: data)
 
         #expect(competition == .fifaWorldCup)
-        #expect(AttieCatalog.competitions(for: .football).contains(.fifaWorldCup))
+        #expect(AttieCatalog.sports[.football]?.name == "Soccer")
+        #expect(Array(AttieCatalog.competitions(for: .football).prefix(2)) == [.fifaWorldCup, .premierLeague])
         #expect(AttieCatalog.competitions[.fifaWorldCup]?.name == "FIFA World Cup")
-        #expect(AttieCatalog.competitions[.fifaWorldCup]?.isDefaultForSport == false)
-        #expect(AttieCatalog.defaultCompetition(for: .football) == .premierLeague)
+        #expect(AttieCatalog.competitions[.fifaWorldCup]?.isDefaultForSport == true)
+        #expect(AttieCatalog.defaultCompetition(for: .football) == .fifaWorldCup)
+        #expect(AttieCatalog.defaultCompetitions(for: .football) == [.fifaWorldCup, .premierLeague])
     }
 
     @Test("fixture competition decodes optional tournament stage")
@@ -78,6 +80,7 @@ struct AttieCoreTests {
 
         #expect(defaults.string(forKey: AttiePreferences.Key.sport) == "football")
         #expect(defaults.string(forKey: AttiePreferences.Key.direction) == "backwards")
+        #expect(preferences.competitions(for: .football) == [.fifaWorldCup, .premierLeague])
         #expect(preferences.competitions(for: .basketball) == [.nba])
     }
 
@@ -112,7 +115,7 @@ struct AttieCoreTests {
         )
 
         #expect(selection.selectedSport == .football)
-        #expect(selection.selectedCompetitions == [.premierLeague])
+        #expect(selection.selectedCompetitions == [.fifaWorldCup, .premierLeague])
         #expect(selection.selectedDirection == .backwards)
     }
 
