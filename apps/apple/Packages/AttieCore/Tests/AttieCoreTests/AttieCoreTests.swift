@@ -130,11 +130,34 @@ struct AttieCoreTests {
         #expect(!state.isScoreRevealed(fixtureID: "fixture-b", sideID: "home"))
     }
 
+    @Test("live fixtures allow score reveal in both directions")
+    func liveFixturesAllowScoreRevealInBothDirections() {
+        let liveFixture = fixture(
+            id: "live",
+            date: "2026-05-01T10:00:00Z",
+            status: "LIVE"
+        )
+        let scheduledFixture = fixture(
+            id: "scheduled",
+            date: "2026-05-01T14:00:00Z",
+            status: "SCHEDULED"
+        )
+
+        #expect(allowsScoreReveal(fixture: liveFixture, direction: .forwards))
+        #expect(allowsScoreReveal(fixture: liveFixture, direction: .backwards))
+        #expect(!allowsScoreReveal(fixture: scheduledFixture, direction: .forwards))
+        #expect(allowsScoreReveal(fixture: scheduledFixture, direction: .backwards))
+    }
+
     private func fixture(id: String, date: String) -> CommonFixture {
+        fixture(id: id, date: date, status: "FINISHED")
+    }
+
+    private func fixture(id: String, date: String, status: String) -> CommonFixture {
         CommonFixture(
             id: id,
             utcDate: date,
-            status: StatusObject(type: "FINISHED", detail: "Full-time"),
+            status: StatusObject(type: status, detail: "Full-time"),
             competition: FixtureCompetition(name: "Premier League"),
             homeTeam: FixtureTeam(name: "Home", shortName: "HOM", crest: ""),
             awayTeam: FixtureTeam(name: "Away", shortName: "AWY", crest: ""),

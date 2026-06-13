@@ -24,7 +24,10 @@ struct WatchFixturesView: View {
                         WatchFixtureRow(
                             fixture: fixture,
                             showsCompetition: model.selectedCompetitions.count > 1,
-                            allowsScoreReveal: model.selectedDirection == .backwards,
+                            allowsScoreReveal: allowsScoreReveal(
+                                fixture: fixture,
+                                direction: model.selectedDirection
+                            ),
                             isHomeScoreVisible: model.isFixtureScoreVisible(fixture.id, side: .home),
                             isAwayScoreVisible: model.isFixtureScoreVisible(fixture.id, side: .away)
                         ) {

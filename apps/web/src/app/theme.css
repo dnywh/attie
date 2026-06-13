@@ -39,7 +39,7 @@
     --color-text-page: #F7F3E7;
     --color-text-heading: #FFFFFF;
     --color-text-tertiary: rgb(92, 92, 92);
-    --color-text-live: #FF5A5A;
+    --color-text-live: rgb(230, 0, 0);
     --color-shadow: rgba(0, 0, 0, 0.28);
   }
 }

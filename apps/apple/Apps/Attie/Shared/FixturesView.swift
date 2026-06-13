@@ -67,9 +67,7 @@ struct FixturesView: View {
         }
         .pickerStyle(.segmented)
 
-        if model.selectedDirection == .backwards {
-            Toggle("Show all scores", isOn: $model.showAllScores)
-        }
+        Toggle("Show all scores", isOn: $model.showAllScores)
     }
 
     private var selectedCompetitionSummary: String {

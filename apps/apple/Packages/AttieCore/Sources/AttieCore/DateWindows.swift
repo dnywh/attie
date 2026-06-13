@@ -66,6 +66,7 @@ public enum FixtureWindows {
         let formatter = DateFormatter()
 
         formatter.calendar = calendar
+        formatter.timeZone = calendar.timeZone
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "yyyy-MM-dd"
 

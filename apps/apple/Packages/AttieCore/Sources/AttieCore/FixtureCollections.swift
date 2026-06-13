@@ -39,6 +39,17 @@ public func sortedFixtures(
     }
 }
 
+public func isLiveFixture(_ fixture: CommonFixture) -> Bool {
+    fixture.status.type == "LIVE"
+}
+
+public func allowsScoreReveal(
+    fixture: CommonFixture,
+    direction: Direction
+) -> Bool {
+    direction == .backwards || isLiveFixture(fixture)
+}
+
 public func mergeFixtures(
     existingFixtures: [CommonFixture],
     incomingFixtures: [CommonFixture],

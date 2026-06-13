@@ -67,7 +67,7 @@ struct FixtureRow: View {
 
             Spacer()
 
-            if model.selectedDirection == .backwards {
+            if allowsScoreReveal(fixture: fixture, direction: model.selectedDirection) {
                 ScoreBubble(
                     score: score,
                     isVisible: model.isScoreVisible(fixtureID: fixture.id, side: side)

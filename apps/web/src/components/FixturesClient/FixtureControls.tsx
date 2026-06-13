@@ -117,41 +117,39 @@ function FixtureControls({
         </SelectionExplainerText>
       </FancyDropdown>
 
-      {selectedDirection === "backwards" && (
-        <FancyDropdown
-          icon={showAllScores ? <ScoresRevealedIcon /> : <ScoresHiddenIcon />}
-        >
-          <Fieldset>
-            <HeadingBanner as={Legend}>Score visibility</HeadingBanner>
-            <RadioGroup
-              value={showAllScores}
-              onChange={onScoreVisibilityChange}
-              aria-label="Score visibility"
-            >
-              <FieldRadioRow value={false}>Hide all scores</FieldRadioRow>
-              <FieldRadioRow value={true}>Show all scores</FieldRadioRow>
-            </RadioGroup>
-          </Fieldset>
+      <FancyDropdown
+        icon={showAllScores ? <ScoresRevealedIcon /> : <ScoresHiddenIcon />}
+      >
+        <Fieldset>
+          <HeadingBanner as={Legend}>Score visibility</HeadingBanner>
+          <RadioGroup
+            value={showAllScores}
+            onChange={onScoreVisibilityChange}
+            aria-label="Score visibility"
+          >
+            <FieldRadioRow value={false}>Hide all scores</FieldRadioRow>
+            <FieldRadioRow value={true}>Show all scores</FieldRadioRow>
+          </RadioGroup>
+        </Fieldset>
 
-          <Fieldset>
-            <HeadingBanner as={Legend}>Sound effects</HeadingBanner>
-            <RadioGroup
-              value={useSoundEffects}
-              onChange={onSoundEffectsChange}
-              aria-label="Sound effects"
-              disabled={showAllScores}
-            >
-              <FieldRadioRow value={true}>Sound on</FieldRadioRow>
-              <FieldRadioRow value={false}>Sound off</FieldRadioRow>
-            </RadioGroup>
-          </Fieldset>
-          <SelectionExplainerText>
-            {showAllScores
-              ? "Reveals all scores, just like any other sports results app. Boring!"
-              : "Hides all scores. Tap the black circles to reveal individual scores."}
-          </SelectionExplainerText>
-        </FancyDropdown>
-      )}
+        <Fieldset>
+          <HeadingBanner as={Legend}>Sound effects</HeadingBanner>
+          <RadioGroup
+            value={useSoundEffects}
+            onChange={onSoundEffectsChange}
+            aria-label="Sound effects"
+            disabled={showAllScores}
+          >
+            <FieldRadioRow value={true}>Sound on</FieldRadioRow>
+            <FieldRadioRow value={false}>Sound off</FieldRadioRow>
+          </RadioGroup>
+        </Fieldset>
+        <SelectionExplainerText>
+          {showAllScores
+            ? "Reveals all scores, just like any other sports results app. Boring!"
+            : "Hides all scores. Tap the black circles to reveal individual scores."}
+        </SelectionExplainerText>
+      </FancyDropdown>
 
       <FancyDropdown
         icon={
@@ -175,7 +173,7 @@ function FixtureControls({
         </Fieldset>
         <SelectionExplainerText>
           {selectedDirection === "forwards"
-            ? "Shows upcoming fixtures, from today into the future."
+            ? "Shows live or upcoming fixtures, from today into the future."
             : "Shows in-progress or finished fixtures, from today back."}
         </SelectionExplainerText>
       </FancyDropdown>

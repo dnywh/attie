@@ -1,8 +1,8 @@
 # Attie
 
-The anti-scores scores app, live at [attie.app](https://www.attie.app). Built on [Next.js](https://nextjs.org).
+The anti-scores scores app, live at [attie.app](https://www.attie.app).
 
-## Getting Started
+## Repository layout
 
 This repo is a small monorepo:
 
@@ -14,6 +14,11 @@ This repo is a small monorepo:
 This project uses `npm` and is pinned to Node 24 LTS. If you use a Node version
 manager, it should pick up `.node-version` automatically.
 
+## Web app
+
+The web app lives in `apps/web`. It is built with [Next.js](https://nextjs.org)
+and includes the Attie API facade used by the native app.
+
 ```bash
 npm install
 npm run dev
@@ -21,20 +26,34 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-For the Apple package:
+Useful web checks from the repo root:
+
+```bash
+npm run lint
+npm run typecheck
+npm run test:web
+npm run build
+```
+
+## Apple apps
+
+The native iOS, macOS, and watchOS sources live in `apps/apple`. See
+[`apps/apple/README.md`](apps/apple/README.md) for Xcode setup and device
+installation notes.
 
 ```bash
 swift test --package-path apps/apple/Packages/AttieCore
 ```
 
-Open `apps/apple/Attie.xcworkspace` in Xcode to work with the native sources.
+Open `apps/apple/Attie.xcworkspace` in Xcode to work with the Swift package and
+native app targets.
 
 ## Maintenance
 
 Use `npm audit`; `package-lock.json` is the source of truth for installed
 dependency versions.
 
-Useful local checks:
+Useful full-repo checks:
 
 ```bash
 npm run lint
