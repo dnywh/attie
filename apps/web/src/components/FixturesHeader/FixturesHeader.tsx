@@ -1,5 +1,8 @@
 import { siteConfig } from "@/config/site";
 import { styled, keyframes } from "next-yak";
+import { webTheme } from "@/styles/theme.yak";
+import FixturesHeaderRefreshButton from "./FixturesHeaderRefreshButton";
+import FixturesHeaderRefreshStatus from "./FixturesHeaderRefreshStatus";
 
 const scrollFade = keyframes`
   from {
@@ -21,6 +24,7 @@ const Header = styled.header`
   font-style: italic;
   text-align: center;
   text-transform: lowercase;
+  user-select: none;
 
   & h1 {
     -webkit-text-stroke: 5px black;
@@ -62,13 +66,73 @@ const Header = styled.header`
   }
 `;
 
+const Wordmark = styled.div`
+  display: inline-block;
+  opacity: 1;
+  position: relative;
+  transition:
+    opacity 160ms ease,
+    transform 240ms ${webTheme.curves.spring.heavy};
+
+  & h1 {
+    transition: color 120ms ease;
+  }
+
+  &:hover {
+    opacity: 0.9;
+    transform: scale(0.975);
+
+    & h1 {
+      color: ${webTheme.colors.background.focus.hover};
+    }
+  }
+
+  &:active {
+    transform: scale(0.9);
+  }
+
+  &:has(button:focus-visible) {
+    outline: 3px solid currentColor;
+    outline-offset: 0.25rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &:hover,
+    &:active {
+      transform: none;
+    }
+  }
+`;
+
+const Byline = styled.div`
+  min-height: 1.275rem;
+  position: relative;
+
+  & .default-byline {
+    transition: opacity 160ms ease;
+  }
+
+  &[data-header-refresh-status="refreshing"] .default-byline,
+  &[data-header-refresh-status="done"] .default-byline {
+    opacity: 0;
+  }
+`;
+
 function FixturesHeader() {
   return (
     <Header>
-      <h1>
-        Atti<span>e</span>
-      </h1>
-      <p>{siteConfig.byline}</p>
+      <Wordmark>
+        <h1>
+          Atti<span>e</span>
+        </h1>
+        <FixturesHeaderRefreshButton />
+      </Wordmark>
+      <Byline data-header-refresh-status="idle">
+        <p className="default-byline">{siteConfig.byline}</p>
+        <FixturesHeaderRefreshStatus />
+      </Byline>
     </Header>
   );
 }

@@ -209,4 +209,30 @@ describe("fixture adapters", () => {
     expect(fixture.status.type).toBe(FIXTURE_STATUS.FINISHED);
     expect(fixture.score.fullTime.away).toBe(21);
   });
+
+  it("normalises NFL live fixtures", () => {
+    const fixture = adaptNFLFixture(
+      {
+        id: 10,
+        date: "2026-05-01",
+        status: "In Progress",
+        home_team: {
+          full_name: "Home Football",
+          name: "Home",
+          abbreviation: "HOM",
+        },
+        visitor_team: {
+          full_name: "Away Football",
+          name: "Away",
+          abbreviation: "AWY",
+        },
+        home_team_score: 7,
+        visitor_team_score: 3,
+      },
+      COMPETITIONS.nfl
+    );
+
+    expect(fixture.status.type).toBe(FIXTURE_STATUS.LIVE);
+    expect(fixture.score.fullTime.home).toBe(7);
+  });
 });

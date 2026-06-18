@@ -122,7 +122,9 @@ export const fetchFixtureBatchForDateRange = async (
     direction: direction === "forwards" ? "future" : "past",
     cursor: options.cursor,
   });
-  const response = await (options.fetcher ?? fetch)(url);
+  const response = await (options.fetcher ?? fetch)(url, {
+    cache: "no-store",
+  });
 
   if (!response.ok) {
     throw new Error(

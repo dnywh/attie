@@ -18,6 +18,12 @@ interface BallDontLieTeam {
 }
 
 const STATUS_MAP: Record<string, string> = {
+  "1st Quarter": FIXTURE_STATUS.LIVE,
+  "2nd Quarter": FIXTURE_STATUS.LIVE,
+  Halftime: FIXTURE_STATUS.LIVE,
+  "3rd Quarter": FIXTURE_STATUS.LIVE,
+  "4th Quarter": FIXTURE_STATUS.LIVE,
+  "In Progress": FIXTURE_STATUS.LIVE,
   Final: FIXTURE_STATUS.FINISHED,
 };
 

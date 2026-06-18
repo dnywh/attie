@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import FancyDropdown from "@/components/FancyDropdown";
 import FixturesBackwardIcon from "@/components/FixturesBackwardIcon";
@@ -9,6 +9,7 @@ import ScoresHiddenIcon from "@/components/ScoresHiddenIcon";
 import SelectionExplainerText from "@/components/SelectionExplainerText";
 import { SPORTS } from "@/config/sportConfig";
 import { STORAGE_KEYS, readStoredSoundPreference } from "@/utils/preferences";
+import { onFixtureRefresh } from "@/utils/fixtureRefreshEvents";
 import { useFixtures } from "@/hooks/useFixtures";
 import type { FixtureParams } from "@/hooks/useFixtures";
 import type { Direction, SportKey } from "@/types/domain";
@@ -47,6 +48,7 @@ export default function FixturesClient({
     fixtures,
     loading,
     loadingMore,
+    refreshing,
     hasReachedEnd,
     hasRateLimitError,
     selectedDirection,
@@ -56,6 +58,7 @@ export default function FixturesClient({
     setSelectedDirection,
     handleCompetitionChange,
     handleLoadMore,
+    refreshFixtures,
   } = useFixtures(params);
   const selectedSportIcon = sportIcon(selectedSport);
 
@@ -66,6 +69,14 @@ export default function FixturesClient({
     selectedDirection,
     selectedSport,
   });
+
+  useEffect(() => {
+    if (!isClient) {
+      return;
+    }
+
+    return onFixtureRefresh(refreshFixtures);
+  }, [isClient, refreshFixtures]);
 
   const handleSoundEffectsChange = (newValue: boolean) => {
     setUseSoundEffects(newValue);
@@ -127,7 +138,7 @@ export default function FixturesClient({
         hasRateLimitError={hasRateLimitError}
         hasReachedEnd={hasReachedEnd}
         loading={loading}
-        loadingMore={loadingMore}
+        loadingMore={loadingMore || refreshing}
         selectedCompetitions={selectedCompetitions}
         selectedDirection={selectedDirection}
         showAllScores={showAllScores}

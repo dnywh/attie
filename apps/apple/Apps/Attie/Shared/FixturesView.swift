@@ -32,6 +32,9 @@ struct FixturesView: View {
             .task {
                 await model.loadInitialFixtures()
             }
+            .refreshable {
+                await model.loadInitialFixtures()
+            }
         }
     }
 

@@ -85,6 +85,8 @@ describe("route parameter validation", () => {
     );
 
     expect(espnResponse.status).toBe(400);
+    expect(espnResponse.headers.get("Cache-Control")).toBe("no-store");
     expect(nbaResponse.status).toBe(400);
+    expect(nbaResponse.headers.get("Cache-Control")).toBe("no-store");
   });
 });

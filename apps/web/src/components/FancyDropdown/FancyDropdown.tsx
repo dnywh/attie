@@ -71,17 +71,16 @@ const StyledButton = styled.button<{ $fillSpace: boolean }>`
   overflow: hidden;
   padding: 0 2rem 0 0.5rem;
   position: relative;
-  transition: transform 150ms ${webTheme.curves.spring.light};
+  transition: background-color 120ms ease;
   ${({ $fillSpace }) => ($fillSpace ? fillButtonStyles : fixedButtonStyles)}
 
   &:hover {
-    transform: translateY(-1.5px) scale(1.005);
+    background-color: ${webTheme.colors.background.focus.hover};
   }
 
+  &:focus-visible,
   &:active {
-    @media (pointer: coarse) {
-      transform: translateY(0) scale(0.965);
-    }
+    background-color: ${webTheme.colors.background.focus.active};
   }
 `;
 

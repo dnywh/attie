@@ -58,6 +58,7 @@ export function useFixtures(initialParams?: FixtureParams) {
   const [fixtures, setFixturesState] = useState<CommonFixture[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [hasReachedEnd, setHasReachedEnd] = useState(false);
   const [hasRateLimitError, setHasRateLimitError] = useState(false);
   const fixturesRef = useRef<CommonFixture[]>([]);
@@ -65,6 +66,8 @@ export function useFixtures(initialParams?: FixtureParams) {
     initialFixtureWindow(initialPreferences.direction)
   );
   const loadAttemptsRef = useRef(0);
+  const refreshInFlightRef = useRef(false);
+  const fixtureRequestIdRef = useRef(0);
 
   const setFixtures = useCallback((nextFixtures: FixtureStateUpdater) => {
     const resolvedFixtures =
@@ -90,11 +93,11 @@ export function useFixtures(initialParams?: FixtureParams) {
         selectedDirection
       );
 
-      if (merged.addedCount > 0) {
+      if (merged.changedCount > 0) {
         setFixtures(merged.fixtures);
       }
 
-      return merged.addedCount;
+      return merged.changedCount;
     },
     [selectedDirection, setFixtures]
   );
@@ -107,6 +110,7 @@ export function useFixtures(initialParams?: FixtureParams) {
         : defaultCompetitionsForSport(newSport);
 
       setLoading(true);
+      fixtureRequestIdRef.current += 1;
       setSelectedSport(newSport);
       storage?.setItem(STORAGE_KEYS.sport, newSport);
       selectedCompetitionsRef.current = newCompetitionsForSport;
@@ -129,6 +133,23 @@ export function useFixtures(initialParams?: FixtureParams) {
     ]
   );
 
+  const handleDirectionChange = useCallback(
+    (newDirection: Direction) => {
+      setLoading(true);
+      fixtureRequestIdRef.current += 1;
+      setSelectedDirection(newDirection);
+      setFixtures([]);
+      dateWindowRef.current = initialFixtureWindow(newDirection);
+      resetPagingState();
+    },
+    [
+      resetPagingState,
+      setFixtures,
+      setLoading,
+      setSelectedDirection,
+    ]
+  );
+
   useEffect(() => {
     const storage = browserStorage();
 
@@ -145,6 +166,7 @@ export function useFixtures(initialParams?: FixtureParams) {
       }
 
       setLoadingMore(true);
+      const requestId = fixtureRequestIdRef.current;
 
       try {
         let nextWindow = currentWindow;
@@ -160,6 +182,11 @@ export function useFixtures(initialParams?: FixtureParams) {
             candidateWindow,
             selectedDirection
           );
+
+          if (requestId !== fixtureRequestIdRef.current) {
+            return;
+          }
+
           const addedCount = appendFixtures(fetchedFixtures);
 
           dateWindowRef.current = candidateWindow;
@@ -180,7 +207,9 @@ export function useFixtures(initialParams?: FixtureParams) {
           console.error("[Load More] Error:", error);
         }
       } finally {
-        setLoadingMore(false);
+        if (requestId === fixtureRequestIdRef.current) {
+          setLoadingMore(false);
+        }
       }
     },
     [
@@ -197,6 +226,9 @@ export function useFixtures(initialParams?: FixtureParams) {
     setLoading(true);
     setFixtures([]);
     resetPagingState();
+    const requestId = fixtureRequestIdRef.current + 1;
+
+    fixtureRequestIdRef.current = requestId;
 
     try {
       const initialWindow = initialFixtureWindow(selectedDirection);
@@ -209,6 +241,10 @@ export function useFixtures(initialParams?: FixtureParams) {
         selectedDirection
       );
 
+      if (requestId !== fixtureRequestIdRef.current) {
+        return;
+      }
+
       if (fetchedFixtures.length === 0) {
         await handleLoadMore(initialWindow);
       } else {
@@ -217,13 +253,19 @@ export function useFixtures(initialParams?: FixtureParams) {
         );
       }
     } catch (error) {
+      if (requestId !== fixtureRequestIdRef.current) {
+        return;
+      }
+
       if (isRateLimitError(error)) {
         setHasRateLimitError(true);
       } else {
         console.error("[Initial Load] Error:", error);
       }
     } finally {
-      setLoading(false);
+      if (requestId === fixtureRequestIdRef.current) {
+        setLoading(false);
+      }
     }
   }, [
     handleLoadMore,
@@ -233,6 +275,51 @@ export function useFixtures(initialParams?: FixtureParams) {
     setFixtures,
     setHasRateLimitError,
     setLoading,
+  ]);
+
+  const refreshFixtures = useCallback(async () => {
+    if (!selectedCompetitions.length || refreshInFlightRef.current) {
+      return;
+    }
+
+    refreshInFlightRef.current = true;
+    setRefreshing(true);
+    setHasRateLimitError(false);
+
+    try {
+      const initialWindow = initialFixtureWindow(selectedDirection);
+      const fetchedFixtures = await fetchFixtureWindow(
+        selectedCompetitions,
+        initialWindow,
+        selectedDirection
+      );
+      const merged = mergeFixtures(
+        fixturesRef.current,
+        fetchedFixtures,
+        selectedDirection
+      );
+
+      dateWindowRef.current = initialWindow;
+
+      if (merged.changedCount > 0) {
+        setFixtures(merged.fixtures);
+      }
+    } catch (error) {
+      if (isRateLimitError(error)) {
+        setHasRateLimitError(true);
+      } else {
+        console.error("[Refresh] Error:", error);
+      }
+    } finally {
+      refreshInFlightRef.current = false;
+      setRefreshing(false);
+    }
+  }, [
+    selectedCompetitions,
+    selectedDirection,
+    setFixtures,
+    setHasRateLimitError,
+    setRefreshing,
   ]);
 
   const hasSelectedCompetitions = selectedCompetitions.length > 0;
@@ -314,14 +401,16 @@ export function useFixtures(initialParams?: FixtureParams) {
     fixtures,
     loading,
     loadingMore,
+    refreshing,
     hasReachedEnd,
     hasRateLimitError,
     selectedDirection,
     selectedSport,
     selectedCompetitions,
-    setSelectedDirection,
+    setSelectedDirection: handleDirectionChange,
     setSelectedSport: handleSportChange,
     handleCompetitionChange,
     handleLoadMore,
+    refreshFixtures,
   };
 }

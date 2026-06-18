@@ -25,6 +25,30 @@
 		1D03A0022C00000100000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1D03B0022C00000100000001 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		1D02F0122C00000100000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1D01F0052C00000100000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1D02F0012C00000100000001;
+			remoteInfo = AttieWatch;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		1D02C0022C00000100000001 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				1D02A0082C00000100000001 /* AttieWatch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		1D01B0012C00000100000001 /* AttieApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttieApp.swift; sourceTree = "<group>"; };
 		1D01B0032C00000100000001 /* FixtureRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixtureRow.swift; sourceTree = "<group>"; };
@@ -114,16 +138,6 @@
 		};
 /* End PBXGroup section */
 
-/* Begin PBXContainerItemProxy section */
-		1D02F0122C00000100000001 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 1D01F0052C00000100000001 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 1D02F0012C00000100000001;
-			remoteInfo = AttieWatch;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXNativeTarget section */
 		1D01F0012C00000100000001 /* Attie */ = {
 			isa = PBXNativeTarget;
@@ -175,7 +189,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 2640;
-				LastUpgradeCheck = 2640;
+				LastUpgradeCheck = 2650;
 				TargetAttributes = {
 					1D01F0012C00000100000001 = {
 						CreatedOnToolsVersion = 26.4.1;
@@ -208,20 +222,6 @@
 		};
 /* End PBXProject section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		1D02C0022C00000100000001 /* Embed Watch Content */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
-			dstSubfolderSpec = 16;
-			files = (
-				1D02A0082C00000100000001 /* AttieWatch.app in Embed Watch Content */,
-			);
-			name = "Embed Watch Content";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXResourcesBuildPhase section */
 		1D01F0042C00000100000001 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
@@ -245,9 +245,9 @@
 		1D01F0032C00000100000001 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
-				files = (
-					1D01A0012C00000100000001 /* AttieApp.swift in Sources */,
-					1D01A0032C00000100000001 /* FixtureRow.swift in Sources */,
+			files = (
+				1D01A0012C00000100000001 /* AttieApp.swift in Sources */,
+				1D01A0032C00000100000001 /* FixtureRow.swift in Sources */,
 				1D01A0042C00000100000001 /* FixturesView.swift in Sources */,
 				1D01A0052C00000100000001 /* FixturesViewModel.swift in Sources */,
 				1D01A0062C00000100000001 /* ScoreBubble.swift in Sources */,
@@ -280,10 +280,11 @@
 /* Begin XCBuildConfiguration section */
 		1D01F0072C00000100000001 /* Debug */ = {
 			isa = XCBuildConfiguration;
-				buildSettings = {
-					ALWAYS_SEARCH_USER_PATHS = NO;
-					ATTIE_IOS_BUNDLE_IDENTIFIER = net.dannywhite.attie;
-					CLANG_ANALYZER_NONNULL = YES;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ATTIE_IOS_BUNDLE_IDENTIFIER = net.dannywhite.attie;
+				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CLANG_ENABLE_MODULES = YES;
@@ -313,6 +314,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = RQFKDUDCNX;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -336,6 +338,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -343,10 +346,11 @@
 		};
 		1D01F0082C00000100000001 /* Release */ = {
 			isa = XCBuildConfiguration;
-				buildSettings = {
-					ALWAYS_SEARCH_USER_PATHS = NO;
-					ATTIE_IOS_BUNDLE_IDENTIFIER = net.dannywhite.attie;
-					CLANG_ANALYZER_NONNULL = YES;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ATTIE_IOS_BUNDLE_IDENTIFIER = net.dannywhite.attie;
+				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CLANG_ENABLE_MODULES = YES;
@@ -376,6 +380,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = RQFKDUDCNX;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -392,6 +397,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -404,7 +410,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
-				DEVELOPMENT_TEAM = RQFKDUDCNX;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Attie;
@@ -418,6 +423,7 @@
 				);
 				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(ATTIE_IOS_BUNDLE_IDENTIFIER)";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = net.dannywhite.attie.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -435,7 +441,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
-				DEVELOPMENT_TEAM = RQFKDUDCNX;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Attie;
@@ -449,6 +454,7 @@
 				);
 				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(ATTIE_IOS_BUNDLE_IDENTIFIER)";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = net.dannywhite.attie.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -465,18 +471,19 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
-				DEVELOPMENT_TEAM = RQFKDUDCNX;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Attie;
 				INFOPLIST_KEY_WKApplication = YES;
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "$(ATTIE_IOS_BUNDLE_IDENTIFIER)";
+				"INFOPLIST_KEY_WKCompanionAppBundleIdentifier[sdk=watchos*]" = net.dannywhite.attie.dev;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(ATTIE_IOS_BUNDLE_IDENTIFIER).watchkitapp";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=watchos*]" = net.dannywhite.attie.dev.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SUPPORTED_PLATFORMS = "watchos watchsimulator";
@@ -493,18 +500,19 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
-				DEVELOPMENT_TEAM = RQFKDUDCNX;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Attie;
 				INFOPLIST_KEY_WKApplication = YES;
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "$(ATTIE_IOS_BUNDLE_IDENTIFIER)";
+				"INFOPLIST_KEY_WKCompanionAppBundleIdentifier[sdk=watchos*]" = net.dannywhite.attie.dev;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(ATTIE_IOS_BUNDLE_IDENTIFIER).watchkitapp";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=watchos*]" = net.dannywhite.attie.dev.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SUPPORTED_PLATFORMS = "watchos watchsimulator";

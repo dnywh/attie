@@ -6,7 +6,7 @@ The reusable product logic lives in `Packages/AttieCore`. The app sources under
 `Apps/` are intentionally native SwiftUI and are organised so Xcode app targets
 can share the same screens while adapting navigation and density per platform.
 
-## Local Checks
+## Local checks
 
 ```sh
 swift test --package-path apps/apple/Packages/AttieCore
@@ -37,3 +37,55 @@ the reusable package target is `AttieCore`.
 
 For a personal Apple Developer account, the installed development build may
 expire and need to be re-run from Xcode periodically.
+
+## Recover an expired iPhone build
+
+If the installed development build has expired, run the `Attie` scheme again
+from Xcode. The scheme embeds `AttieWatch`, so a phone build can still fail while
+signing the watch target.
+
+1. Open `apps/apple/Attie.xcworkspace`, not the `.xcodeproj`.
+2. Select **Attie > Danny's iPhone** in the toolbar.
+3. In **Signing & Capabilities**, check both targets:
+   - `Attie`: `net.dannywhite.attie.dev`
+   - `AttieWatch`: `net.dannywhite.attie.dev.watchkitapp`
+4. In **Build Settings** for `AttieWatch`, check that
+   `WKCompanionAppBundleIdentifier` resolves to `net.dannywhite.attie.dev`.
+5. Press **Run**.
+
+If `AttieWatch` still fails to sign, delete Xcode's stale managed profiles and
+let it recreate them:
+
+```sh
+rm -rf ~/Library/MobileDevice/Provisioning\ Profiles
+```
+
+Then reopen Xcode and run the `Attie` scheme again.
+
+To inspect Xcode's resolved identifiers:
+
+```sh
+xcodebuild -showBuildSettings \
+  -workspace apps/apple/Attie.xcworkspace \
+  -scheme AttieWatch \
+  -configuration Debug \
+  -destination 'generic/platform=watchOS' \
+  | rg 'TARGET_NAME|PRODUCT_BUNDLE_IDENTIFIER|ATTIE_IOS_BUNDLE_IDENTIFIER|DEVELOPMENT_TEAM|INFOPLIST_KEY_WKCompanion'
+```
+
+## Xcode recommended settings
+
+Xcode may ask to update the project to its recommended settings. These changes
+are expected:
+
+- **Asset catalog enable generated asset symbol extensions**: sets
+  `ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES`.
+- **Build settings inherit development team from project settings**: moves
+  `DEVELOPMENT_TEAM` from individual targets to the project build settings.
+- **Localisation string catalog symbol generation**: sets
+  `STRING_CATALOG_GENERATE_SYMBOLS = YES`.
+
+The `Watch7,18` asset-catalog error usually means the installed Xcode does not
+recognise the paired Apple Watch model or watchOS version. Update Xcode, reopen
+the workspace, reconnect the phone, and wait for Xcode to finish preparing
+device support before running again.
