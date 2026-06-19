@@ -1,4 +1,5 @@
 import { FIXTURE_STATUS } from "@/constants/fixtureStatus";
+import { fixtureInstantMs } from "@/utils/fixtureTime";
 import type { CommonFixture, Direction } from "@/types/domain";
 
 export const isLiveFixture = (
@@ -14,7 +15,17 @@ export const isFixtureVisibleForDirection = (
     return true;
   }
 
-  const fixtureDate = new Date(fixture.utcDate);
+  const statusType = fixture.status.type;
+  const fixtureTime = fixtureInstantMs(fixture);
+  const nowTime = now.getTime();
 
-  return direction === "forwards" ? fixtureDate >= now : fixtureDate <= now;
+  if (statusType === FIXTURE_STATUS.SCHEDULED) {
+    return direction === "forwards" && fixtureTime >= nowTime;
+  }
+
+  if (statusType === FIXTURE_STATUS.FINISHED) {
+    return direction === "backwards" && fixtureTime <= nowTime;
+  }
+
+  return direction === "backwards" && fixtureTime <= nowTime;
 };

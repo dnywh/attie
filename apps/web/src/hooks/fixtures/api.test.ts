@@ -64,10 +64,37 @@ describe("fixture API helpers", () => {
 
     expect(fetcher).toHaveBeenCalledTimes(2);
     expect(fetcher.mock.calls[0][0]).toBe(
-      "/api/mlb?dateFrom=2026-04-30&dateTo=2026-05-01&direction=past"
+      "/api/mlb?dateFrom=2026-04-29&dateTo=2026-05-02&direction=past"
     );
     expect(fetcher.mock.calls[1][0]).toBe(
-      "/api/mlb?dateFrom=2026-04-30&dateTo=2026-05-01&direction=past&cursor=456"
+      "/api/mlb?dateFrom=2026-04-29&dateTo=2026-05-02&direction=past&cursor=456"
+    );
+  });
+
+  it("pads provider date windows before adapter-specific date handling", async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
+      Response.json({
+        events: [],
+        meta: {
+          next_cursor: null,
+          per_page: null,
+          has_more: false,
+        },
+      })
+    );
+
+    await fetchFixtureWindow(
+      ["premier-league"],
+      { fromOffset: 0, toOffset: 28 },
+      "forwards",
+      {
+        fetcher,
+        today: new Date(2026, 4, 1, 12),
+      }
+    );
+
+    expect(fetcher.mock.calls[0][0]).toContain(
+      "/api/espn?dateFrom=2026-04-30&dateTo=2026-05-31&direction=future&sport=soccer&league=eng.1"
     );
   });
 });

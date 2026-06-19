@@ -68,6 +68,21 @@ describe("fixture visibility", () => {
     ).toBe(true);
   });
 
+  it("does not show scheduled past fixtures in either direction", () => {
+    const scheduledPast = fixture(
+      "scheduled-past",
+      "2026-05-01T10:00:00Z",
+      FIXTURE_STATUS.SCHEDULED
+    );
+
+    expect(
+      isFixtureVisibleForDirection(scheduledPast, "forwards", now)
+    ).toBe(false);
+    expect(
+      isFixtureVisibleForDirection(scheduledPast, "backwards", now)
+    ).toBe(false);
+  });
+
   it("shows live and finished past fixtures in the backwards direction", () => {
     expect(
       isFixtureVisibleForDirection(

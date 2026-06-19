@@ -1,5 +1,6 @@
 import { COMPETITIONS } from "@/constants/competitions";
 import { ADAPTER_BASE_PATHS, adaptFixture } from "@/utils/adapters";
+import { addDaysToDateString, padDateRange } from "@/utils/fixtureTime";
 import { dateRangeForAdapter } from "./windows";
 import type {
   CommonFixture,
@@ -86,13 +87,9 @@ export const adaptFixturePayload = (
   meta: parseFixtureMeta(data.meta),
 });
 
-const addDaysToDateString = (dateString: string, days: number): string => {
-  const [year, month, day] = dateString.split("-").map(Number);
-  const date = new Date(Date.UTC(year, month - 1, day));
-
-  date.setUTCDate(date.getUTCDate() + days);
-
-  return date.toISOString().slice(0, 10);
+const PROVIDER_DATE_PADDING = {
+  before: 1,
+  after: 1,
 };
 
 const dateRangeForAdapterDateRange = (
@@ -116,7 +113,11 @@ export const fetchFixtureBatchForDateRange = async (
   } = {}
 ): Promise<FixtureBatch> => {
   const competition = COMPETITIONS[competitionKey];
-  const dateRange = dateRangeForAdapterDateRange(range, competition.api.adapter);
+  const paddedRange = padDateRange(range, PROVIDER_DATE_PADDING);
+  const dateRange = dateRangeForAdapterDateRange(
+    paddedRange,
+    competition.api.adapter
+  );
   const url = buildFixtureApiUrl(competition, {
     ...dateRange,
     direction: direction === "forwards" ? "future" : "past",

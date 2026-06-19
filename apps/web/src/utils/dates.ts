@@ -1,4 +1,9 @@
 import type { CommonFixture, Direction, FixtureWithLocalDate } from "@/types/domain";
+import {
+    addDaysToDateString,
+    fixtureInstantMs,
+    localDayKey,
+} from "@/utils/fixtureTime";
 
 /**
  * Format a date for display with relative terms (Today, Yesterday, etc.)
@@ -8,14 +13,8 @@ export const formatDateForDisplay = (date: Date | string): string => {
     const localDate = new Date(date);
 
     // Convert both dates to start of day in local timezone
-    const stripTime = (d: Date): number => {
-        const local = new Date(d);
-        local.setHours(0, 0, 0, 0);
-        return local.getTime();
-    };
-
-    const dateTime = stripTime(localDate);
-    const nowTime = stripTime(now);
+    const dateTime = localDayKey(localDate);
+    const nowTime = localDayKey(now);
     const dayDiff = Math.round((dateTime - nowTime) / (1000 * 60 * 60 * 24));
 
     // Only show Today/Yesterday for past dates
@@ -54,13 +53,13 @@ export const sortFixtures = <T extends Pick<CommonFixture, "utcDate">>(
     selectedDirection: Direction
 ): T[] => {
     return [...fixtures].sort((a, b) => {
-        const dateA = new Date(a.utcDate);
-        const dateB = new Date(b.utcDate);
+        const dateA = fixtureInstantMs(a);
+        const dateB = fixtureInstantMs(b);
         // When fixtures direction backwards: most recent first (B-A)
         // When fixtures direction forwards: soonest first (A-B)
         return selectedDirection === "forwards"
-            ? dateA.getTime() - dateB.getTime()
-            : dateB.getTime() - dateA.getTime();
+            ? dateA - dateB
+            : dateB - dateA;
     });
 };
 
@@ -72,7 +71,7 @@ export const groupFixturesByDate = (
 ): Record<string, FixtureWithLocalDate[]> => {
     return fixtures.reduce<Record<string, FixtureWithLocalDate[]>>((groups, fixture) => {
         const localDate = new Date(fixture.utcDate);
-        const dayStart = new Date(localDate).setHours(0, 0, 0, 0); // Use timestamp as key
+        const dayStart = localDayKey(localDate);
 
         if (!groups[dayStart]) {
             groups[dayStart] = [];
@@ -89,14 +88,12 @@ export const groupFixturesByDate = (
 // But my adaptors just pass a dateFrom and dateTo
 // This function makes so make an array based on dateFrom and dateTo
 export function generateDateRange(startDate: string, endDate: string): string[] {
-    const dates = [];
-    const currentDate = new Date(startDate);
-    const lastDate = new Date(endDate);
+    const dates: string[] = [];
+    let currentDate = startDate;
 
-    // Include the start date
-    while (currentDate <= lastDate) {
-        dates.push(currentDate.toISOString().split('T')[0]);
-        currentDate.setDate(currentDate.getDate() + 1);
+    while (currentDate <= endDate) {
+        dates.push(currentDate);
+        currentDate = addDaysToDateString(currentDate, 1);
     }
 
     return dates;

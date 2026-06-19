@@ -63,11 +63,13 @@ describe("normalised fixtures route", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("Cache-Control")).toBe("no-store");
     expect(fetchMock.mock.calls[0][0]?.toString()).toContain(
-      "/api/espn?dateFrom=2026-05-01&dateTo=2026-05-03&direction=past&sport=soccer&league=eng.1"
+      "/api/espn?dateFrom=2026-04-30&dateTo=2026-05-04&direction=past&sport=soccer&league=eng.1"
     );
     expect(fetchMock.mock.calls[0][1]).toMatchObject({ cache: "no-store" });
     expect(body.fixtures[0].homeTeam.shortName).toBe("Home");
     expect(body.meta.count).toBe(1);
+    expect(body.meta.dateFrom).toBe("2026-05-01");
+    expect(body.meta.dateTo).toBe("2026-05-02");
   });
 
   it("returns normalised FIFA World Cup fixtures", async () => {
@@ -125,7 +127,7 @@ describe("normalised fixtures route", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("Cache-Control")).toBe("no-store");
     expect(fetchMock.mock.calls[0][0]?.toString()).toContain(
-      "/api/espn?dateFrom=2026-06-11&dateTo=2026-07-20&direction=future&sport=soccer&league=fifa.world"
+      "/api/espn?dateFrom=2026-06-10&dateTo=2026-07-21&direction=future&sport=soccer&league=fifa.world"
     );
     expect(fetchMock.mock.calls[0][1]).toMatchObject({ cache: "no-store" });
     expect(body.fixtures[0]).toMatchObject({

@@ -1,24 +1,7 @@
 import { DEFAULT_WINDOWS } from "@/utils/config/windows";
+import { addDays, formatLocalDate, startOfLocalDay } from "@/utils/fixtureTime";
 import type { Direction } from "@/types/domain";
 import type { FixtureDateRange, FixtureDateWindow } from "./types";
-
-const MS_PER_DAY = 24 * 60 * 60 * 1000;
-
-const formatLocalDate = (date: Date): string => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-};
-
-const addDays = (date: Date, offset: number): Date => {
-  return new Date(date.getTime() + offset * MS_PER_DAY);
-};
-
-const startOfLocalDay = (date: Date): Date => {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-};
 
 export const initialFixtureWindow = (direction: Direction): FixtureDateWindow =>
   direction === "forwards"
@@ -60,19 +43,10 @@ export const fixtureWindowToDateRange = (
 
 export const dateRangeForAdapter = (
   window: FixtureDateWindow,
-  adapter: string,
+  _adapter: string,
   today = new Date()
 ): FixtureDateRange => {
   const range = fixtureWindowToDateRange(window, today);
 
-  if (adapter !== "espn") {
-    return range;
-  }
-
-  return {
-    ...range,
-    dateTo: formatLocalDate(
-      addDays(startOfLocalDay(today), window.toOffset + 1)
-    ),
-  };
+  return range;
 };
