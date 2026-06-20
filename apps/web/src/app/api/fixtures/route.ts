@@ -2,8 +2,10 @@ import { NextResponse } from "next/server";
 import { fixturesParams, errorMessage } from "@/utils/api/params";
 import { fetchFixtureBatchForDateRange } from "@/hooks/fixtures/api";
 import { sortFixtures } from "@/utils/dates";
+import { isFixtureVisibleForDirection } from "@/utils/fixtureVisibility";
 import type {
   ApiDirection,
+  CommonFixture,
   Direction,
   FixtureApiMeta,
   FixtureListResponse,
@@ -52,6 +54,62 @@ const mergedMeta = (metadata: FixtureApiMeta[]): FixtureApiMeta => {
   return metadata[0] ?? EMPTY_META;
 };
 
+const dateStringInTimeZone = (date: Date, timeZone: string): string => {
+  try {
+    const parts = new Intl.DateTimeFormat("en", {
+      day: "2-digit",
+      month: "2-digit",
+      timeZone,
+      year: "numeric",
+    }).formatToParts(date);
+    const part = (type: Intl.DateTimeFormatPartTypes) =>
+      parts.find((datePart) => datePart.type === type)?.value;
+    const year = part("year");
+    const month = part("month");
+    const day = part("day");
+
+    if (year && month && day) {
+      return `${year}-${month}-${day}`;
+    }
+  } catch {
+    // Fall through to UTC when the caller supplies an invalid timezone.
+  }
+
+  return date.toISOString().slice(0, 10);
+};
+
+const isFixtureInRequestedRange = (
+  fixture: Pick<CommonFixture, "utcDate">,
+  range: { dateFrom: string; dateTo: string; timeZone: string }
+): boolean => {
+  const fixtureDate = dateStringInTimeZone(
+    new Date(fixture.utcDate),
+    range.timeZone
+  );
+
+  return fixtureDate >= range.dateFrom && fixtureDate <= range.dateTo;
+};
+
+const publicFixturesForRequest = (
+  fixtures: CommonFixture[],
+  {
+    dateFrom,
+    dateTo,
+    direction,
+    timeZone,
+  }: {
+    dateFrom: string;
+    dateTo: string;
+    direction: Direction;
+    timeZone: string;
+  }
+): CommonFixture[] =>
+  fixtures.filter(
+    (fixture) =>
+      isFixtureInRequestedRange(fixture, { dateFrom, dateTo, timeZone }) &&
+      isFixtureVisibleForDirection(fixture, direction)
+  );
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const params = fixturesParams(searchParams);
@@ -71,6 +129,7 @@ export async function GET(request: Request) {
     direction: apiDirection,
   } = params.value;
   const direction = directionFromApiDirection(apiDirection);
+  const timeZone = searchParams.get("timeZone") ?? "UTC";
 
   try {
     const batches = await Promise.all(
@@ -87,7 +146,10 @@ export async function GET(request: Request) {
       )
     );
     const fixtures = sortFixtures(
-      batches.flatMap((batch) => batch.fixtures),
+      publicFixturesForRequest(
+        batches.flatMap((batch) => batch.fixtures),
+        { dateFrom, dateTo, direction, timeZone }
+      ),
       direction
     );
     const meta = mergedMeta(batches.map((batch) => batch.meta));

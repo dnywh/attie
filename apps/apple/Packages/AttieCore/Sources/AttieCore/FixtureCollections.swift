@@ -12,16 +12,20 @@ public struct MergeFixturesResult: Equatable, Sendable {
     }
 }
 
-private func fixtureDate(_ value: String) -> Date {
+public func fixtureDate(_ value: String) -> Date? {
     let fractionalFormatter = ISO8601DateFormatter()
-    let fallbackFormatter = ISO8601DateFormatter()
+    let internetFormatter = ISO8601DateFormatter()
+    let minuteFormatter = DateFormatter()
 
     fractionalFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-    fallbackFormatter.formatOptions = [.withInternetDateTime]
+    internetFormatter.formatOptions = [.withInternetDateTime]
+    minuteFormatter.locale = Locale(identifier: "en_US_POSIX")
+    minuteFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+    minuteFormatter.dateFormat = "yyyy-MM-dd'T'HH:mmX"
 
     return fractionalFormatter.date(from: value)
-        ?? fallbackFormatter.date(from: value)
-        ?? .distantPast
+        ?? internetFormatter.date(from: value)
+        ?? minuteFormatter.date(from: value)
 }
 
 public func sortedFixtures(
@@ -29,8 +33,8 @@ public func sortedFixtures(
     direction: Direction
 ) -> [CommonFixture] {
     fixtures.sorted { first, second in
-        let firstDate = fixtureDate(first.utcDate)
-        let secondDate = fixtureDate(second.utcDate)
+        let firstDate = fixtureDate(first.utcDate) ?? .distantPast
+        let secondDate = fixtureDate(second.utcDate) ?? .distantPast
 
         switch direction {
         case .forwards:
@@ -43,6 +47,37 @@ public func sortedFixtures(
 
 public func isLiveFixture(_ fixture: CommonFixture) -> Bool {
     fixture.status.type == "LIVE"
+}
+
+public func isFixtureVisibleForDirection(
+    _ fixture: CommonFixture,
+    direction: Direction,
+    now: Date = Date()
+) -> Bool {
+    if isLiveFixture(fixture) {
+        return true
+    }
+
+    let fixtureTime = fixtureDate(fixture.utcDate) ?? .distantPast
+
+    switch fixture.status.type {
+    case "SCHEDULED":
+        return direction == .forwards && fixtureTime >= now
+    case "FINISHED":
+        return direction == .backwards && fixtureTime <= now
+    default:
+        return direction == .backwards && fixtureTime <= now
+    }
+}
+
+public func visibleFixtures(
+    _ fixtures: [CommonFixture],
+    direction: Direction,
+    now: Date = Date()
+) -> [CommonFixture] {
+    fixtures.filter {
+        isFixtureVisibleForDirection($0, direction: direction, now: now)
+    }
 }
 
 public func allowsScoreReveal(

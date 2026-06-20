@@ -7,6 +7,7 @@ import type {
   CompetitionConfig,
   CompetitionKey,
   Direction,
+  FixtureListResponse,
 } from "@/types/domain";
 import type {
   BuildFixtureApiUrlParams,
@@ -69,6 +70,32 @@ export const buildFixtureApiUrl = (
   return `${basePath}?${queryParams.toString()}`;
 };
 
+export const buildFixturesFacadeUrl = (
+  competitionKey: CompetitionKey,
+  params: BuildFixtureApiUrlParams
+): string => {
+  const queryParams = new URLSearchParams();
+
+  queryParams.set("competition", competitionKey);
+  queryParams.set("dateFrom", params.dateFrom);
+  queryParams.set("dateTo", params.dateTo);
+  queryParams.set("direction", params.direction);
+
+  if (typeof params.cursor === "number") {
+    queryParams.set("cursor", String(params.cursor));
+  }
+
+  if (params.refreshToken) {
+    queryParams.set("_refresh", params.refreshToken);
+  }
+
+  if (params.timeZone) {
+    queryParams.set("timeZone", params.timeZone);
+  }
+
+  return `/api/fixtures?${queryParams.toString()}`;
+};
+
 const parseFixtureMeta = (meta?: Partial<FixtureApiMeta>): FixtureApiMeta => ({
   next_cursor: meta?.next_cursor ?? null,
   per_page: meta?.per_page ?? null,
@@ -106,6 +133,14 @@ const dateRangeForAdapterDateRange = (
         dateTo: addDaysToDateString(range.dateTo, 1),
       }
     : range;
+
+const currentTimeZone = (): string | null => {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone ?? null;
+  } catch {
+    return null;
+  }
+};
 
 export const fetchFixtureBatchForDateRange = async (
   competitionKey: CompetitionKey,
@@ -168,6 +203,49 @@ export const fetchFixtureBatch = async (
   return fetchFixtureBatchForDateRange(competitionKey, dateRange, direction, options);
 };
 
+export const fetchFixtureFacadeBatch = async (
+  competitionKey: CompetitionKey,
+  window: FixtureDateWindow,
+  direction: Direction,
+  options: {
+    cursor?: number | null;
+    fetcher?: FixtureFetch;
+    refreshToken?: string | null;
+    today?: Date;
+  } = {}
+): Promise<FixtureBatch> => {
+  const dateRange = dateRangeForAdapter(window, "facade", options.today);
+  const url = buildFixturesFacadeUrl(competitionKey, {
+    ...dateRange,
+    direction: direction === "forwards" ? "future" : "past",
+    cursor: options.cursor,
+    refreshToken: options.refreshToken,
+    timeZone: currentTimeZone(),
+  });
+  const response = await (options.fetcher ?? fetch)(url, {
+    cache: "no-store",
+    headers: {
+      "Cache-Control": "no-cache",
+      Pragma: "no-cache",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      response.status === 429
+        ? "RATE_LIMIT_EXCEEDED"
+        : `API error: ${response.status} for ${url}`
+    );
+  }
+
+  const data = (await response.json()) as FixtureListResponse;
+
+  return {
+    fixtures: data.fixtures,
+    meta: parseFixtureMeta(data.meta),
+  };
+};
+
 export const fetchFixtureWindow = async (
   competitionKeys: CompetitionKey[],
   window: FixtureDateWindow,
@@ -185,7 +263,7 @@ export const fetchFixtureWindow = async (
       let pagesFetched = 0;
 
       do {
-        const batch = await fetchFixtureBatch(competitionKey, window, direction, {
+        const batch = await fetchFixtureFacadeBatch(competitionKey, window, direction, {
           ...options,
           cursor,
         });

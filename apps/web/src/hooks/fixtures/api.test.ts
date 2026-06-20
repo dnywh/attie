@@ -1,6 +1,14 @@
 import { describe, expect, it, vi } from "vitest";
 import { COMPETITIONS } from "@/constants/competitions";
-import { buildFixtureApiUrl, fetchFixtureWindow } from "./api";
+import {
+  buildFixtureApiUrl,
+  buildFixturesFacadeUrl,
+  fetchFixtureBatchForDateRange,
+  fetchFixtureWindow,
+} from "./api";
+
+const encodedTimeZone = () =>
+  encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone);
 
 describe("fixture API helpers", () => {
   it("builds adapter URLs without the removed page parameter", () => {
@@ -41,12 +49,25 @@ describe("fixture API helpers", () => {
     );
   });
 
+  it("builds canonical fixture facade URLs for app-facing requests", () => {
+    const url = buildFixturesFacadeUrl("nba", {
+      dateFrom: "2026-05-01",
+      dateTo: "2026-05-02",
+      direction: "future",
+      refreshToken: "fresh-123",
+    });
+
+    expect(url).toBe(
+      "/api/fixtures?competition=nba&dateFrom=2026-05-01&dateTo=2026-05-02&direction=future&_refresh=fresh-123"
+    );
+  });
+
   it("follows Ball Don't Lie cursors within a fixture window", async () => {
     const fetcher = vi
       .fn<typeof fetch>()
       .mockResolvedValueOnce(
         Response.json({
-          matches: [],
+          fixtures: [],
           meta: {
             next_cursor: 456,
             per_page: 25,
@@ -56,7 +77,7 @@ describe("fixture API helpers", () => {
       )
       .mockResolvedValueOnce(
         Response.json({
-          matches: [],
+          fixtures: [],
           meta: {
             next_cursor: null,
             per_page: 25,
@@ -77,7 +98,7 @@ describe("fixture API helpers", () => {
 
     expect(fetcher).toHaveBeenCalledTimes(2);
     expect(fetcher.mock.calls[0][0]).toBe(
-      "/api/mlb?dateFrom=2026-04-29&dateTo=2026-05-02&direction=past"
+      `/api/fixtures?competition=mlb&dateFrom=2026-04-30&dateTo=2026-05-01&direction=past&timeZone=${encodedTimeZone()}`
     );
     expect(fetcher.mock.calls[0][1]).toMatchObject({
       cache: "no-store",
@@ -87,14 +108,14 @@ describe("fixture API helpers", () => {
       },
     });
     expect(fetcher.mock.calls[1][0]).toBe(
-      "/api/mlb?dateFrom=2026-04-29&dateTo=2026-05-02&direction=past&cursor=456"
+      `/api/fixtures?competition=mlb&dateFrom=2026-04-30&dateTo=2026-05-01&direction=past&cursor=456&timeZone=${encodedTimeZone()}`
     );
   });
 
   it("uses refresh tokens when fetching fixture windows", async () => {
     const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
       Response.json({
-        matches: [],
+        fixtures: [],
         meta: {
           next_cursor: null,
           per_page: null,
@@ -115,7 +136,7 @@ describe("fixture API helpers", () => {
     );
 
     expect(fetcher.mock.calls[0][0]).toBe(
-      "/api/nba?dateFrom=2026-04-30&dateTo=2026-05-03&direction=future&_refresh=fresh-456"
+      `/api/fixtures?competition=nba&dateFrom=2026-05-01&dateTo=2026-05-02&direction=future&_refresh=fresh-456&timeZone=${encodedTimeZone()}`
     );
   });
 
@@ -131,13 +152,12 @@ describe("fixture API helpers", () => {
       })
     );
 
-    await fetchFixtureWindow(
-      ["premier-league"],
-      { fromOffset: 0, toOffset: 28 },
+    await fetchFixtureBatchForDateRange(
+      "premier-league",
+      { dateFrom: "2026-05-01", dateTo: "2026-05-29" },
       "forwards",
       {
         fetcher,
-        today: new Date(2026, 4, 1, 12),
       }
     );
 

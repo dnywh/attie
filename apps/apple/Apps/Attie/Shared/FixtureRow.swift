@@ -80,8 +80,9 @@ struct FixtureRow: View {
     }
 
     private var formattedDate: String {
-        let formatter = ISO8601DateFormatter()
-        let date = formatter.date(from: fixture.utcDate) ?? Date()
+        guard let date = fixtureDate(fixture.utcDate) else {
+            return fixture.utcDate
+        }
 
         return date.formatted(
             .dateTime

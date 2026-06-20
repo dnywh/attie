@@ -96,6 +96,47 @@ struct AttieCoreTests {
         #expect(result.fixtures == [refreshedFixture])
     }
 
+    @Test("fixture dates parse provider timestamps without seconds")
+    func fixtureDatesParseProviderTimestampsWithoutSeconds() throws {
+        let date = try #require(fixtureDate("2026-06-11T19:00Z"))
+
+        #expect(date.timeIntervalSince1970 == 1_781_204_400)
+    }
+
+    @Test("fixture visibility matches direction semantics")
+    func fixtureVisibilityMatchesDirectionSemantics() {
+        let now = fixtureDate("2026-05-01T12:00:00Z")!
+        let scheduledFuture = fixture(
+            id: "scheduled-future",
+            date: "2026-05-01T14:00:00Z",
+            status: "SCHEDULED"
+        )
+        let scheduledPast = fixture(
+            id: "scheduled-past",
+            date: "2026-05-01T10:00:00Z",
+            status: "SCHEDULED"
+        )
+        let finishedPast = fixture(
+            id: "finished-past",
+            date: "2026-05-01T10:00:00Z",
+            status: "FINISHED"
+        )
+        let livePast = fixture(
+            id: "live-past",
+            date: "2026-05-01T10:00:00Z",
+            status: "LIVE"
+        )
+
+        #expect(isFixtureVisibleForDirection(scheduledFuture, direction: .forwards, now: now))
+        #expect(!isFixtureVisibleForDirection(scheduledFuture, direction: .backwards, now: now))
+        #expect(!isFixtureVisibleForDirection(scheduledPast, direction: .forwards, now: now))
+        #expect(!isFixtureVisibleForDirection(scheduledPast, direction: .backwards, now: now))
+        #expect(!isFixtureVisibleForDirection(finishedPast, direction: .forwards, now: now))
+        #expect(isFixtureVisibleForDirection(finishedPast, direction: .backwards, now: now))
+        #expect(isFixtureVisibleForDirection(livePast, direction: .forwards, now: now))
+        #expect(isFixtureVisibleForDirection(livePast, direction: .backwards, now: now))
+    }
+
     @Test("preferences use localStorage-compatible keys")
     func preferencesUseCompatibleKeys() throws {
         let suiteName = "attie.tests.\(UUID().uuidString)"

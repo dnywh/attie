@@ -53,14 +53,19 @@ signing the watch target.
    `WKCompanionAppBundleIdentifier` resolves to `net.dannywhite.attie.dev`.
 5. Press **Run**.
 
-If `AttieWatch` still fails to sign, delete Xcode's stale managed profiles and
-let it recreate them:
+If `AttieWatch` still fails to sign, refresh profiles through Xcode instead of
+deleting files manually:
 
-```sh
-rm -rf ~/Library/MobileDevice/Provisioning\ Profiles
-```
+1. Open **Xcode > Settings > Accounts**.
+2. Select **Danny White**.
+3. Choose **Download Manual Profiles**.
+4. Choose **Product > Clean Build Folder**.
+5. Run the `Attie` scheme again.
 
-Then reopen Xcode and run the `Attie` scheme again.
+If the expanded `CodeSign` log says `resource fork, Finder information, or
+similar detritus not allowed`, **Clean Build Folder** is the important step.
+That clears stale build output for this project without touching provisioning
+profiles.
 
 To inspect Xcode's resolved identifiers:
 

@@ -40,6 +40,7 @@ public struct AttieAPIClient: @unchecked Sendable {
         queryItems.append(URLQueryItem(name: "dateFrom", value: dateRange.dateFrom))
         queryItems.append(URLQueryItem(name: "dateTo", value: dateRange.dateTo))
         queryItems.append(URLQueryItem(name: "direction", value: direction.apiDirection.rawValue))
+        queryItems.append(URLQueryItem(name: "timeZone", value: TimeZone.current.identifier))
 
         if let cursor {
             queryItems.append(URLQueryItem(name: "cursor", value: String(cursor)))

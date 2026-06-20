@@ -150,7 +150,10 @@ final class FixturesViewModel: ObservableObject {
                 refreshToken: Self.refreshToken()
             )
 
-            fixtures = sortedFixtures(response.fixtures, direction: selectedDirection)
+            fixtures = sortedFixtures(
+                visibleFixtures(response.fixtures, direction: selectedDirection),
+                direction: selectedDirection
+            )
             isUsingSyncedSnapshot = false
             latestSyncedAt = nil
             publishSnapshot()
@@ -189,7 +192,10 @@ final class FixturesViewModel: ObservableObject {
                 )
                 let result = mergeFixtures(
                     existingFixtures: fixtures,
-                    incomingFixtures: response.fixtures,
+                    incomingFixtures: visibleFixtures(
+                        response.fixtures,
+                        direction: selectedDirection
+                    ),
                     direction: selectedDirection
                 )
 
@@ -241,16 +247,17 @@ final class FixturesViewModel: ObservableObject {
                 direction: selectedDirection,
                 refreshToken: Self.refreshToken()
             )
-            let result = mergeFixtures(
+
+            let reconciledFixtures = reconciledRefreshFixtures(
                 existingFixtures: fixtures,
-                incomingFixtures: response.fixtures,
-                direction: selectedDirection
+                refreshedFixtures: response.fixtures,
+                refreshedRange: range
             )
 
             currentWindow = initialWindow
 
-            if result.changedCount > 0 {
-                fixtures = result.fixtures
+            if reconciledFixtures != fixtures {
+                fixtures = reconciledFixtures
                 isUsingSyncedSnapshot = false
                 latestSyncedAt = nil
                 publishSnapshot()
@@ -275,7 +282,10 @@ final class FixturesViewModel: ObservableObject {
         selectedSport = snapshot.selectedSport
         selectedCompetitions = snapshot.selectedCompetitions
         selectedDirection = snapshot.selectedDirection
-        fixtures = sortedFixtures(snapshot.fixtures, direction: snapshot.selectedDirection)
+        fixtures = sortedFixtures(
+            visibleFixtures(snapshot.fixtures, direction: snapshot.selectedDirection),
+            direction: snapshot.selectedDirection
+        )
         latestSyncedAt = snapshot.generatedAt
         isUsingSyncedSnapshot = true
         isLoading = false
@@ -284,6 +294,50 @@ final class FixturesViewModel: ObservableObject {
         hasRateLimitError = false
         currentWindow = FixtureWindows.initialWindow(direction: snapshot.selectedDirection)
         scoreRevealState.reset()
+    }
+
+    private func reconciledRefreshFixtures(
+        existingFixtures: [CommonFixture],
+        refreshedFixtures: [CommonFixture],
+        refreshedRange: FixtureDateRange
+    ) -> [CommonFixture] {
+        let selectedCompetitionNames = Set(selectedCompetitions.compactMap {
+            AttieCatalog.competitions[$0]?.name
+        })
+        let visibleRefreshedFixtures = visibleFixtures(
+            refreshedFixtures,
+            direction: selectedDirection
+        )
+        let visibleRefreshedIDs = Set(visibleRefreshedFixtures.map(\.id))
+        let retainedFixtures = existingFixtures.filter { fixture in
+            !(
+                selectedCompetitionNames.contains(fixture.competition.name)
+                && isFixture(fixture, in: refreshedRange)
+                && !visibleRefreshedIDs.contains(fixture.id)
+            )
+        }
+
+        return mergeFixtures(
+            existingFixtures: retainedFixtures,
+            incomingFixtures: visibleRefreshedFixtures,
+            direction: selectedDirection
+        ).fixtures
+    }
+
+    private func isFixture(
+        _ fixture: CommonFixture,
+        in range: FixtureDateRange
+    ) -> Bool {
+        guard let date = fixtureDate(fixture.utcDate) else {
+            return false
+        }
+
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd"
+        let fixtureDateString = formatter.string(from: date)
+
+        return fixtureDateString >= range.dateFrom && fixtureDateString <= range.dateTo
     }
 
     private func publishSnapshot() {

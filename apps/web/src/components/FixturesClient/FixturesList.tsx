@@ -7,7 +7,6 @@ import Interstitial from "@/components/Interstitial";
 import LoadingText from "@/components/LoadingText";
 import SelectionExplainerText from "@/components/SelectionExplainerText";
 import { formatDateForDisplay, groupFixturesByDate } from "@/utils/dates";
-import { isFixtureVisibleForDirection } from "@/utils/fixtureVisibility";
 import type { CommonFixture, CompetitionKey, Direction } from "@/types/domain";
 import {
   AllFixturesList,
@@ -77,11 +76,7 @@ function FixturesList({
     <section>
       <AllFixturesList>
         {Object.entries(
-          groupFixturesByDate(
-            fixtures.filter((fixture) =>
-              isFixtureVisibleForDirection(fixture, selectedDirection)
-            )
-          )
+          groupFixturesByDate(fixtures)
         ).map(([groupingKey, dateFixtures], index) => {
           const firstFixture = dateFixtures[0];
 

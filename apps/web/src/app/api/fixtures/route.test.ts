@@ -3,10 +3,14 @@ import { GET } from "./route";
 
 describe("normalised fixtures route", () => {
   afterEach(() => {
+    vi.useRealTimers();
     vi.restoreAllMocks();
   });
 
   it("returns normalised fixtures through the Attie API facade", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-05-02T12:00:00Z"));
+
     const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
       Response.json({
         events: [
@@ -75,6 +79,9 @@ describe("normalised fixtures route", () => {
   });
 
   it("returns normalised FIFA World Cup fixtures", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-06-10T12:00:00Z"));
+
     const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
       Response.json({
         events: [
@@ -140,6 +147,142 @@ describe("normalised fixtures route", () => {
     expect(body.meta.competitions).toEqual(["fifa-world-cup"]);
   });
 
+  it("filters padded provider data back to the requested past window", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-06-20T21:00:00Z"));
+
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      Response.json({
+        events: [
+          espnEvent({
+            id: "finished",
+            date: "2026-06-20T16:00:00Z",
+            statusName: "STATUS_FINAL",
+            shortDetail: "FT",
+          }),
+          espnEvent({
+            id: "live",
+            date: "2026-06-20T20:00:00Z",
+            statusName: "STATUS_IN_PROGRESS",
+            shortDetail: "87'",
+          }),
+          espnEvent({
+            id: "scheduled-today",
+            date: "2026-06-20T23:00:00Z",
+            statusName: "STATUS_SCHEDULED",
+            shortDetail: "23:00",
+          }),
+          espnEvent({
+            id: "padded-future",
+            date: "2026-06-21T20:00:00Z",
+            statusName: "STATUS_SCHEDULED",
+            shortDetail: "21 Jun",
+          }),
+        ],
+      })
+    );
+
+    const response = await GET(
+      new Request(
+        "https://attie.test/api/fixtures?competition=fifa-world-cup&dateFrom=2026-06-20&dateTo=2026-06-20&direction=past"
+      )
+    );
+    const body = await response.json();
+
+    expect(body.fixtures.map(({ id }: { id: string }) => id)).toEqual([
+      "live",
+      "finished",
+    ]);
+    expect(body.meta.count).toBe(2);
+    expect(body.meta.dateFrom).toBe("2026-06-20");
+    expect(body.meta.dateTo).toBe("2026-06-20");
+  });
+
+  it("filters padded provider data back to the requested future window", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-06-20T21:00:00Z"));
+
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      Response.json({
+        events: [
+          espnEvent({
+            id: "finished",
+            date: "2026-06-20T16:00:00Z",
+            statusName: "STATUS_FINAL",
+            shortDetail: "FT",
+          }),
+          espnEvent({
+            id: "live",
+            date: "2026-06-20T20:00:00Z",
+            statusName: "STATUS_IN_PROGRESS",
+            shortDetail: "87'",
+          }),
+          espnEvent({
+            id: "scheduled-today",
+            date: "2026-06-20T23:00:00Z",
+            statusName: "STATUS_SCHEDULED",
+            shortDetail: "23:00",
+          }),
+          espnEvent({
+            id: "padded-tomorrow",
+            date: "2026-06-21T20:00:00Z",
+            statusName: "STATUS_SCHEDULED",
+            shortDetail: "21 Jun",
+          }),
+        ],
+      })
+    );
+
+    const response = await GET(
+      new Request(
+        "https://attie.test/api/fixtures?competition=fifa-world-cup&dateFrom=2026-06-20&dateTo=2026-06-20&direction=future"
+      )
+    );
+    const body = await response.json();
+
+    expect(body.fixtures.map(({ id }: { id: string }) => id)).toEqual([
+      "live",
+      "scheduled-today",
+    ]);
+    expect(body.meta.count).toBe(2);
+  });
+
+  it("uses the caller timezone when trimming the public date window", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-06-21T00:00:00Z"));
+
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      Response.json({
+        events: [
+          espnEvent({
+            id: "local-evening",
+            date: "2026-06-21T01:30:00Z",
+            statusName: "STATUS_SCHEDULED",
+            shortDetail: "20:30",
+          }),
+          espnEvent({
+            id: "next-local-day",
+            date: "2026-06-21T18:00:00Z",
+            statusName: "STATUS_SCHEDULED",
+            shortDetail: "13:00",
+          }),
+        ],
+      })
+    );
+
+    const response = await GET(
+      new Request(
+        "https://attie.test/api/fixtures?competition=fifa-world-cup&dateFrom=2026-06-20&dateTo=2026-06-20&direction=future&timeZone=America%2FMexico_City"
+      )
+    );
+    const body = await response.json();
+
+    expect(body.fixtures.map(({ id }: { id: string }) => id)).toEqual([
+      "local-evening",
+    ]);
+    expect(body.meta.count).toBe(1);
+  });
+
   it("surfaces provider rate limits", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       Response.json({ error: "Rate limit exceeded" }, { status: 429 })
@@ -158,3 +301,50 @@ describe("normalised fixtures route", () => {
     expect(body.isRateLimit).toBe(true);
   });
 });
+
+function espnEvent({
+  id,
+  date,
+  statusName,
+  shortDetail,
+}: {
+  id: string;
+  date: string;
+  statusName: string;
+  shortDetail: string;
+}) {
+  return {
+    id,
+    date,
+    competitions: [
+      {
+        status: {
+          type: {
+            name: statusName,
+            shortDetail,
+          },
+        },
+        competitors: [
+          {
+            homeAway: "home",
+            score: "1",
+            team: {
+              name: "Home FC",
+              shortDisplayName: "Home",
+              logo: "https://example.com/home.png",
+            },
+          },
+          {
+            homeAway: "away",
+            score: "0",
+            team: {
+              name: "Away FC",
+              shortDisplayName: "Away",
+              logo: "https://example.com/away.png",
+            },
+          },
+        ],
+      },
+    ],
+  };
+}

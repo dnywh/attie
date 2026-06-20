@@ -41,6 +41,7 @@ struct AttieAPIClientTests {
         #expect(url.path == "/api/fixtures")
         #expect(queryItems.contains(URLQueryItem(name: "competition", value: "nba")))
         #expect(queryItems.contains(URLQueryItem(name: "direction", value: "future")))
+        #expect(queryItems.contains(URLQueryItem(name: "timeZone", value: TimeZone.current.identifier)))
         #expect(queryItems.contains(URLQueryItem(name: "cursor", value: "123")))
         #expect(queryItems.contains(URLQueryItem(name: "_refresh", value: "fresh-123")))
         #expect(request.cachePolicy == .reloadIgnoringLocalAndRemoteCacheData)

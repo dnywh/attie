@@ -37,4 +37,5 @@ export interface BuildFixtureApiUrlParams extends FixtureDateRange {
   direction: ApiDirection;
   cursor?: number | null;
   refreshToken?: string | null;
+  timeZone?: string | null;
 }
