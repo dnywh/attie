@@ -62,6 +62,8 @@ describe("normalised fixtures route", () => {
 
     expect(response.status).toBe(200);
     expect(response.headers.get("Cache-Control")).toBe("no-store");
+    expect(response.headers.get("Pragma")).toBe("no-cache");
+    expect(response.headers.get("Expires")).toBe("0");
     expect(fetchMock.mock.calls[0][0]?.toString()).toContain(
       "/api/espn?dateFrom=2026-04-30&dateTo=2026-05-04&direction=past&sport=soccer&league=eng.1"
     );
@@ -152,6 +154,7 @@ describe("normalised fixtures route", () => {
 
     expect(response.status).toBe(429);
     expect(response.headers.get("Cache-Control")).toBe("no-store");
+    expect(response.headers.get("Pragma")).toBe("no-cache");
     expect(body.isRateLimit).toBe(true);
   });
 });

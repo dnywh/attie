@@ -1,9 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { FIXTURE_STATUS } from "@/constants/fixtureStatus";
 import type { CommonFixture } from "@/types/domain";
-import { mergeFixtures } from "./merge";
+import { mergeFixtures, reconcileRefreshedFixtures } from "./merge";
 
-const fixture = (id: string, utcDate: string): CommonFixture => ({
+const fixture = (
+  id: string,
+  utcDate: string,
+  competitionName = "Premier League"
+): CommonFixture => ({
   id,
   utcDate,
   status: {
@@ -11,7 +15,7 @@ const fixture = (id: string, utcDate: string): CommonFixture => ({
     detail: null,
   },
   competition: {
-    name: "Premier League",
+    name: competitionName,
   },
   homeTeam: {
     name: "Home",
@@ -88,5 +92,95 @@ describe("fixture merging", () => {
       detail: "1st half",
     });
     expect(merged.fixtures[1].score.fullTime.home).toBe(1);
+  });
+
+  it("reconciles refreshed fixtures by replacing stale records", () => {
+    const existingFixture = {
+      ...fixture("live", "2026-05-01T10:00:00Z"),
+      status: {
+        type: FIXTURE_STATUS.LIVE,
+        detail: "Live: 67",
+      },
+      score: {
+        fullTime: {
+          home: 1,
+          away: 1,
+        },
+      },
+    };
+    const refreshedFixture = {
+      ...existingFixture,
+      status: {
+        type: FIXTURE_STATUS.FINISHED,
+        detail: "FT",
+      },
+      score: {
+        fullTime: {
+          home: 2,
+          away: 1,
+        },
+      },
+    };
+    const reconciled = reconcileRefreshedFixtures(
+      [existingFixture],
+      [refreshedFixture],
+      "backwards",
+      {
+        refreshedRange: {
+          dateFrom: "2026-05-01",
+          dateTo: "2026-05-01",
+        },
+        refreshedCompetitionNames: new Set(["Premier League"]),
+      }
+    );
+
+    expect(reconciled.changedCount).toBe(1);
+    expect(reconciled.fixtures).toEqual([refreshedFixture]);
+  });
+
+  it("removes stale fixtures absent from the refreshed initial window", () => {
+    const staleLiveFixture = {
+      ...fixture("stale-live", "2026-05-01T10:00:00Z"),
+      status: {
+        type: FIXTURE_STATUS.LIVE,
+        detail: "Live: 67",
+      },
+    };
+    const loadedEarlierFixture = fixture("older", "2026-04-20T10:00:00Z");
+    const otherCompetitionFixture = fixture("nba", "2026-05-01T10:00:00Z", "NBA");
+    const reconciled = reconcileRefreshedFixtures(
+      [staleLiveFixture, loadedEarlierFixture, otherCompetitionFixture],
+      [],
+      "backwards",
+      {
+        refreshedRange: {
+          dateFrom: "2026-05-01",
+          dateTo: "2026-05-01",
+        },
+        refreshedCompetitionNames: new Set(["Premier League"]),
+      }
+    );
+
+    expect(reconciled.changedCount).toBe(1);
+    expect(reconciled.fixtures.map(({ id }) => id)).toEqual(["nba", "older"]);
+  });
+
+  it("preserves loaded fixtures outside the refreshed window", () => {
+    const outsideWindowFixture = fixture("outside", "2026-04-30T10:00:00Z");
+    const refreshedFixture = fixture("fresh", "2026-05-01T10:00:00Z");
+    const reconciled = reconcileRefreshedFixtures(
+      [outsideWindowFixture],
+      [refreshedFixture],
+      "backwards",
+      {
+        refreshedRange: {
+          dateFrom: "2026-05-01",
+          dateTo: "2026-05-01",
+        },
+        refreshedCompetitionNames: new Set(["Premier League"]),
+      }
+    );
+
+    expect(reconciled.fixtures.map(({ id }) => id)).toEqual(["fresh", "outside"]);
   });
 });

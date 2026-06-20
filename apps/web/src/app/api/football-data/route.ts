@@ -9,6 +9,8 @@ export const fetchCache = "force-no-store";
 const API_BASE_URL = "https://api.football-data.org/v4";
 const NO_STORE_HEADERS = {
   "Cache-Control": "no-store",
+  Pragma: "no-cache",
+  Expires: "0",
 };
 
 export async function GET(request: Request) {

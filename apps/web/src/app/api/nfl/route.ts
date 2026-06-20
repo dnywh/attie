@@ -11,6 +11,8 @@ export const fetchCache = "force-no-store";
 const NFL_PER_PAGE = 25;
 const NO_STORE_HEADERS = {
   "Cache-Control": "no-store",
+  Pragma: "no-cache",
+  Expires: "0",
 };
 
 export async function GET(request: Request) {

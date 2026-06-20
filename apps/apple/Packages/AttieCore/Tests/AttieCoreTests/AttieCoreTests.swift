@@ -65,7 +65,35 @@ struct AttieCoreTests {
         )
 
         #expect(result.addedCount == 1)
+        #expect(result.changedCount == 1)
         #expect(result.fixtures.map(\.id) == ["newer", "older"])
+    }
+
+    @Test("merge replaces changed duplicate fixtures")
+    func mergeReplacesChangedDuplicateFixtures() {
+        let staleFixture = fixture(
+            id: "live",
+            date: "2026-05-01T12:00:00Z",
+            status: "LIVE"
+        )
+        let refreshedFixture = CommonFixture(
+            id: staleFixture.id,
+            utcDate: staleFixture.utcDate,
+            status: StatusObject(type: "FINISHED", detail: "Full-time"),
+            competition: staleFixture.competition,
+            homeTeam: staleFixture.homeTeam,
+            awayTeam: staleFixture.awayTeam,
+            score: FixtureScore(fullTime: FullTimeScore(home: .number(2), away: .number(1)))
+        )
+        let result = mergeFixtures(
+            existingFixtures: [staleFixture],
+            incomingFixtures: [refreshedFixture],
+            direction: .backwards
+        )
+
+        #expect(result.addedCount == 0)
+        #expect(result.changedCount == 1)
+        #expect(result.fixtures == [refreshedFixture])
     }
 
     @Test("preferences use localStorage-compatible keys")

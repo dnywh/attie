@@ -11,6 +11,8 @@ export const fetchCache = "force-no-store";
 const NBA_PER_PAGE = 72; // 25-100, with 64 being the average in a week
 const NO_STORE_HEADERS = {
   "Cache-Control": "no-store",
+  Pragma: "no-cache",
+  Expires: "0",
 };
 
 export async function GET(request: Request) {

@@ -36,4 +36,5 @@ export interface FixtureBatch {
 export interface BuildFixtureApiUrlParams extends FixtureDateRange {
   direction: ApiDirection;
   cursor?: number | null;
+  refreshToken?: string | null;
 }

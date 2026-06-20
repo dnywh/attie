@@ -21,6 +21,8 @@ const EMPTY_META: FixtureApiMeta = {
 
 const NO_STORE_HEADERS = {
   "Cache-Control": "no-store",
+  Pragma: "no-cache",
+  Expires: "0",
 };
 
 const directionFromApiDirection = (direction: ApiDirection): Direction =>

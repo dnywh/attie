@@ -62,6 +62,10 @@ export const buildFixtureApiUrl = (
     queryParams.set("cursor", String(params.cursor));
   }
 
+  if (params.refreshToken) {
+    queryParams.set("_refresh", params.refreshToken);
+  }
+
   return `${basePath}?${queryParams.toString()}`;
 };
 
@@ -110,6 +114,7 @@ export const fetchFixtureBatchForDateRange = async (
   options: {
     cursor?: number | null;
     fetcher?: FixtureFetch;
+    refreshToken?: string | null;
   } = {}
 ): Promise<FixtureBatch> => {
   const competition = COMPETITIONS[competitionKey];
@@ -122,9 +127,14 @@ export const fetchFixtureBatchForDateRange = async (
     ...dateRange,
     direction: direction === "forwards" ? "future" : "past",
     cursor: options.cursor,
+    refreshToken: options.refreshToken,
   });
   const response = await (options.fetcher ?? fetch)(url, {
     cache: "no-store",
+    headers: {
+      "Cache-Control": "no-cache",
+      Pragma: "no-cache",
+    },
   });
 
   if (!response.ok) {
@@ -145,6 +155,7 @@ export const fetchFixtureBatch = async (
   options: {
     cursor?: number | null;
     fetcher?: FixtureFetch;
+    refreshToken?: string | null;
     today?: Date;
   } = {}
 ): Promise<FixtureBatch> => {
@@ -163,6 +174,7 @@ export const fetchFixtureWindow = async (
   direction: Direction,
   options: {
     fetcher?: FixtureFetch;
+    refreshToken?: string | null;
     today?: Date;
   } = {}
 ): Promise<CommonFixture[]> => {

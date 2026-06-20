@@ -24,6 +24,7 @@ final class FixturesViewModel: ObservableObject {
     private let mode: FixturesViewMode
     private var currentWindow: FixtureDateWindow
     private var loadAttempts = 0
+    private var isRefreshInFlight = false
     private var cancellables = Set<AnyCancellable>()
 
     init(
@@ -145,7 +146,8 @@ final class FixturesViewModel: ObservableObject {
             let response = try await client.fetchFixtures(
                 competitions: selectedCompetitions,
                 dateRange: range,
-                direction: selectedDirection
+                direction: selectedDirection,
+                refreshToken: Self.refreshToken()
             )
 
             fixtures = sortedFixtures(response.fixtures, direction: selectedDirection)
@@ -193,13 +195,16 @@ final class FixturesViewModel: ObservableObject {
 
                 currentWindow = nextWindow
 
-                if result.addedCount > 0 {
+                if result.changedCount > 0 {
                     fixtures = result.fixtures
-                    loadAttempts = 0
-                    isLoadingMore = false
                     isUsingSyncedSnapshot = false
                     latestSyncedAt = nil
                     publishSnapshot()
+                }
+
+                if result.addedCount > 0 {
+                    loadAttempts = 0
+                    isLoadingMore = false
                     return
                 }
             }
@@ -213,6 +218,48 @@ final class FixturesViewModel: ObservableObject {
         }
 
         isLoadingMore = false
+    }
+
+    func refreshFixtures() async {
+        guard !selectedCompetitions.isEmpty,
+              !isLoading,
+              !isLoadingMore,
+              !isRefreshInFlight,
+              !hasRateLimitError else {
+            return
+        }
+
+        isRefreshInFlight = true
+        defer { isRefreshInFlight = false }
+
+        do {
+            let initialWindow = FixtureWindows.initialWindow(direction: selectedDirection)
+            let range = FixtureWindows.dateRange(for: initialWindow)
+            let response = try await client.fetchFixtures(
+                competitions: selectedCompetitions,
+                dateRange: range,
+                direction: selectedDirection,
+                refreshToken: Self.refreshToken()
+            )
+            let result = mergeFixtures(
+                existingFixtures: fixtures,
+                incomingFixtures: response.fixtures,
+                direction: selectedDirection
+            )
+
+            currentWindow = initialWindow
+
+            if result.changedCount > 0 {
+                fixtures = result.fixtures
+                isUsingSyncedSnapshot = false
+                latestSyncedAt = nil
+                publishSnapshot()
+            }
+        } catch AttieAPIError.rateLimited {
+            hasRateLimitError = true
+        } catch {
+            print("[Attie] Failed to refresh fixtures: \(error)")
+        }
     }
 
     private func resetPaging() {
@@ -252,6 +299,10 @@ final class FixturesViewModel: ObservableObject {
                 fixtures: fixtures
             )
         )
+    }
+
+    private static func refreshToken() -> String {
+        String(Int(Date().timeIntervalSince1970 * 1000))
     }
 }
 

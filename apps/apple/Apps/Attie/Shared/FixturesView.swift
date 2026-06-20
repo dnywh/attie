@@ -2,6 +2,7 @@ import AttieCore
 import SwiftUI
 
 struct FixturesView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @StateObject private var model = FixturesViewModel()
 
     var body: some View {
@@ -32,9 +33,35 @@ struct FixturesView: View {
             .task {
                 await model.loadInitialFixtures()
             }
+            .task(id: scenePhase) {
+                guard scenePhase == .active else {
+                    return
+                }
+
+                await refreshFixturesPeriodically()
+            }
+            .onChange(of: scenePhase) { _, newPhase in
+                guard newPhase == .active else {
+                    return
+                }
+
+                Task { await model.refreshFixtures() }
+            }
             .refreshable {
                 await model.loadInitialFixtures()
             }
+        }
+    }
+
+    private func refreshFixturesPeriodically() async {
+        while !Task.isCancelled {
+            do {
+                try await Task.sleep(for: .seconds(60))
+            } catch {
+                return
+            }
+
+            await model.refreshFixtures()
         }
     }
 

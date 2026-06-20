@@ -8,13 +8,21 @@ import {
   initialiseStorage,
 } from "@/utils/preferences";
 import { fetchFixtureWindow } from "@/hooks/fixtures/api";
-import { mergeFixtures } from "@/hooks/fixtures/merge";
+import {
+  mergeFixtures,
+  reconcileRefreshedFixtures,
+} from "@/hooks/fixtures/merge";
+import {
+  FIXTURE_REFRESH_INTERVAL_MS,
+  shouldAutoRefreshFixtures,
+} from "@/hooks/fixtures/refresh";
 import {
   browserStorage,
   defaultCompetitionsForSport,
   normaliseInitialParams,
 } from "@/hooks/fixtures/params";
 import {
+  fixtureWindowToDateRange,
   initialFixtureWindow,
   nextFixtureWindow,
 } from "@/hooks/fixtures/windows";
@@ -68,6 +76,11 @@ export function useFixtures(initialParams?: FixtureParams) {
   const loadAttemptsRef = useRef(0);
   const refreshInFlightRef = useRef(false);
   const fixtureRequestIdRef = useRef(0);
+  const loadingRef = useRef(loading);
+  const loadingMoreRef = useRef(loadingMore);
+  const refreshingRef = useRef(refreshing);
+  const hasRateLimitErrorRef = useRef(hasRateLimitError);
+  const lastSuccessfulRefreshAtRef = useRef(0);
 
   const setFixtures = useCallback((nextFixtures: FixtureStateUpdater) => {
     const resolvedFixtures =
@@ -158,6 +171,13 @@ export function useFixtures(initialParams?: FixtureParams) {
     }
   }, []);
 
+  useEffect(() => {
+    loadingRef.current = loading;
+    loadingMoreRef.current = loadingMore;
+    refreshingRef.current = refreshing;
+    hasRateLimitErrorRef.current = hasRateLimitError;
+  }, [hasRateLimitError, loading, loadingMore, refreshing]);
+
   const handleLoadMore = useCallback(
     async (currentWindow = dateWindowRef.current) => {
       if (loadAttemptsRef.current >= DEFAULT_WINDOWS.MAX_ATTEMPTS) {
@@ -238,12 +258,17 @@ export function useFixtures(initialParams?: FixtureParams) {
       const fetchedFixtures = await fetchFixtureWindow(
         selectedCompetitions,
         initialWindow,
-        selectedDirection
+        selectedDirection,
+        {
+          refreshToken: String(Date.now()),
+        }
       );
 
       if (requestId !== fixtureRequestIdRef.current) {
         return;
       }
+
+      lastSuccessfulRefreshAtRef.current = Date.now();
 
       if (fetchedFixtures.length === 0) {
         await handleLoadMore(initialWindow);
@@ -277,8 +302,22 @@ export function useFixtures(initialParams?: FixtureParams) {
     setLoading,
   ]);
 
-  const refreshFixtures = useCallback(async () => {
+  const refreshFixtures = useCallback(async (
+    options: { force?: boolean } = { force: true }
+  ) => {
     if (!selectedCompetitions.length || refreshInFlightRef.current) {
+      return;
+    }
+
+    if (loadingRef.current || loadingMoreRef.current || refreshingRef.current) {
+      return;
+    }
+
+    if (
+      !options.force &&
+      (hasRateLimitErrorRef.current ||
+        (typeof document !== "undefined" && document.hidden))
+    ) {
       return;
     }
 
@@ -288,18 +327,28 @@ export function useFixtures(initialParams?: FixtureParams) {
 
     try {
       const initialWindow = initialFixtureWindow(selectedDirection);
+      const refreshedRange = fixtureWindowToDateRange(initialWindow);
+      const refreshToken = String(Date.now());
       const fetchedFixtures = await fetchFixtureWindow(
         selectedCompetitions,
         initialWindow,
-        selectedDirection
+        selectedDirection,
+        {
+          refreshToken,
+        }
       );
-      const merged = mergeFixtures(
+      const merged = reconcileRefreshedFixtures(
         fixturesRef.current,
         fetchedFixtures,
-        selectedDirection
+        selectedDirection,
+        {
+          refreshedRange,
+          refreshedCompetitionNames: competitionNames(selectedCompetitions),
+        }
       );
 
       dateWindowRef.current = initialWindow;
+      lastSuccessfulRefreshAtRef.current = Date.now();
 
       if (merged.changedCount > 0) {
         setFixtures(merged.fixtures);
@@ -356,6 +405,47 @@ export function useFixtures(initialParams?: FixtureParams) {
     resetPagingState,
     setFixtures,
   ]);
+
+  useEffect(() => {
+    if (!hasSelectedCompetitions || typeof window === "undefined") {
+      return;
+    }
+
+    const refreshIfStale = () => {
+      if (shouldAutoRefreshFixtures({
+        hasRateLimitError: hasRateLimitErrorRef.current,
+        isDocumentHidden: document.hidden,
+        lastSuccessfulRefreshAt: lastSuccessfulRefreshAtRef.current,
+        loading: loadingRef.current,
+        loadingMore: loadingMoreRef.current,
+        now: Date.now(),
+        refreshing: refreshingRef.current,
+      })) {
+        void refreshFixtures({ force: false });
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        refreshIfStale();
+      }
+    };
+
+    const intervalId = window.setInterval(() => {
+      refreshIfStale();
+    }, FIXTURE_REFRESH_INTERVAL_MS);
+
+    window.addEventListener("pageshow", refreshIfStale);
+    window.addEventListener("focus", refreshIfStale);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      window.clearInterval(intervalId);
+      window.removeEventListener("pageshow", refreshIfStale);
+      window.removeEventListener("focus", refreshIfStale);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [hasSelectedCompetitions, refreshFixtures]);
 
   const handleCompetitionChange = useCallback(
     (competitionKey: CompetitionKey) => {

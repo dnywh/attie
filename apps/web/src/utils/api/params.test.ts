@@ -50,7 +50,7 @@ describe("route parameter validation", () => {
   it("accepts normalised fixture facade params", () => {
     const result = fixturesParams(
       new URLSearchParams(
-        "competition=premier-league,nba&dateFrom=2026-05-01&dateTo=2026-05-02&direction=future"
+        "competition=premier-league,nba&dateFrom=2026-05-01&dateTo=2026-05-02&direction=future&_refresh=fresh"
       )
     );
 

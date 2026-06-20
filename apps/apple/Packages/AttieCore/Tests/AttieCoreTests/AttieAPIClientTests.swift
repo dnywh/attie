@@ -30,9 +30,11 @@ struct AttieAPIClientTests {
             competitions: [.nba],
             dateRange: FixtureDateRange(dateFrom: "2026-05-01", dateTo: "2026-05-02"),
             direction: .forwards,
-            cursor: 123
+            cursor: 123,
+            refreshToken: "fresh-123"
         )
-        let url = try #require(MockURLProtocol.lastRequest?.url)
+        let request = try #require(MockURLProtocol.lastRequest)
+        let url = try #require(request.url)
         let components = try #require(URLComponents(url: url, resolvingAgainstBaseURL: false))
         let queryItems = components.queryItems ?? []
 
@@ -40,6 +42,10 @@ struct AttieAPIClientTests {
         #expect(queryItems.contains(URLQueryItem(name: "competition", value: "nba")))
         #expect(queryItems.contains(URLQueryItem(name: "direction", value: "future")))
         #expect(queryItems.contains(URLQueryItem(name: "cursor", value: "123")))
+        #expect(queryItems.contains(URLQueryItem(name: "_refresh", value: "fresh-123")))
+        #expect(request.cachePolicy == .reloadIgnoringLocalAndRemoteCacheData)
+        #expect(request.value(forHTTPHeaderField: "Cache-Control") == "no-cache")
+        #expect(request.value(forHTTPHeaderField: "Pragma") == "no-cache")
         #expect(response.meta.nextCursor == 123)
         #expect(response.meta.direction == .future)
     }

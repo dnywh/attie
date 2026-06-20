@@ -28,6 +28,19 @@ describe("fixture API helpers", () => {
     );
   });
 
+  it("adds refresh tokens to fixture URLs without changing normal params", () => {
+    const url = buildFixtureApiUrl(COMPETITIONS.nba, {
+      dateFrom: "2026-05-01",
+      dateTo: "2026-05-02",
+      direction: "future",
+      refreshToken: "fresh-123",
+    });
+
+    expect(url).toBe(
+      "/api/nba?dateFrom=2026-05-01&dateTo=2026-05-02&direction=future&_refresh=fresh-123"
+    );
+  });
+
   it("follows Ball Don't Lie cursors within a fixture window", async () => {
     const fetcher = vi
       .fn<typeof fetch>()
@@ -66,8 +79,43 @@ describe("fixture API helpers", () => {
     expect(fetcher.mock.calls[0][0]).toBe(
       "/api/mlb?dateFrom=2026-04-29&dateTo=2026-05-02&direction=past"
     );
+    expect(fetcher.mock.calls[0][1]).toMatchObject({
+      cache: "no-store",
+      headers: {
+        "Cache-Control": "no-cache",
+        Pragma: "no-cache",
+      },
+    });
     expect(fetcher.mock.calls[1][0]).toBe(
       "/api/mlb?dateFrom=2026-04-29&dateTo=2026-05-02&direction=past&cursor=456"
+    );
+  });
+
+  it("uses refresh tokens when fetching fixture windows", async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
+      Response.json({
+        matches: [],
+        meta: {
+          next_cursor: null,
+          per_page: null,
+          has_more: false,
+        },
+      })
+    );
+
+    await fetchFixtureWindow(
+      ["nba"],
+      { fromOffset: 0, toOffset: 1 },
+      "forwards",
+      {
+        fetcher,
+        refreshToken: "fresh-456",
+        today: new Date(2026, 4, 1, 12),
+      }
+    );
+
+    expect(fetcher.mock.calls[0][0]).toBe(
+      "/api/nba?dateFrom=2026-04-30&dateTo=2026-05-03&direction=future&_refresh=fresh-456"
     );
   });
 

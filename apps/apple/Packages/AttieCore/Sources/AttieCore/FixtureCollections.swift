@@ -3,10 +3,12 @@ import Foundation
 public struct MergeFixturesResult: Equatable, Sendable {
     public var fixtures: [CommonFixture]
     public var addedCount: Int
+    public var changedCount: Int
 
-    public init(fixtures: [CommonFixture], addedCount: Int) {
+    public init(fixtures: [CommonFixture], addedCount: Int, changedCount: Int) {
         self.fixtures = fixtures
         self.addedCount = addedCount
+        self.changedCount = changedCount
     }
 }
 
@@ -55,15 +57,37 @@ public func mergeFixtures(
     incomingFixtures: [CommonFixture],
     direction: Direction
 ) -> MergeFixturesResult {
-    let existingIDs = Set(existingFixtures.map(\.id))
-    let addedFixtures = incomingFixtures.filter { !existingIDs.contains($0.id) }
+    var fixturesByID = Dictionary(
+        uniqueKeysWithValues: existingFixtures.map { ($0.id, $0) }
+    )
+    var addedCount = 0
+    var changedCount = 0
 
-    guard !addedFixtures.isEmpty else {
-        return MergeFixturesResult(fixtures: existingFixtures, addedCount: 0)
+    for incomingFixture in incomingFixtures {
+        guard let existingFixture = fixturesByID[incomingFixture.id] else {
+            addedCount += 1
+            changedCount += 1
+            fixturesByID[incomingFixture.id] = incomingFixture
+            continue
+        }
+
+        if existingFixture != incomingFixture {
+            changedCount += 1
+            fixturesByID[incomingFixture.id] = incomingFixture
+        }
+    }
+
+    guard changedCount > 0 else {
+        return MergeFixturesResult(
+            fixtures: existingFixtures,
+            addedCount: 0,
+            changedCount: 0
+        )
     }
 
     return MergeFixturesResult(
-        fixtures: sortedFixtures(existingFixtures + addedFixtures, direction: direction),
-        addedCount: addedFixtures.count
+        fixtures: sortedFixtures(Array(fixturesByID.values), direction: direction),
+        addedCount: addedCount,
+        changedCount: changedCount
     )
 }

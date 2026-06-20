@@ -22,7 +22,8 @@ public struct AttieAPIClient: @unchecked Sendable {
         competitions: [CompetitionKey],
         dateRange: FixtureDateRange,
         direction: Direction,
-        cursor: Int? = nil
+        cursor: Int? = nil,
+        refreshToken: String? = nil
     ) async throws -> FixtureListResponse {
         guard cursor == nil || competitions.count == 1 else {
             throw AttieAPIError.invalidURL
@@ -44,13 +45,24 @@ public struct AttieAPIClient: @unchecked Sendable {
             queryItems.append(URLQueryItem(name: "cursor", value: String(cursor)))
         }
 
+        if let refreshToken {
+            queryItems.append(URLQueryItem(name: "_refresh", value: refreshToken))
+        }
+
         components?.queryItems = queryItems
 
         guard let url = components?.url else {
             throw AttieAPIError.invalidURL
         }
 
-        let (data, response) = try await urlSession.data(from: url)
+        var request = URLRequest(
+            url: url,
+            cachePolicy: .reloadIgnoringLocalAndRemoteCacheData
+        )
+        request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
+        request.setValue("no-cache", forHTTPHeaderField: "Pragma")
+
+        let (data, response) = try await urlSession.data(for: request)
         let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 200
 
         if statusCode == 429 {
