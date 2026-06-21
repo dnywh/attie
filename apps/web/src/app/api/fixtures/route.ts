@@ -130,6 +130,7 @@ export async function GET(request: Request) {
   } = params.value;
   const direction = directionFromApiDirection(apiDirection);
   const timeZone = searchParams.get("timeZone") ?? "UTC";
+  const refreshToken = searchParams.get("_refresh");
 
   try {
     const batches = await Promise.all(
@@ -141,6 +142,7 @@ export async function GET(request: Request) {
           {
             cursor,
             fetcher: absoluteInternalFetcher(request),
+            refreshToken,
           }
         )
       )
