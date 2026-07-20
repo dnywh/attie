@@ -97,16 +97,6 @@ export const COMPETITIONS = {
       league: "3",
     },
   },
-  "fifa-world-cup": {
-    sport: "football",
-    name: "FIFA World Cup",
-    defaultForSport: true,
-    api: {
-      adapter: "espn",
-      sport: "soccer",
-      league: "fifa.world",
-    },
-  },
   "premier-league": {
     sport: "football",
     name: "Premier League",
@@ -361,7 +351,7 @@ export interface FixtureListResponse {
 
 export const DEFAULTS = {
   SPORT: "football",
-  COMPETITIONS: ["fifa-world-cup", "premier-league"],
+  COMPETITIONS: ["premier-league"],
   DIRECTION: "backwards",
   SOUND: false,
 } as const satisfies {

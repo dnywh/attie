@@ -15,7 +15,7 @@ describe("ESPN provider route", () => {
 
     const response = await GET(
       new Request(
-        "https://attie.test/api/espn?dateFrom=2026-06-20&dateTo=2026-06-21&direction=past&sport=soccer&league=fifa.world&_refresh=fresh-123"
+        "https://attie.test/api/espn?dateFrom=2026-06-20&dateTo=2026-06-21&direction=past&sport=soccer&league=eng.1&_refresh=fresh-123"
       )
     );
     const body = await response.json();
@@ -65,7 +65,7 @@ describe("ESPN provider route", () => {
 
     const response = await GET(
       new Request(
-        "https://attie.test/api/espn?dateFrom=2026-06-01&dateTo=2026-07-01&direction=past&sport=soccer&league=fifa.world&_refresh=fresh-456"
+        "https://attie.test/api/espn?dateFrom=2026-06-01&dateTo=2026-07-01&direction=past&sport=soccer&league=eng.1&_refresh=fresh-456"
       )
     );
     const body = await response.json();

@@ -41,7 +41,6 @@ public enum SportKey: String, Codable, CaseIterable, Sendable {
 public enum CompetitionKey: String, Codable, CaseIterable, Sendable {
     case afl
     case nrl
-    case fifaWorldCup = "fifa-world-cup"
     case premierLeague = "premier-league"
     case faCup = "fa-cup"
     case championship
