@@ -78,75 +78,6 @@ describe("normalised fixtures route", () => {
     expect(body.meta.dateTo).toBe("2026-05-02");
   });
 
-  it("returns normalised FIFA World Cup fixtures", async () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-06-10T12:00:00Z"));
-
-    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
-      Response.json({
-        events: [
-          {
-            id: "760415",
-            date: "2026-06-11T19:00Z",
-            season: {
-              slug: "group-stage",
-            },
-            competitions: [
-              {
-                status: {
-                  type: {
-                    name: "STATUS_SCHEDULED",
-                    shortDetail: "11 Jun",
-                  },
-                },
-                competitors: [
-                  {
-                    homeAway: "home",
-                    score: "0",
-                    team: {
-                      name: "Mexico",
-                      shortDisplayName: "Mexico",
-                      logo: "https://a.espncdn.com/i/teamlogos/countries/500/mex.png",
-                    },
-                  },
-                  {
-                    homeAway: "away",
-                    score: "0",
-                    team: {
-                      name: "South Africa",
-                      shortDisplayName: "South Africa",
-                      logo: "https://a.espncdn.com/i/teamlogos/countries/500/rsa.png",
-                    },
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      })
-    );
-
-    const response = await GET(
-      new Request(
-        "https://attie.test/api/fixtures?competition=fifa-world-cup&dateFrom=2026-06-11&dateTo=2026-07-19&direction=future"
-      )
-    );
-    const body = await response.json();
-
-    expect(response.status).toBe(200);
-    expect(response.headers.get("Cache-Control")).toBe("no-store");
-    expect(fetchMock.mock.calls[0][0]?.toString()).toContain(
-      "/api/espn?dateFrom=2026-06-10&dateTo=2026-07-21&direction=future&sport=soccer&league=fifa.world"
-    );
-    expect(fetchMock.mock.calls[0][1]).toMatchObject({ cache: "no-store" });
-    expect(body.fixtures[0]).toMatchObject({
-      competition: { name: "FIFA World Cup", stage: "Group stage" },
-      homeTeam: { shortName: "Mexico" },
-      awayTeam: { shortName: "South Africa" },
-    });
-    expect(body.meta.competitions).toEqual(["fifa-world-cup"]);
-  });
-
   it("filters padded provider data back to the requested past window", async () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-06-20T21:00:00Z"));
@@ -184,7 +115,7 @@ describe("normalised fixtures route", () => {
 
     const response = await GET(
       new Request(
-        "https://attie.test/api/fixtures?competition=fifa-world-cup&dateFrom=2026-06-20&dateTo=2026-06-20&direction=past"
+        "https://attie.test/api/fixtures?competition=premier-league&dateFrom=2026-06-20&dateTo=2026-06-20&direction=past"
       )
     );
     const body = await response.json();
@@ -235,7 +166,7 @@ describe("normalised fixtures route", () => {
 
     const response = await GET(
       new Request(
-        "https://attie.test/api/fixtures?competition=fifa-world-cup&dateFrom=2026-06-20&dateTo=2026-06-20&direction=future"
+        "https://attie.test/api/fixtures?competition=premier-league&dateFrom=2026-06-20&dateTo=2026-06-20&direction=future"
       )
     );
     const body = await response.json();
@@ -272,7 +203,7 @@ describe("normalised fixtures route", () => {
 
     const response = await GET(
       new Request(
-        "https://attie.test/api/fixtures?competition=fifa-world-cup&dateFrom=2026-06-20&dateTo=2026-06-20&direction=future&timeZone=America%2FMexico_City"
+        "https://attie.test/api/fixtures?competition=premier-league&dateFrom=2026-06-20&dateTo=2026-06-20&direction=future&timeZone=America%2FMexico_City"
       )
     );
     const body = await response.json();

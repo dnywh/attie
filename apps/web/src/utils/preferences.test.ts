@@ -35,7 +35,7 @@ describe("preferences", () => {
   it("falls back to defaults without browser storage", () => {
     expect(getStoredPreferences()).toEqual({
       sport: "football",
-      competitions: ["fifa-world-cup", "premier-league"],
+      competitions: ["premier-league"],
       direction: "backwards",
     });
   });
@@ -61,7 +61,7 @@ describe("preferences", () => {
 
     expect(storage.getItem(STORAGE_KEYS.sport)).toBe("football");
     expect(storage.getItem(STORAGE_KEYS.competitionsForSport("football"))).toBe(
-      JSON.stringify(["fifa-world-cup", "premier-league"])
+      JSON.stringify(["premier-league"])
     );
     expect(storage.getItem(STORAGE_KEYS.direction)).toBe("backwards");
   });

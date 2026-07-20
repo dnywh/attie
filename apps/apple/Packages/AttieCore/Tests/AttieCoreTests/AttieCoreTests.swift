@@ -16,26 +16,20 @@ struct AttieCoreTests {
         #expect(response.fixtures.first?.score.fullTime.home == .number(2))
     }
 
-    @Test("catalog includes FIFA World Cup as the first default soccer competition")
-    func catalogIncludesFIFAWorldCup() throws {
-        let data = Data(#""fifa-world-cup""#.utf8)
-        let competition = try JSONDecoder().decode(CompetitionKey.self, from: data)
-
-        #expect(competition == .fifaWorldCup)
+    @Test("catalog uses Premier League as the default soccer competition")
+    func catalogUsesPremierLeagueAsDefaultSoccerCompetition() {
         #expect(AttieCatalog.sports[.football]?.name == "Soccer")
-        #expect(Array(AttieCatalog.competitions(for: .football).prefix(2)) == [.fifaWorldCup, .premierLeague])
-        #expect(AttieCatalog.competitions[.fifaWorldCup]?.name == "FIFA World Cup")
-        #expect(AttieCatalog.competitions[.fifaWorldCup]?.isDefaultForSport == true)
-        #expect(AttieCatalog.defaultCompetition(for: .football) == .fifaWorldCup)
-        #expect(AttieCatalog.defaultCompetitions(for: .football) == [.fifaWorldCup, .premierLeague])
+        #expect(AttieCatalog.competitions(for: .football).first == .premierLeague)
+        #expect(AttieCatalog.defaultCompetition(for: .football) == .premierLeague)
+        #expect(AttieCatalog.defaultCompetitions(for: .football) == [.premierLeague])
     }
 
     @Test("fixture competition decodes optional tournament stage")
     func fixtureCompetitionDecodesStage() throws {
-        let data = Data(#"{"name":"FIFA World Cup","stage":"Round of 16"}"#.utf8)
+        let data = Data(#"{"name":"Tournament","stage":"Round of 16"}"#.utf8)
         let competition = try JSONDecoder().decode(FixtureCompetition.self, from: data)
 
-        #expect(competition.name == "FIFA World Cup")
+        #expect(competition.name == "Tournament")
         #expect(competition.stage == "Round of 16")
     }
 
@@ -149,8 +143,23 @@ struct AttieCoreTests {
 
         #expect(defaults.string(forKey: AttiePreferences.Key.sport) == "football")
         #expect(defaults.string(forKey: AttiePreferences.Key.direction) == "backwards")
-        #expect(preferences.competitions(for: .football) == [.fifaWorldCup, .premierLeague])
+        #expect(preferences.competitions(for: .football) == [.premierLeague])
         #expect(preferences.competitions(for: .basketball) == [.nba])
+    }
+
+    @Test("preferences ignore removed competition keys")
+    func preferencesIgnoreRemovedCompetitionKeys() throws {
+        let suiteName = "attie.tests.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let preferences = AttiePreferences(defaults: defaults)
+
+        defaults.set(
+            #"["fifa-world-cup","fa-cup"]"#,
+            forKey: AttiePreferences.Key.competitions(for: .football)
+        )
+
+        #expect(preferences.competitions(for: .football) == [.faCup])
     }
 
     @Test("watch fixture snapshots encode and decode")
@@ -184,7 +193,7 @@ struct AttieCoreTests {
         )
 
         #expect(selection.selectedSport == .football)
-        #expect(selection.selectedCompetitions == [.fifaWorldCup, .premierLeague])
+        #expect(selection.selectedCompetitions == [.premierLeague])
         #expect(selection.selectedDirection == .backwards)
     }
 
