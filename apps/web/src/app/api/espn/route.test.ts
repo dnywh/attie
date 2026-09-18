@@ -65,6 +65,22 @@ describe("ESPN provider route", () => {
     expect(body.meta.matchCount).toBe(31);
     expect(body.events).toHaveLength(31);
   });
+
+  it("rejects oversized scoreboard windows before calling ESPN", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch");
+
+    const response = await GET(
+      new Request(
+        "https://attie.test/api/espn?dateFrom=2026-01-01&dateTo=2026-03-15&direction=future&sport=soccer&league=eng.1"
+      )
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(body.error).toContain("Date range too large");
+    expect(body.error).toContain("60 days");
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
 });
 
 function espnEvent(

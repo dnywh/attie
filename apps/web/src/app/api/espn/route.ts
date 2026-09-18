@@ -11,6 +11,9 @@ const API_BASE_URL = "https://site.api.espn.com/apis/site/v2/sports";
 // ("Failed to get events endpoint."), so always fetch one day at a time.
 // Cap parallel requests to avoid hammering ESPN on longer windows.
 const MAX_PARALLEL_SCOREBOARD_FETCHES = 14;
+// Single-day fan-out makes unbounded windows dangerous. Attie's own UI asks
+// for ~28–32 padded days; reject anything well above that.
+const MAX_SCOREBOARD_WINDOW_DAYS = 60;
 const NO_STORE_HEADERS = {
   "Cache-Control": "no-store",
   Pragma: "no-cache",
@@ -64,6 +67,16 @@ export async function GET(request: Request) {
     limit,
   } = params.value;
   const requestedDates = generateDateRange(rawDateFrom, rawDateTo);
+
+  if (requestedDates.length > MAX_SCOREBOARD_WINDOW_DAYS) {
+    return NextResponse.json(
+      {
+        error: `Date range too large. Maximum is ${MAX_SCOREBOARD_WINDOW_DAYS} days.`,
+      },
+      { status: 400, headers: NO_STORE_HEADERS }
+    );
+  }
+
   const refreshToken =
     searchParams.get("_refresh") ?? `${Date.now()}-${Math.random()}`;
 
