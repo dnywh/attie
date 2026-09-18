@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { errorMessage, espnParams } from "@/utils/api/params";
-import { addDaysToDateString } from "@/utils/fixtureTime";
 import { generateDateRange } from "@/utils/dates";
 
 export const dynamic = "force-dynamic";
@@ -8,7 +7,10 @@ export const revalidate = 0;
 export const fetchCache = "force-no-store";
 
 const API_BASE_URL = "https://site.api.espn.com/apis/site/v2/sports";
-const MAX_SINGLE_DAY_SCOREBOARD_FETCHES = 14;
+// ESPN's multi-day `dates=FROM-TO` scoreboard endpoint now returns 400
+// ("Failed to get events endpoint."), so always fetch one day at a time.
+// Cap parallel requests to avoid hammering ESPN on longer windows.
+const MAX_PARALLEL_SCOREBOARD_FETCHES = 14;
 const NO_STORE_HEADERS = {
   "Cache-Control": "no-store",
   Pragma: "no-cache",
@@ -22,11 +24,6 @@ type EspnScoreboardEvent = {
 type EspnScoreboardPayload = {
   events?: EspnScoreboardEvent[];
 };
-
-const todayUtcDateString = (): string => new Date().toISOString().slice(0, 10);
-
-const isDateInRange = (date: string, dateFrom: string, dateTo: string): boolean =>
-  date >= dateFrom && date <= dateTo;
 
 const mergeEventsById = (
   eventGroups: EspnScoreboardEvent[][]
@@ -67,12 +64,6 @@ export async function GET(request: Request) {
     limit,
   } = params.value;
   const requestedDates = generateDateRange(rawDateFrom, rawDateTo);
-  const today = todayUtcDateString();
-  const liveSensitiveDates = [addDaysToDateString(today, -1), today].filter(
-    (date) => isDateInRange(date, rawDateFrom, rawDateTo)
-  );
-  const shouldFetchSingleDays =
-    requestedDates.length <= MAX_SINGLE_DAY_SCOREBOARD_FETCHES;
   const refreshToken =
     searchParams.get("_refresh") ?? `${Date.now()}-${Math.random()}`;
 
@@ -110,20 +101,24 @@ export async function GET(request: Request) {
     return (await response.json()) as EspnScoreboardPayload;
   };
 
+  const fetchScoreboardsForDates = async (
+    dates: string[]
+  ): Promise<EspnScoreboardPayload[]> => {
+    const payloads: EspnScoreboardPayload[] = [];
+
+    for (let i = 0; i < dates.length; i += MAX_PARALLEL_SCOREBOARD_FETCHES) {
+      const chunk = dates.slice(i, i + MAX_PARALLEL_SCOREBOARD_FETCHES);
+      const chunkPayloads = await Promise.all(
+        chunk.map((date) => fetchScoreboard(date.replace(/-/g, "")))
+      );
+      payloads.push(...chunkPayloads);
+    }
+
+    return payloads;
+  };
+
   try {
-    const rangeDates = `${rawDateFrom.replace(/-/g, "")}-${rawDateTo.replace(/-/g, "")}`;
-    const payloads = shouldFetchSingleDays
-      ? await Promise.all(
-          requestedDates.map((date) => fetchScoreboard(date.replace(/-/g, "")))
-        )
-      : [
-          await fetchScoreboard(rangeDates),
-          ...(await Promise.all(
-            liveSensitiveDates.map((date) =>
-              fetchScoreboard(date.replace(/-/g, ""))
-            )
-          )),
-        ];
+    const payloads = await fetchScoreboardsForDates(requestedDates);
     const events = mergeEventsById(
       payloads.map((payload) => payload.events ?? [])
     );

@@ -3,7 +3,6 @@ import { GET } from "./route";
 
 describe("ESPN provider route", () => {
   afterEach(() => {
-    vi.useRealTimers();
     vi.restoreAllMocks();
   });
 
@@ -35,46 +34,36 @@ describe("ESPN provider route", () => {
     expect(body.meta.matchCount).toBe(2);
   });
 
-  it("replaces broad range events with fresh recent single-day events", async () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-06-21T23:00:00Z"));
+  it("fetches long scoreboard windows as single days in parallel chunks", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockImplementation(
+      async (input) => {
+        const url = input.toString();
+        const dates = new URL(url).searchParams.get("dates") ?? "";
 
-    vi
-      .spyOn(globalThis, "fetch")
-      .mockResolvedValueOnce(
-        Response.json({
-          events: [
-            espnEvent("live", {
-              detail: "67'",
-              statusName: "STATUS_SECOND_HALF",
-            }),
-          ],
-        })
-      )
-      .mockResolvedValueOnce(Response.json({ events: [] }))
-      .mockResolvedValueOnce(
-        Response.json({
-          events: [
-            espnEvent("live", {
-              detail: "FT",
-              statusName: "STATUS_FINAL",
-            }),
-          ],
-        })
-      );
+        expect(dates).not.toContain("-");
+
+        return Response.json({
+          events: [espnEvent(`day-${dates}`)],
+        });
+      }
+    );
 
     const response = await GET(
       new Request(
-        "https://attie.test/api/espn?dateFrom=2026-06-01&dateTo=2026-07-01&direction=past&sport=soccer&league=eng.1&_refresh=fresh-456"
+        "https://attie.test/api/espn?dateFrom=2026-06-01&dateTo=2026-07-01&direction=future&sport=soccer&league=eng.1&_refresh=fresh-456"
       )
     );
     const body = await response.json();
 
-    expect(body.events).toHaveLength(1);
-    expect(body.events[0].competitions[0].status.type).toMatchObject({
-      name: "STATUS_FINAL",
-      shortDetail: "FT",
-    });
+    // Inclusive range: 1 June through 1 July is 31 days.
+    expect(fetchMock).toHaveBeenCalledTimes(31);
+    expect(
+      fetchMock.mock.calls.every(
+        ([request]) => !request?.toString().includes("dates=20260601-")
+      )
+    ).toBe(true);
+    expect(body.meta.matchCount).toBe(31);
+    expect(body.events).toHaveLength(31);
   });
 });
 
